@@ -20,8 +20,10 @@
         <button id="clearSearch" type="button" aria-label="清空搜索">清空</button>
       </div>
       <nav class="nav">
-        <a href="#roadmap">学习路线</a>
+        <a href="#glossary">术语表</a>
         <a href="#rl-foundations">RL 基础</a>
+        <a href="#cheatsheet">公式速查</a>
+        <a href="#roadmap">学习路线</a>
         <a href="#ppo">PPO</a>
         <a href="#dpo">DPO</a>
         <a href="#grpo">GRPO</a>
@@ -30,8 +32,6 @@
         <a href="#offline-rl">Offline RL</a>
         <a href="#diffusion-vla">Diffusion / VLA</a>
         <a href="#real-robot">真机后训练</a>
-        <a href="#cheatsheet">公式速查</a>
-        <a href="#glossary">术语表</a>
       </nav>
       <div class="progress-wrap">
         阅读进度
@@ -58,39 +58,74 @@
             <div class="stat"><b>12</b><span>核心章节</span></div>
             <div class="stat"><b>7+</b><span>流程与结构图</span></div>
             <div class="stat"><b>18+</b><span>主流算法卡片</span></div>
-            <div class="stat"><b>56</b><span>术语速查</span></div>
+            <div class="stat"><b>57</b><span>术语速查</span></div>
           </div>
         </div>
       </header>
 
       <div id="noResults" class="no-results">没有找到匹配内容。可以试试 “critic”、“KL”、“reward”、“VLA” 或算法缩写。</div>
 
-      <section id="roadmap" class="section" data-tags="roadmap 学习路线 robot llm vla">
-        <h2>学习路线</h2>
-        <p class="lead">建议先建立统一抽象，再按你的目标选择路线。机器人方向更重视连续控制、样本效率和安全；大模型方向更重视偏好、奖励、KL 约束和长序列稳定性。</p>
-        <div class="grid">
-          <article class="path-card" data-tags="机器人 优先 路线 SAC Offline VLA">
-            <h3>路线 A：机器人 RL 优先</h3>
-            <p>RL 基础循环 -> Value / Q / Advantage -> SAC 连续控制 -> Offline RL -> PPO -> VLA 真机闭环 -> LLM RLHF。</p>
-          </article>
-          <article class="path-card" data-tags="LLM 优先 路线 PPO DPO GRPO">
-            <h3>路线 B：LLM RL 优先</h3>
-            <p>RL 基础循环 -> LLM 的状态/动作/奖励 -> PPO-RLHF -> DPO -> GRPO -> Offline RL 分布问题 -> VLA。</p>
-          </article>
-          <article class="path-card" data-tags="工程 实现 路线 BC 数据 奖励">
-            <h3>路线 C：工程实现优先</h3>
-            <p>Behavior Cloning -> Offline Dataset -> SAC/PPO baseline -> Reward/Preference 数据 -> DPO/GRPO -> VLA 数据闭环。</p>
-          </article>
-        </div>
-        <div class="two-col">
-          <div class="note" data-tags="机器人 LLM 类比">
-            <h3>统一类比</h3>
-            <p>机器人状态是图像、本体状态和环境反馈；LLM 状态是 prompt 与已生成上下文。机器人动作是控制命令；LLM 动作是 token。奖励可以是任务成功、人工偏好、规则验证器或 learned critic。</p>
-          </div>
-          <div class="note" data-tags="on policy off policy offline">
-            <h3>三个数据模式</h3>
-            <p>On-policy 用当前策略刚采的数据；off-policy 可以复用旧数据和 replay buffer；offline RL 只用固定数据集。真机机器人通常偏好 off-policy/offline，因为真实交互贵且有风险。</p>
-          </div>
+      <section id="glossary" class="section" data-tags="glossary terms">
+        <h2>术语表</h2>
+        <p class="lead">常见名词的短定义。搜索框也会检索这一节。</p>
+        <div class="term-grid">
+          <div class="term" data-tags="强化学习"><b>强化学习</b><span>智能体通过与环境交互、获得奖励来学习决策策略的方法。</span></div>
+          <div class="term" data-tags="智能体 agent"><b>智能体</b><span>做出动作的学习系统，在机器人中是控制策略，在 LLM 中是生成模型。</span></div>
+          <div class="term" data-tags="环境 environment"><b>环境</b><span>智能体交互的外部系统，可以是真实世界、仿真器、用户或评测器。</span></div>
+          <div class="term" data-tags="状态 state"><b>状态</b><span>环境在某一时刻提供给智能体的信息。</span></div>
+          <div class="term" data-tags="观测 observation"><b>观测</b><span>智能体实际看到的数据，可能只是完整状态的一部分。</span></div>
+          <div class="term" data-tags="动作 action token"><b>动作</b><span>智能体选择的行为，机器人中可为控制命令，LLM 中可为 token。</span></div>
+          <div class="term" data-tags="奖励 reward"><b>奖励</b><span>评价动作好坏的标量信号，可以来自规则、人类、模型或真实任务结果。</span></div>
+          <div class="term" data-tags="策略 policy"><b>策略</b><span>从状态到动作概率分布的函数，通常记为 π(a|s)。</span></div>
+          <div class="term" data-tags="轨迹 trajectory"><b>轨迹</b><span>一串状态、动作、奖励组成的交互序列。</span></div>
+          <div class="term" data-tags="回报 return"><b>回报</b><span>从某一时刻开始累计得到的折扣奖励总和。</span></div>
+          <div class="term" data-tags="折扣因子 gamma"><b>折扣因子</b><span>控制未来奖励重要性的系数，通常记为 γ。</span></div>
+          <div class="term" data-tags="价值函数 value"><b>价值函数</b><span>估计某状态未来能获得多少回报的函数。</span></div>
+          <div class="term" data-tags="Q 函数 critic"><b>Q 函数</b><span>估计在某状态执行某动作后未来能获得多少回报的函数。</span></div>
+          <div class="term" data-tags="优势函数 advantage"><b>优势函数</b><span>衡量某动作相对该状态平均水平有多好。</span></div>
+          <div class="term" data-tags="MDP"><b>MDP</b><span>马尔可夫决策过程，是强化学习的标准数学模型。</span></div>
+          <div class="term" data-tags="on-policy"><b>On-policy</b><span>使用当前策略采集的数据来更新当前策略。</span></div>
+          <div class="term" data-tags="off-policy"><b>Off-policy</b><span>可以使用旧策略或其他策略采集的数据来训练当前策略。</span></div>
+          <div class="term" data-tags="online RL"><b>Online RL</b><span>训练过程中持续和环境交互、边采新数据边更新策略；可以是 on-policy，也可以是 off-policy。</span></div>
+          <div class="term" data-tags="offline RL"><b>Offline RL</b><span>只使用固定离线数据集训练策略，不再与环境在线交互。</span></div>
+          <div class="term" data-tags="behavior policy"><b>Behavior Policy</b><span>生成离线数据的原始策略。</span></div>
+          <div class="term" data-tags="distribution shift"><b>Distribution Shift</b><span>训练数据分布和策略实际访问分布不一致的问题。</span></div>
+          <div class="term" data-tags="OOD action"><b>OOD Action</b><span>数据分布之外的动作，容易导致价值函数错误外推。</span></div>
+          <div class="term" data-tags="policy gradient"><b>Policy Gradient</b><span>直接优化策略参数以提高期望回报的方法。</span></div>
+          <div class="term" data-tags="actor critic"><b>Actor-Critic</b><span>同时学习策略网络和价值网络的强化学习框架。</span></div>
+          <div class="term" data-tags="actor"><b>Actor</b><span>负责输出动作的策略模型。</span></div>
+          <div class="term" data-tags="critic"><b>Critic</b><span>负责评估状态或动作价值的模型。</span></div>
+          <div class="term" data-tags="replay buffer"><b>Replay Buffer</b><span>存储历史交互数据、供 off-policy 算法采样训练的数据池。</span></div>
+          <div class="term" data-tags="PPO"><b>PPO</b><span>一种限制策略更新幅度的稳定策略优化算法。</span></div>
+          <div class="term" data-tags="clipping"><b>Clipping</b><span>把概率比限制在一定范围内，防止策略更新过大。</span></div>
+          <div class="term" data-tags="importance ratio"><b>Importance Ratio</b><span>新策略与旧策略对同一动作赋予概率的比值。</span></div>
+          <div class="term" data-tags="KL"><b>KL 散度</b><span>衡量两个概率分布差异的指标，常用于限制模型偏离参考策略。</span></div>
+          <div class="term" data-tags="entropy"><b>Entropy Regularization</b><span>鼓励策略保持随机性，提升探索能力的正则项。</span></div>
+          <div class="term" data-tags="SAC"><b>SAC</b><span>Soft Actor-Critic，适合连续动作控制的 off-policy 算法。</span></div>
+          <div class="term" data-tags="soft Q"><b>Soft Q Function</b><span>包含熵奖励的 Q 函数，用于鼓励探索。</span></div>
+          <div class="term" data-tags="twin Q"><b>Twin Q Networks</b><span>使用两个 Q 网络降低价值高估风险的方法。</span></div>
+          <div class="term" data-tags="BC"><b>Behavior Cloning</b><span>通过模仿数据中的专家动作来训练策略。</span></div>
+          <div class="term" data-tags="CQL"><b>CQL</b><span>Conservative Q-Learning，通过压低数据外动作价值来提升 offline RL 稳定性。</span></div>
+          <div class="term" data-tags="RLHF"><b>RLHF</b><span>基于人类反馈的强化学习，常用于对齐大语言模型。</span></div>
+          <div class="term" data-tags="SFT"><b>SFT</b><span>监督微调，用人工标注回答训练基础模型。</span></div>
+          <div class="term" data-tags="reward model"><b>Reward Model</b><span>把回答质量映射成奖励分数的模型。</span></div>
+          <div class="term" data-tags="preference data"><b>Preference Data</b><span>由候选结果及人类偏好标签组成的数据。</span></div>
+          <div class="term" data-tags="pairwise preference"><b>Pairwise Preference</b><span>比较两个回答哪个更好的偏好形式。</span></div>
+          <div class="term" data-tags="chosen response"><b>Chosen Response</b><span>偏好数据中被认为更好的回答。</span></div>
+          <div class="term" data-tags="rejected response"><b>Rejected Response</b><span>偏好数据中被认为较差的回答。</span></div>
+          <div class="term" data-tags="DPO"><b>DPO</b><span>Direct Preference Optimization，直接用偏好对优化策略而不显式训练奖励模型。</span></div>
+          <div class="term" data-tags="reference model"><b>Reference Model</b><span>作为约束基准的冻结模型，用来防止策略偏离过大。</span></div>
+          <div class="term" data-tags="GRPO"><b>GRPO</b><span>Group Relative Policy Optimization，用组内相对奖励估计优势的策略优化方法。</span></div>
+          <div class="term" data-tags="group advantage"><b>Group Advantage</b><span>同一 prompt 下多个候选回答之间归一化得到的相对优势。</span></div>
+          <div class="term" data-tags="rollout"><b>Rollout</b><span>使用当前策略生成一批交互轨迹或回答样本的过程。</span></div>
+          <div class="term" data-tags="reward hacking"><b>Reward Hacking</b><span>模型利用奖励漏洞获得高分但实际行为不符合目标的现象。</span></div>
+          <div class="term" data-tags="VLA"><b>VLA 模型</b><span>Vision-Language-Action 模型，把视觉、语言和机器人状态映射为动作。</span></div>
+          <div class="term" data-tags="action chunking"><b>Action Chunking</b><span>一次预测未来多个连续动作，减少逐步决策噪声。</span></div>
+          <div class="term" data-tags="proprioception"><b>Proprioception</b><span>机器人自身状态信息，如关节角、速度、力矩等。</span></div>
+          <div class="term" data-tags="sim to real"><b>Sim-to-Real</b><span>把仿真中训练的策略迁移到真实机器人。</span></div>
+          <div class="term" data-tags="real to data"><b>Real-to-Data</b><span>从真实机器人执行中收集数据，用于继续训练和改进模型。</span></div>
+          <div class="term" data-tags="safety constraint"><b>Safety Constraint</b><span>限制策略行为避免危险动作的规则或模型约束。</span></div>
+          <div class="term" data-tags="human intervention"><b>Human Intervention</b><span>人在机器人失败或危险时接管控制，用于安全和数据收集。</span></div>
         </div>
       </section>
 
@@ -134,7 +169,95 @@
             <div class="formula"><button class="copy-formula">复制</button><pre>A^\pi(s,a) = Q^\pi(s,a) - V^\pi(s)</pre></div>
           </article>
         </div>
+
+        <div class="two-col">
+          <div class="note" data-tags="online offline RL data collection">
+            <h3>Online vs Offline：能不能继续采数据</h3>
+            <p><b>Online RL</b> 训练时策略会继续和环境交互：做动作、拿奖励、更新，再继续采样。它能主动探索和纠错，但真机成本高、风险高。<b>Offline RL</b> 只用固定数据集训练，不再向环境试错，所以更安全省钱，但最怕数据覆盖不足和 OOD action。</p>
+          </div>
+          <div class="note" data-tags="on-policy off-policy current policy replay buffer">
+            <h3>On-policy vs Off-policy：数据来自谁</h3>
+            <p><b>On-policy</b> 要求更新数据基本来自当前策略，例如 PPO rollout 后马上更新。<b>Off-policy</b> 允许用旧策略、专家、人类或 replay buffer 里的数据，例如 SAC、TD3、DQN。它更省样本，但要处理分布偏移和重要性校正。</p>
+          </div>
+        </div>
+
+        <table data-tags="online offline on-policy off-policy comparison">
+          <thead>
+            <tr><th>轴</th><th>核心问题</th><th>含义</th><th>典型例子</th><th>机器人 / VLA 启发</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Online RL</td><td>训练时还能采新数据吗</td><td>能，策略边和环境交互边更新。</td><td>PPO 在线 rollout；SAC 边采边放 replay buffer</td><td>适合仿真和可控真机闭环，但要管安全、成本和探索风险。</td></tr>
+            <tr><td>Offline RL</td><td>训练时还能采新数据吗</td><td>不能，只能用固定数据集。</td><td>CQL、IQL、TD3+BC、BC</td><td>适合昂贵真机数据和历史遥操作数据；核心难点是数据覆盖和保守更新。</td></tr>
+            <tr><td>On-policy</td><td>更新数据必须来自当前策略吗</td><td>基本必须，旧数据很快失效。</td><td>PPO、A2C、TRPO</td><td>更新稳定、逻辑清楚，但样本效率低，真机上通常要很谨慎。</td></tr>
+            <tr><td>Off-policy</td><td>更新数据必须来自当前策略吗</td><td>不必须，可以复用旧数据或别的策略数据。</td><td>SAC、TD3、DQN、RLPD</td><td>更适合真机，因为能复用 replay、示教和干预数据，但要防止分布偏移。</td></tr>
+          </tbody>
+        </table>
+        <p class="caption">不要把 online 等同于 on-policy：SAC 常见是 online + off-policy。也不要把 off-policy 等同于 offline：off-policy 可以一边采新数据，一边复用旧数据。</p>
       </section>
+
+      <section id="cheatsheet" class="section" data-tags="formula cheatsheet PPO DPO GRPO SAC CQL">
+        <h2>公式速查</h2>
+        <p class="lead">这一节不是为了背公式，而是为了知道每个算法在“优化什么”。公式块可以点击复制。</p>
+        <div class="grid">
+          <article class="algo-card" data-tags="policy gradient">
+            <h3>Policy Gradient</h3>
+            <div class="formula"><button class="copy-formula">复制</button><pre>nabla_theta J(theta) =
+E_{pi_theta}[ nabla_theta log pi_theta(a_t|s_t) A_t ]</pre></div>
+          </article>
+          <article class="algo-card" data-tags="KL regularization">
+            <h3>KL Regularization</h3>
+            <div class="formula"><button class="copy-formula">复制</button><pre>D_KL(pi_theta || pi_ref) =
+E_{y~pi_theta}[ log pi_theta(y|x) - log pi_ref(y|x) ]</pre></div>
+          </article>
+          <article class="algo-card" data-tags="reward model Bradley Terry">
+            <h3>Reward Model</h3>
+            <div class="formula"><button class="copy-formula">复制</button><pre>P(y_w > y_l | x) =
+sigma(r_phi(x,y_w) - r_phi(x,y_l))</pre></div>
+          </article>
+          <article class="algo-card" data-tags="advantage normalization">
+            <h3>Advantage Normalization</h3>
+            <div class="formula"><button class="copy-formula">复制</button><pre>A_hat = (A - mu_A) / (sigma_A + epsilon)</pre></div>
+          </article>
+          <article class="algo-card" data-tags="IQL expectile">
+            <h3>IQL Policy Update</h3>
+            <div class="formula"><button class="copy-formula">复制</button><pre>max_pi E_{(s,a)~D}[ exp(beta(Q(s,a)-V(s))) log pi(a|s) ]</pre></div>
+          </article>
+          <article class="algo-card" data-tags="AWAC">
+            <h3>AWAC</h3>
+            <div class="formula"><button class="copy-formula">复制</button><pre>max_pi E_D[ exp(A(s,a)/lambda) log pi(a|s) ]</pre></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="roadmap" class="section" data-tags="roadmap 学习路线 robot llm vla">
+        <h2>学习路线</h2>
+        <p class="lead">建议先建立统一抽象，再按你的目标选择路线。机器人方向更重视连续控制、样本效率和安全；大模型方向更重视偏好、奖励、KL 约束和长序列稳定性。</p>
+        <div class="grid">
+          <article class="path-card" data-tags="机器人 优先 路线 SAC Offline VLA">
+            <h3>路线 A：机器人 RL 优先</h3>
+            <p>RL 基础循环 -> Value / Q / Advantage -> SAC 连续控制 -> Offline RL -> PPO -> VLA 真机闭环 -> LLM RLHF。</p>
+          </article>
+          <article class="path-card" data-tags="LLM 优先 路线 PPO DPO GRPO">
+            <h3>路线 B：LLM RL 优先</h3>
+            <p>RL 基础循环 -> LLM 的状态/动作/奖励 -> PPO-RLHF -> DPO -> GRPO -> Offline RL 分布问题 -> VLA。</p>
+          </article>
+          <article class="path-card" data-tags="工程 实现 路线 BC 数据 奖励">
+            <h3>路线 C：工程实现优先</h3>
+            <p>Behavior Cloning -> Offline Dataset -> SAC/PPO baseline -> Reward/Preference 数据 -> DPO/GRPO -> VLA 数据闭环。</p>
+          </article>
+        </div>
+        <div class="two-col">
+          <div class="note" data-tags="机器人 LLM 类比">
+            <h3>统一类比</h3>
+            <p>机器人状态是图像、本体状态和环境反馈；LLM 状态是 prompt 与已生成上下文。机器人动作是控制命令；LLM 动作是 token。奖励可以是任务成功、人工偏好、规则验证器或 learned critic。</p>
+          </div>
+          <div class="note" data-tags="online offline on policy off policy">
+            <h3>两组容易混的轴</h3>
+            <p>Online/offline 说训练时能不能继续从环境采新数据；on/off-policy 说更新时能不能使用旧策略或其他策略的数据。SAC 常见是 online + off-policy；PPO 通常是 online + on-policy；CQL/IQL 属于 offline RL。</p>
+          </div>
+        </div>
+      </section>
+
 
       <section id="ppo" class="section" data-tags="PPO RLHF robot clipped objective KL GAE">
         <h2>PPO：稳定小步更新</h2>
@@ -632,103 +755,6 @@ a_{t:t+k}: 未来一段动作序列</pre>
           <li>上线前做离线动作回放检查</li>
           <li>评估包含成功率、安全事件、介入次数和泛化场景</li>
         </ul>
-      </section>
-
-      <section id="cheatsheet" class="section" data-tags="formula cheatsheet PPO DPO GRPO SAC CQL">
-        <h2>公式速查</h2>
-        <p class="lead">这一节不是为了背公式，而是为了知道每个算法在“优化什么”。公式块可以点击复制。</p>
-        <div class="grid">
-          <article class="algo-card" data-tags="policy gradient">
-            <h3>Policy Gradient</h3>
-            <div class="formula"><button class="copy-formula">复制</button><pre>nabla_theta J(theta) =
-E_{pi_theta}[ nabla_theta log pi_theta(a_t|s_t) A_t ]</pre></div>
-          </article>
-          <article class="algo-card" data-tags="KL regularization">
-            <h3>KL Regularization</h3>
-            <div class="formula"><button class="copy-formula">复制</button><pre>D_KL(pi_theta || pi_ref) =
-E_{y~pi_theta}[ log pi_theta(y|x) - log pi_ref(y|x) ]</pre></div>
-          </article>
-          <article class="algo-card" data-tags="reward model Bradley Terry">
-            <h3>Reward Model</h3>
-            <div class="formula"><button class="copy-formula">复制</button><pre>P(y_w > y_l | x) =
-sigma(r_phi(x,y_w) - r_phi(x,y_l))</pre></div>
-          </article>
-          <article class="algo-card" data-tags="advantage normalization">
-            <h3>Advantage Normalization</h3>
-            <div class="formula"><button class="copy-formula">复制</button><pre>A_hat = (A - mu_A) / (sigma_A + epsilon)</pre></div>
-          </article>
-          <article class="algo-card" data-tags="IQL expectile">
-            <h3>IQL Policy Update</h3>
-            <div class="formula"><button class="copy-formula">复制</button><pre>max_pi E_{(s,a)~D}[ exp(beta(Q(s,a)-V(s))) log pi(a|s) ]</pre></div>
-          </article>
-          <article class="algo-card" data-tags="AWAC">
-            <h3>AWAC</h3>
-            <div class="formula"><button class="copy-formula">复制</button><pre>max_pi E_D[ exp(A(s,a)/lambda) log pi(a|s) ]</pre></div>
-          </article>
-        </div>
-      </section>
-
-      <section id="glossary" class="section" data-tags="glossary terms">
-        <h2>术语表</h2>
-        <p class="lead">常见名词的短定义。搜索框也会检索这一节。</p>
-        <div class="term-grid">
-          <div class="term" data-tags="强化学习"><b>强化学习</b><span>智能体通过与环境交互、获得奖励来学习决策策略的方法。</span></div>
-          <div class="term" data-tags="智能体 agent"><b>智能体</b><span>做出动作的学习系统，在机器人中是控制策略，在 LLM 中是生成模型。</span></div>
-          <div class="term" data-tags="环境 environment"><b>环境</b><span>智能体交互的外部系统，可以是真实世界、仿真器、用户或评测器。</span></div>
-          <div class="term" data-tags="状态 state"><b>状态</b><span>环境在某一时刻提供给智能体的信息。</span></div>
-          <div class="term" data-tags="观测 observation"><b>观测</b><span>智能体实际看到的数据，可能只是完整状态的一部分。</span></div>
-          <div class="term" data-tags="动作 action token"><b>动作</b><span>智能体选择的行为，机器人中可为控制命令，LLM 中可为 token。</span></div>
-          <div class="term" data-tags="奖励 reward"><b>奖励</b><span>评价动作好坏的标量信号，可以来自规则、人类、模型或真实任务结果。</span></div>
-          <div class="term" data-tags="策略 policy"><b>策略</b><span>从状态到动作概率分布的函数，通常记为 π(a|s)。</span></div>
-          <div class="term" data-tags="轨迹 trajectory"><b>轨迹</b><span>一串状态、动作、奖励组成的交互序列。</span></div>
-          <div class="term" data-tags="回报 return"><b>回报</b><span>从某一时刻开始累计得到的折扣奖励总和。</span></div>
-          <div class="term" data-tags="折扣因子 gamma"><b>折扣因子</b><span>控制未来奖励重要性的系数，通常记为 γ。</span></div>
-          <div class="term" data-tags="价值函数 value"><b>价值函数</b><span>估计某状态未来能获得多少回报的函数。</span></div>
-          <div class="term" data-tags="Q 函数 critic"><b>Q 函数</b><span>估计在某状态执行某动作后未来能获得多少回报的函数。</span></div>
-          <div class="term" data-tags="优势函数 advantage"><b>优势函数</b><span>衡量某动作相对该状态平均水平有多好。</span></div>
-          <div class="term" data-tags="MDP"><b>MDP</b><span>马尔可夫决策过程，是强化学习的标准数学模型。</span></div>
-          <div class="term" data-tags="on-policy"><b>On-policy</b><span>使用当前策略采集的数据来更新当前策略。</span></div>
-          <div class="term" data-tags="off-policy"><b>Off-policy</b><span>可以使用旧策略或其他策略采集的数据来训练当前策略。</span></div>
-          <div class="term" data-tags="offline RL"><b>Offline RL</b><span>只使用固定离线数据集训练策略，不再与环境在线交互。</span></div>
-          <div class="term" data-tags="behavior policy"><b>Behavior Policy</b><span>生成离线数据的原始策略。</span></div>
-          <div class="term" data-tags="distribution shift"><b>Distribution Shift</b><span>训练数据分布和策略实际访问分布不一致的问题。</span></div>
-          <div class="term" data-tags="OOD action"><b>OOD Action</b><span>数据分布之外的动作，容易导致价值函数错误外推。</span></div>
-          <div class="term" data-tags="policy gradient"><b>Policy Gradient</b><span>直接优化策略参数以提高期望回报的方法。</span></div>
-          <div class="term" data-tags="actor critic"><b>Actor-Critic</b><span>同时学习策略网络和价值网络的强化学习框架。</span></div>
-          <div class="term" data-tags="actor"><b>Actor</b><span>负责输出动作的策略模型。</span></div>
-          <div class="term" data-tags="critic"><b>Critic</b><span>负责评估状态或动作价值的模型。</span></div>
-          <div class="term" data-tags="replay buffer"><b>Replay Buffer</b><span>存储历史交互数据、供 off-policy 算法采样训练的数据池。</span></div>
-          <div class="term" data-tags="PPO"><b>PPO</b><span>一种限制策略更新幅度的稳定策略优化算法。</span></div>
-          <div class="term" data-tags="clipping"><b>Clipping</b><span>把概率比限制在一定范围内，防止策略更新过大。</span></div>
-          <div class="term" data-tags="importance ratio"><b>Importance Ratio</b><span>新策略与旧策略对同一动作赋予概率的比值。</span></div>
-          <div class="term" data-tags="KL"><b>KL 散度</b><span>衡量两个概率分布差异的指标，常用于限制模型偏离参考策略。</span></div>
-          <div class="term" data-tags="entropy"><b>Entropy Regularization</b><span>鼓励策略保持随机性，提升探索能力的正则项。</span></div>
-          <div class="term" data-tags="SAC"><b>SAC</b><span>Soft Actor-Critic，适合连续动作控制的 off-policy 算法。</span></div>
-          <div class="term" data-tags="soft Q"><b>Soft Q Function</b><span>包含熵奖励的 Q 函数，用于鼓励探索。</span></div>
-          <div class="term" data-tags="twin Q"><b>Twin Q Networks</b><span>使用两个 Q 网络降低价值高估风险的方法。</span></div>
-          <div class="term" data-tags="BC"><b>Behavior Cloning</b><span>通过模仿数据中的专家动作来训练策略。</span></div>
-          <div class="term" data-tags="CQL"><b>CQL</b><span>Conservative Q-Learning，通过压低数据外动作价值来提升 offline RL 稳定性。</span></div>
-          <div class="term" data-tags="RLHF"><b>RLHF</b><span>基于人类反馈的强化学习，常用于对齐大语言模型。</span></div>
-          <div class="term" data-tags="SFT"><b>SFT</b><span>监督微调，用人工标注回答训练基础模型。</span></div>
-          <div class="term" data-tags="reward model"><b>Reward Model</b><span>把回答质量映射成奖励分数的模型。</span></div>
-          <div class="term" data-tags="preference data"><b>Preference Data</b><span>由候选结果及人类偏好标签组成的数据。</span></div>
-          <div class="term" data-tags="pairwise preference"><b>Pairwise Preference</b><span>比较两个回答哪个更好的偏好形式。</span></div>
-          <div class="term" data-tags="chosen response"><b>Chosen Response</b><span>偏好数据中被认为更好的回答。</span></div>
-          <div class="term" data-tags="rejected response"><b>Rejected Response</b><span>偏好数据中被认为较差的回答。</span></div>
-          <div class="term" data-tags="DPO"><b>DPO</b><span>Direct Preference Optimization，直接用偏好对优化策略而不显式训练奖励模型。</span></div>
-          <div class="term" data-tags="reference model"><b>Reference Model</b><span>作为约束基准的冻结模型，用来防止策略偏离过大。</span></div>
-          <div class="term" data-tags="GRPO"><b>GRPO</b><span>Group Relative Policy Optimization，用组内相对奖励估计优势的策略优化方法。</span></div>
-          <div class="term" data-tags="group advantage"><b>Group Advantage</b><span>同一 prompt 下多个候选回答之间归一化得到的相对优势。</span></div>
-          <div class="term" data-tags="rollout"><b>Rollout</b><span>使用当前策略生成一批交互轨迹或回答样本的过程。</span></div>
-          <div class="term" data-tags="reward hacking"><b>Reward Hacking</b><span>模型利用奖励漏洞获得高分但实际行为不符合目标的现象。</span></div>
-          <div class="term" data-tags="VLA"><b>VLA 模型</b><span>Vision-Language-Action 模型，把视觉、语言和机器人状态映射为动作。</span></div>
-          <div class="term" data-tags="action chunking"><b>Action Chunking</b><span>一次预测未来多个连续动作，减少逐步决策噪声。</span></div>
-          <div class="term" data-tags="proprioception"><b>Proprioception</b><span>机器人自身状态信息，如关节角、速度、力矩等。</span></div>
-          <div class="term" data-tags="sim to real"><b>Sim-to-Real</b><span>把仿真中训练的策略迁移到真实机器人。</span></div>
-          <div class="term" data-tags="real to data"><b>Real-to-Data</b><span>从真实机器人执行中收集数据，用于继续训练和改进模型。</span></div>
-          <div class="term" data-tags="safety constraint"><b>Safety Constraint</b><span>限制策略行为避免危险动作的规则或模型约束。</span></div>
-          <div class="term" data-tags="human intervention"><b>Human Intervention</b><span>人在机器人失败或危险时接管控制，用于安全和数据收集。</span></div>
-        </div>
       </section>
     </main>
   </div>
