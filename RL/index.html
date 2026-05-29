@@ -24,6 +24,7 @@
         <a href="#rl-foundations">RL 基础</a>
         <a href="#cheatsheet">公式速查</a>
         <a href="#roadmap">学习路线</a>
+        <a href="#robot-learning">Robot Learning 主线</a>
         <a href="#ppo">PPO</a>
         <a href="#dpo">DPO</a>
         <a href="#grpo">GRPO</a>
@@ -55,10 +56,10 @@
         <div class="hero-panel">
           <h3>这份手册怎么用</h3>
           <div class="stat-grid">
-            <div class="stat"><b>12</b><span>核心章节</span></div>
-            <div class="stat"><b>7+</b><span>流程与结构图</span></div>
+            <div class="stat"><b>13</b><span>核心章节</span></div>
+            <div class="stat"><b>8+</b><span>流程与结构图</span></div>
             <div class="stat"><b>18+</b><span>主流算法卡片</span></div>
-            <div class="stat"><b>57</b><span>术语速查</span></div>
+            <div class="stat"><b>65</b><span>术语速查</span></div>
           </div>
         </div>
       </header>
@@ -121,10 +122,18 @@
           <div class="term" data-tags="reward hacking"><b>Reward Hacking</b><span>模型利用奖励漏洞获得高分但实际行为不符合目标的现象。</span></div>
           <div class="term" data-tags="VLA"><b>VLA 模型</b><span>Vision-Language-Action 模型，把视觉、语言和机器人状态映射为动作。</span></div>
           <div class="term" data-tags="action chunking"><b>Action Chunking</b><span>一次预测未来多个连续动作，减少逐步决策噪声。</span></div>
+          <div class="term" data-tags="action space"><b>Action Space</b><span>策略可输出的动作集合，机器人中可以是关节力矩、速度、末端位姿增量或 action chunk。</span></div>
           <div class="term" data-tags="proprioception"><b>Proprioception</b><span>机器人自身状态信息，如关节角、速度、力矩等。</span></div>
+          <div class="term" data-tags="sparse reward"><b>Sparse Reward</b><span>只在成功或失败时给奖励，信号稀少但不容易被奖励黑客利用。</span></div>
+          <div class="term" data-tags="reward shaping"><b>Reward Shaping</b><span>加入距离、姿态、接触等中间奖励，让学习更快，但设计不好会诱导错误行为。</span></div>
+          <div class="term" data-tags="reset"><b>Reset</b><span>把环境恢复到下一次训练可开始的状态，真机 reset 成本常常决定算法能不能落地。</span></div>
+          <div class="term" data-tags="domain randomization"><b>Domain Randomization</b><span>在仿真中随机化纹理、质量、摩擦、光照等因素，提高策略迁移到真机的鲁棒性。</span></div>
+          <div class="term" data-tags="system identification"><b>System Identification</b><span>根据真实机器人数据估计动力学、摩擦、延迟等参数，让仿真更接近现实。</span></div>
           <div class="term" data-tags="sim to real"><b>Sim-to-Real</b><span>把仿真中训练的策略迁移到真实机器人。</span></div>
           <div class="term" data-tags="real to data"><b>Real-to-Data</b><span>从真实机器人执行中收集数据，用于继续训练和改进模型。</span></div>
+          <div class="term" data-tags="teleoperation"><b>Teleoperation</b><span>人通过手柄、VR、示教器或遥操作设备控制机器人，用来收集示教数据。</span></div>
           <div class="term" data-tags="safety constraint"><b>Safety Constraint</b><span>限制策略行为避免危险动作的规则或模型约束。</span></div>
+          <div class="term" data-tags="safety shield"><b>Safety Shield</b><span>部署在策略和机器人之间的安全层，负责裁剪、拒绝或替换危险动作。</span></div>
           <div class="term" data-tags="human intervention"><b>Human Intervention</b><span>人在机器人失败或危险时接管控制，用于安全和数据收集。</span></div>
         </div>
       </section>
@@ -255,6 +264,102 @@ sigma(r_phi(x,y_w) - r_phi(x,y_l))</pre></div>
             <h3>两组容易混的轴</h3>
             <p>Online/offline 说训练时能不能继续从环境采新数据；on/off-policy 说更新时能不能使用旧策略或其他策略的数据。SAC 常见是 online + off-policy；PPO 通常是 online + on-policy；CQL/IQL 属于 offline RL。</p>
           </div>
+        </div>
+      </section>
+
+      <section id="robot-learning" class="section" data-tags="robot learning MDP observation action reward data safety">
+        <h2>Robot Learning 主线：先把真实任务翻译成 RL</h2>
+        <p class="lead">如果只背 PPO、SAC、CQL，很容易觉得 RL 还是散的。机器人 RL 更像一条工程链：先定义任务和可观测信息，再选动作空间、奖励、数据来源和安全边界，最后才轮到算法。</p>
+
+        <svg class="diagram" viewBox="0 0 980 330" role="img" aria-label="Robot learning problem formulation">
+          <defs>
+            <marker id="arrowRobot" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="#9fb0c3"></path>
+            </marker>
+          </defs>
+          <rect class="box-warn" x="44" y="72" width="150" height="70" rx="8"></rect>
+          <text x="119" y="101" text-anchor="middle">Task</text>
+          <text class="muted" x="119" y="123" text-anchor="middle">success + reset</text>
+          <line x1="194" y1="107" x2="258" y2="107" stroke="#9fb0c3" stroke-width="2" marker-end="url(#arrowRobot)"></line>
+          <rect class="box" x="258" y="48" width="165" height="118" rx="8"></rect>
+          <text x="340" y="83" text-anchor="middle">MDP Design</text>
+          <text class="muted" x="340" y="110" text-anchor="middle">obs / action</text>
+          <text class="muted" x="340" y="134" text-anchor="middle">horizon / reward</text>
+          <line x1="423" y1="107" x2="487" y2="107" stroke="#9fb0c3" stroke-width="2" marker-end="url(#arrowRobot)"></line>
+          <rect class="box-accent" x="487" y="48" width="165" height="118" rx="8"></rect>
+          <text x="570" y="83" text-anchor="middle">Data</text>
+          <text class="muted" x="570" y="110" text-anchor="middle">demo / sim</text>
+          <text class="muted" x="570" y="134" text-anchor="middle">rollout / replay</text>
+          <line x1="652" y1="107" x2="716" y2="107" stroke="#9fb0c3" stroke-width="2" marker-end="url(#arrowRobot)"></line>
+          <rect class="box" x="716" y="48" width="190" height="118" rx="8"></rect>
+          <text x="811" y="83" text-anchor="middle">Learning</text>
+          <text class="muted" x="811" y="110" text-anchor="middle">BC / offline RL</text>
+          <text class="muted" x="811" y="134" text-anchor="middle">off-policy update</text>
+          <path d="M811 166 C800 235, 675 265, 560 244" stroke="#9fb0c3" stroke-width="2" fill="none" marker-end="url(#arrowRobot)"></path>
+          <rect class="box-danger" x="292" y="210" width="185" height="74" rx="8"></rect>
+          <text x="384" y="239" text-anchor="middle">Safety Layer</text>
+          <text class="muted" x="384" y="263" text-anchor="middle">limits / shield / stop</text>
+          <rect class="box-warn" x="542" y="210" width="185" height="74" rx="8"></rect>
+          <text x="635" y="239" text-anchor="middle">Evaluation</text>
+          <text class="muted" x="635" y="263" text-anchor="middle">success / damage / drift</text>
+          <line x1="542" y1="247" x2="477" y2="247" stroke="#9fb0c3" stroke-width="2" marker-end="url(#arrowRobot)"></line>
+          <path d="M292 247 C155 240, 102 180, 119 142" stroke="#9fb0c3" stroke-width="2" fill="none" marker-end="url(#arrowRobot)"></path>
+        </svg>
+        <p class="caption">机器人 RL 的核心不是“直接把 PPO 跑在机械臂上”，而是把任务、数据、安全和评估连成闭环。算法只是闭环里的更新器。</p>
+
+        <div class="two-col">
+          <div class="note" data-tags="robot MDP observation action reward">
+            <h3>一个机器人任务怎么变成 MDP</h3>
+            <p>先问五个问题：机器人看见什么，能控制什么，什么时候算成功，失败后怎么 reset，一小时能安全试多少次。答案会决定你该用 BC、offline RL、SAC、PPO、residual RL 还是 VLA critic。</p>
+          </div>
+          <div class="note" data-tags="robot reward sparse shaped learned">
+            <h3>奖励不是越密越好</h3>
+            <p>稀疏成功奖励干净但难学；距离、姿态、接触等 shaped reward 学得快但容易学偏；learned reward/VLA-Critic 表达强但要防 reward hacking。真机里常把成功判定、人类介入和安全惩罚混合使用。</p>
+          </div>
+        </div>
+
+        <table data-tags="robot learning formulation table">
+          <thead>
+            <tr><th>建模环节</th><th>你要决定什么</th><th>常见选择</th><th>选错会怎样</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Observation</td><td>策略输入哪些信息</td><td>RGB/深度、腕部相机、本体状态、触觉、语言指令</td><td>缺关键状态会变成部分可观测问题，策略看起来随机失败。</td></tr>
+            <tr><td>Action</td><td>策略输出控制什么</td><td>关节位置/速度、末端位姿增量、夹爪命令、action chunk</td><td>动作太底层难学且危险；动作太高层又可能限制精细接触。</td></tr>
+            <tr><td>Reward</td><td>什么行为应该被强化</td><td>成功奖励、距离 shaping、人工偏好、规则验证器、learned critic</td><td>奖励写偏会让机器人学会投机，比如撞过去、绕开任务或卡判定。</td></tr>
+            <tr><td>Reset</td><td>失败后如何重新开始</td><td>人工 reset、自动归位、多初始状态、仿真并行 reset</td><td>reset 慢会让 online RL 极贵；初始状态太单一会过拟合。</td></tr>
+            <tr><td>Data</td><td>第一批数据从哪来</td><td>遥操作示教、脚本控制器、仿真、历史日志、当前策略 rollout</td><td>没有好初始数据就在线探索，真机容易又慢又危险。</td></tr>
+            <tr><td>Safety</td><td>哪些动作永远不能执行</td><td>工作空间、速度/力限制、碰撞检测、shield、人类接管</td><td>策略训练初期最会犯低级错误，安全层缺失会直接损坏设备。</td></tr>
+          </tbody>
+        </table>
+
+        <div class="details open" data-tags="pick place robot rl workflow">
+          <button type="button">例子：Pick-and-Place 任务怎么落地</button>
+          <div class="body">
+            <ol>
+              <li>定义成功：物体进入目标区域并稳定停留；定义失败：掉落、碰撞、超时或人类接管。</li>
+              <li>选 observation：外部相机 + 腕部相机 + 末端位姿 + 夹爪开合；先不要把无关传感器全塞进去。</li>
+              <li>选 action：末端位姿增量 + 夹爪命令，或一次输出未来 5 到 10 步 action chunk。</li>
+              <li>收集 50 到 500 条示教，先训练 BC，让策略进入“能偶尔成功”的分布。</li>
+              <li>用小规模安全 rollout 记录成功、失败、介入和碰撞，放入 replay buffer。</li>
+              <li>如果奖励清楚，用 SAC/AWAC/RLPD；如果只有固定示教，用 IQL/CQL/TD3+BC；如果已有强 VLA，用 residual RL 或 critic-guided 后训练。</li>
+              <li>每轮只小步更新，比较成功率、介入率、碰撞率、动作平滑度和新物体/新位置泛化。</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="grid">
+          <article class="algo-card" data-tags="when not to use RL robot">
+            <h3>什么时候先别用 RL</h3>
+            <p>如果任务能用规则控制器稳定完成，或者连成功判定和 reset 都没定义清楚，先做工程基线。RL 会放大未定义目标。</p>
+          </article>
+          <article class="algo-card" data-tags="when to use RL robot">
+            <h3>什么时候 RL 值得上</h3>
+            <p>当接触、摩擦、柔性物体、长尾失败、微小动作修正让手写控制器很难覆盖时，RL 的试错改进才有价值。</p>
+          </article>
+          <article class="algo-card" data-tags="robot learning default recipe">
+            <h3>真机默认配方</h3>
+            <p>BC/VLA 初始化，加安全层和 replay buffer，再用 off-policy、offline 或 residual RL 小步改进。真机从零 on-policy RL 通常不是第一选择。</p>
+          </article>
         </div>
       </section>
 
@@ -519,6 +624,19 @@ Loss_{GRPO} =
         <h2>机器人 RL 算法族</h2>
         <p class="lead">机器人强化学习的关键词是样本效率、安全和动作表达。多数真实项目不是 RL from scratch，而是 BC/示教起步，再通过 offline/off-policy/residual RL 小心改进。</p>
 
+        <table data-tags="robot rl algorithm selection">
+          <thead>
+            <tr><th>任务/数据状态</th><th>优先路线</th><th>为什么</th><th>常见坑</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>仿真可并行、奖励清楚</td><td>PPO 或 SAC</td><td>可以大量试错，PPO 稳，SAC 样本效率高。</td><td>仿真成功不代表真机成功，要做 domain randomization 和真机小批验证。</td></tr>
+            <tr><td>真机连续控制、有安全 rollout</td><td>SAC / TD3 / RLPD</td><td>off-policy 能复用 replay buffer 和示教数据。</td><td>critic 过估计、探索动作危险，需要动作限幅和保守更新。</td></tr>
+            <tr><td>只有固定示教数据</td><td>BC -> IQL/CQL/TD3+BC</td><td>不能在线试错时，先保持在数据支持范围内变好。</td><td>数据覆盖不足时，offline RL 不会凭空学会新技能。</td></tr>
+            <tr><td>已有控制器或 VLA，但细节差</td><td>Residual RL / AWAC</td><td>让 RL 学小修正，减少破坏基础能力的风险。</td><td>残差范围过大就变成危险探索；过小又改不动。</td></tr>
+            <tr><td>稀疏成功奖励、目标条件任务</td><td>HER + off-policy RL</td><td>失败轨迹也能重标成有用数据。</td><td>目标表示要清楚，否则 hindsight label 没意义。</td></tr>
+          </tbody>
+        </table>
+
         <div class="grid">
           <article class="algo-card" data-tags="BC behavior cloning imitation">
             <div class="meta"><span>离线</span><span>模仿学习</span></div>
@@ -590,6 +708,24 @@ Loss_{GRPO} =
           <text x="725" y="202" text-anchor="middle">Twin Critics Q1/Q2</text>
           <text class="muted" x="725" y="228" text-anchor="middle">+ entropy alpha</text>
         </svg>
+
+        <div class="details open" data-tags="robot rl troubleshooting">
+          <button type="button">机器人 RL 失败诊断表</button>
+          <div class="body">
+            <table>
+              <thead>
+                <tr><th>现象</th><th>更可能的原因</th><th>优先处理</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>仿真很好，真机很差</td><td>视觉、摩擦、延迟、相机标定或动力学差异</td><td>做 system identification、domain randomization、真机小样本校准。</td></tr>
+                <tr><td>BC 训练 loss 低，上机失败</td><td>covariate shift，策略遇到示教没覆盖的状态</td><td>收集失败状态示教、DAgger、人类介入数据或加 recovery policy。</td></tr>
+                <tr><td>RL 成功率涨，但动作很危险</td><td>奖励没惩罚安全成本，或探索范围太大</td><td>加 safety constraint、action clipping、shield、KL/BC 正则和介入惩罚。</td></tr>
+                <tr><td>Offline RL 评估高，上机低</td><td>Q 函数对 OOD 动作过估计</td><td>用 CQL/IQL/TD3+BC，限制策略离数据动作太远。</td></tr>
+                <tr><td>奖励一直没信号</td><td>任务太稀疏，随机探索到不了成功区域</td><td>先 BC 初始化、课程学习、HER、分阶段奖励或自动 reset。</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </section>
 
       <section id="offline-rl" class="section" data-tags="offline RL CQL IQL TD3+BC OOD distribution shift">
