@@ -313,7 +313,7 @@ const vlaMapData = {
       title: "RT-2：把动作当作另一种语言",
       sourceTitle: "RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control",
       sourceUrl: "https://robotics-transformer2.github.io/",
-      imageUrl: "https://robotics-transformer2.github.io/img/fig2.png",
+      imageUrl: "./assets/figures/rt2-approach.png",
       originalFigure: "项目页 Approach Overview / 论文核心图：看 image + prompt 如何进入 VLM，并把 action token de-tokenize 成机器人动作。",
       simplified: [
         "输入当前图像和问题模板：What should the robot do to <task>?",
@@ -327,7 +327,7 @@ const vlaMapData = {
       title: "OpenVLA：开源 VLM 到动作 token 的基线",
       sourceTitle: "OpenVLA: An Open-Source Vision-Language-Action Model",
       sourceUrl: "https://openvla.github.io/",
-      imageUrl: "https://openvla.github.io/static/images/openvla_model.jpg",
+      imageUrl: "./assets/figures/openvla-model.jpg",
       originalFigure: "项目页 The OpenVLA Model / 论文模型架构图：DINOv2 + SigLIP、MLP projector、Llama 2 7B 和 Action De-Tokenizer。",
       simplified: [
         "多视角/单视角图像进入 DINOv2 与 SigLIP 融合视觉编码器。",
@@ -341,7 +341,7 @@ const vlaMapData = {
       title: "Octo：通用策略 + Diffusion Action Head",
       sourceTitle: "Octo: An Open-Source Generalist Robot Policy",
       sourceUrl: "https://octo-models.github.io/",
-      imageUrl: "https://octo-models.github.io/architecture.jpg",
+      imageUrl: "./assets/figures/octo-architecture.jpg",
       originalFigure: "项目页 The Model / 论文 model architecture 图：task tokens、observation tokens、Octo Transformer、readout token 和 action head。",
       simplified: [
         "语言或 goal image 变成 task tokens，历史图像和 state 变成 observation tokens。",
@@ -355,6 +355,7 @@ const vlaMapData = {
       title: "π0 / OpenPI：VLM Backbone + Flow Action Expert",
       sourceTitle: "π0: A Vision-Language-Action Flow Model for General Robot Control",
       sourceUrl: "https://www.pi.website/blog/pi0",
+      imageUrl: "./assets/figures/pi0-framework.png",
       originalFigure: "官方 blog 的 cross-embodiment training 图和 π0 论文 overview/framework 图：重点看 pre-trained VLM、cross-embodiment data 与 Action Expert。",
       simplified: [
         "从预训练 VLM 继承视觉语义和语言理解。",
@@ -368,6 +369,7 @@ const vlaMapData = {
       title: "FAST：把连续动作序列压缩成高效 token",
       sourceTitle: "FAST: Efficient Action Tokenization for Vision-Language-Action Models",
       sourceUrl: "https://arxiv.org/abs/2501.09747",
+      imageUrl: "./assets/figures/fast-tokenizer.png",
       originalFigure: "论文的 FAST tokenizer 图：重点看动作 chunk 如何经过频域/量化/BPE 式压缩，再接入 next-token prediction。",
       simplified: [
         "先把一段连续动作 chunk 当作多维时间序列。",
@@ -381,7 +383,7 @@ const vlaMapData = {
       title: "GR00T N1/N1.7：System 2 语义 + System 1 动作生成",
       sourceTitle: "NVIDIA Isaac GR00T N1 Technical Blog / GR00T N1.7 Model Card",
       sourceUrl: "https://developer.nvidia.com/blog/accelerate-generalist-humanoid-robot-development-with-nvidia-isaac-gr00t-n1/",
-      imageUrl: "https://developer-blogs.nvidia.com/wp-content/uploads/2025/03/gr00t-n1-model-architecture-1024x576.png",
+      imageUrl: "./assets/figures/gr00t-n1-architecture.png",
       originalFigure: "NVIDIA 技术博客 Figure 2：传感器/文本 token 进入 VLM System 2，再由 Diffusion Transformer System 1 生成 humanoid action。",
       simplified: [
         "传感器图像、文本指令和 proprioception 编码成多模态 tokens。",
@@ -395,7 +397,7 @@ const vlaMapData = {
       title: "DreamZero：WAM 同时预测未来视频和动作",
       sourceTitle: "DreamZero: World Action Models are Zero-shot Policies",
       sourceUrl: "https://dreamzero0.github.io/",
-      imageUrl: "https://dreamzero0.github.io/images/project_overview.png",
+      imageUrl: "./assets/figures/dreamzero-overview.png",
       originalFigure: "项目页 DreamZero Method Overview / 论文总览图：看 World Action Model 如何用 video、language、proprio 联合生成 future videos 与 continuous actions。",
       simplified: [
         "输入历史视频、语言指令和 proprioception，而不是只输入当前帧。",
@@ -409,6 +411,7 @@ const vlaMapData = {
       title: "Figure Helix：高频上身控制的快慢系统",
       sourceTitle: "Helix: A Vision-Language-Action Model for Generalist Humanoid Control",
       sourceUrl: "https://www.figure.ai/news/helix",
+      imageUrl: "./assets/figures/helix-system12.png",
       originalFigure: "官方 blog 的 System 1 / System 2 架构段落与多机器人协作视频：重点看 S2 低频语义 latent 如何喂给 S1 高频 visuomotor policy。",
       simplified: [
         "S2 是 onboard VLM，以较低频率理解场景、语言和任务语义。",

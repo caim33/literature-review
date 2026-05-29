@@ -87,6 +87,8 @@ for (const figure of data.paperFigureGuides) {
   assert.ok(figure.title, "paper figure guide needs title");
   assert.ok(figure.sourceTitle, `${figure.title} needs sourceTitle`);
   assert.ok(figure.sourceUrl?.startsWith("http"), `${figure.title} needs source URL`);
+  assert.ok(figure.imageUrl?.startsWith("./assets/figures/"), `${figure.title} should use a local figure asset`);
+  assert.ok(existsSync(path.join(__dirname, figure.imageUrl.replace("./", ""))), `${figure.title} local figure asset should exist`);
   assert.ok(figure.originalFigure, `${figure.title} needs original figure description`);
   assert.ok(Array.isArray(figure.simplified) && figure.simplified.length >= 3, `${figure.title} needs simplified steps`);
 }
