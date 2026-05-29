@@ -27,6 +27,184 @@ const wmMapData = {
       meaning: "A generative model with a step-like interface: it reacts to actions over time, so agents can train, evaluate, or plan inside it."
     }
   ],
+  foundations: [
+    {
+      term: "Agent",
+      analogy: "做决定的人",
+      meaning: "在机器人里通常是策略模型或控制系统；它根据观测和目标选择动作。",
+      robotExample: "VLA 看到桌面图像和指令“把杯子放进水槽”，输出一段手臂动作。"
+    },
+    {
+      term: "Environment",
+      analogy: "被行动改变的世界",
+      meaning: "机器人交互的外部系统，可以是真实厨房、仿真器、数据集回放器，或者一个学出来的交互模拟器。",
+      robotExample: "杯子、桌面、人的干预、相机延迟和机械臂动力学都属于环境的一部分。"
+    },
+    {
+      term: "State / Observation",
+      analogy: "真实世界 vs 你看到的画面",
+      meaning: "state 是完整世界状态；observation 是智能体实际拿到的信息。机器人通常只能看到 RGB、深度、本体状态和少量传感器。",
+      robotExample: "杯子内部是否有水是真实状态；相机被手挡住时，模型只拿到部分观测。"
+    },
+    {
+      term: "Action",
+      analogy: "你准备怎么动",
+      meaning: "动作可以是关节位置、末端位姿、速度、gripper 开合、action chunk、键鼠输入或高层子目标。",
+      robotExample: "连续 16 步的 delta end-effector pose 就是一段 action chunk。"
+    },
+    {
+      term: "Transition Model",
+      analogy: "如果这样做，下一秒会怎样",
+      meaning: "world model 的核心：学习动作如何把当前状态或观测变成未来状态、未来观测或未来 latent。",
+      robotExample: "如果夹爪从左侧推杯子，模型预测杯子会向右滑、可能碰到盘子。"
+    },
+    {
+      term: "Rollout / Imagination",
+      analogy: "在脑内试演几步",
+      meaning: "给模型一串候选动作，让它一步步预测未来。rollout 可以在像素、latent、reward/value 或任务进度空间里发生。",
+      robotExample: "机器人先想象三种抓取轨迹，选最不容易碰撞的一条执行。"
+    },
+    {
+      term: "Planning / Reranking",
+      analogy: "想完再选",
+      meaning: "利用 WM 预测结果给候选动作打分，选择最可能成功、风险最低或进度最大的动作。",
+      robotExample: "VLA 提出 8 个动作候选，WM 预测其中两个会碰撞，reranker 选择安全的那个。"
+    },
+    {
+      term: "Model Bias",
+      analogy: "脑补错了还很自信",
+      meaning: "学出来的模型和真实世界不一致，策略可能利用模型漏洞，在想象中成功但真机失败。",
+      robotExample: "WM 没学好摩擦，想象里杯子会滑到目标点，真机上却卡住。"
+    }
+  ],
+  modelFreeVsModelBased: [
+    {
+      axis: "学什么",
+      modelFree: "直接学策略或价值：看到什么就做什么，或估计这个动作值不值。",
+      modelBased: "额外学世界如何变化：执行动作后，未来状态、观测、奖励或风险会怎样。",
+      robotTakeaway: "VLA 多数偏 model-free policy；WM 给它补上后果预测。"
+    },
+    {
+      axis: "数据效率",
+      modelFree: "常需要大量真实交互或示教数据，因为每个动作后果都要从数据里见过。",
+      modelBased: "可以在模型里做 imagined rollout，用较少真实数据试更多候选。",
+      robotTakeaway: "真机数据贵，所以机器人特别需要 WM 或仿真器帮忙省试错。"
+    },
+    {
+      axis: "部署方式",
+      modelFree: "推理快：输入观测，直接输出动作。",
+      modelBased: "推理慢一些：要预测未来、搜索或重排候选动作。",
+      robotTakeaway: "常见混合方案是 VLA 快速提议，WM 在关键时刻慢速校验。"
+    },
+    {
+      axis: "主要风险",
+      modelFree: "遇到分布外场景容易反应错，且不一定知道自己会失败。",
+      modelBased: "模型误差会累积，策略可能钻模型漏洞。",
+      robotTakeaway: "真实系统通常需要 uncertainty、safety filter 和真机反馈闭环。"
+    },
+    {
+      axis: "评估重点",
+      modelFree: "看真实任务成功率、泛化、动作稳定性和延迟。",
+      modelBased: "除了成功率，还要看预测是否可控、闭环是否稳定、是否提升规划。",
+      robotTakeaway: "漂亮视频不是最终指标；能不能让机器人少失败才是指标。"
+    }
+  ],
+  predictionTargets: [
+    {
+      name: "未来像素 / 视频",
+      predicts: "未来几帧 RGB、深度或多视角视频。",
+      usefulFor: "目标图像控制、可视化调试、生成数据、交互式模拟器。",
+      caution: "视频清晰不代表动作可控，也不代表接触物理正确。"
+    },
+    {
+      name: "Latent State",
+      predicts: "压缩后的 belief state、离散 token 或连续 hidden state。",
+      usefulFor: "Dreamer/PlaNet/TD-MPC 式规划和想象学习。",
+      caution: "latent 看不见，必须用下游控制效果验证它是否有用。"
+    },
+    {
+      name: "Reward / Value / Q",
+      predicts: "动作之后能获得多少回报，或某个未来状态有多好。",
+      usefulFor: "MPC、MCTS、candidate reranking、policy improvement。",
+      caution: "只预测价值可能不可解释，而且容易被策略 exploit。"
+    },
+    {
+      name: "Success / Failure / Progress",
+      predicts: "任务是否会成功、是否卡住、当前做到哪一步。",
+      usefulFor: "长程 household task、失败恢复、human intervention 触发。",
+      caution: "需要明确任务阶段标签或从轨迹中学 progress。"
+    },
+    {
+      name: "Contact / Force / Collision",
+      predicts: "手、物体、桌面、身体之间的接触和碰撞风险。",
+      usefulFor: "双手操作、人形 whole-body feasibility、安全过滤。",
+      caution: "纯视觉数据常常不够，最好结合本体、力觉或仿真标签。"
+    },
+    {
+      name: "Occupancy / 3D / Scene State",
+      predicts: "空间占据、物体 pose、agent 运动、可通行区域。",
+      usefulFor: "移动操作、人形导航、自动驾驶闭环仿真。",
+      caution: "3D 表示适合空间，但未必能处理灵巧接触细节。"
+    }
+  ],
+  robotWorkflow: [
+    {
+      step: "1",
+      title: "观测当前世界",
+      detail: "机器人读取 RGB/深度、本体状态、历史动作和语言目标，形成当前上下文。"
+    },
+    {
+      step: "2",
+      title: "VLA 或 planner 生成候选",
+      detail: "策略先给出若干 action chunk、末端轨迹、子目标或技能调用。"
+    },
+    {
+      step: "3",
+      title: "WM 想象后果",
+      detail: "对每个候选动作做短 horizon rollout，预测未来图像、latent、成功率、碰撞或进度。"
+    },
+    {
+      step: "4",
+      title: "Scorer / safety filter 重排",
+      detail: "把任务成功、风险、平滑性、可达性和安全约束合成分数，选出最合适的动作。"
+    },
+    {
+      step: "5",
+      title: "Controller 执行",
+      detail: "低层控制器把动作变成关节命令、全身平衡、抓取闭环和碰撞规避。"
+    },
+    {
+      step: "6",
+      title: "真实反馈回流",
+      detail: "执行结果、失败、人工接管和纠错数据回到数据池，用于更新 VLA、WM 或 critic。"
+    }
+  ],
+  misconceptions: [
+    {
+      myth: "会生成视频就是 World Model",
+      reality: "不够。机器人 WM 至少要能被动作控制，并且预测结果能服务规划、评估或训练。"
+    },
+    {
+      myth: "视频越清晰，机器人越会做事",
+      reality: "画质和控制能力不是一回事。机器人更需要可控性、接触正确性和闭环稳定。"
+    },
+    {
+      myth: "WM 一定要预测像素",
+      reality: "不一定。很多强 WM 预测 latent、reward、value、Q、occupancy 或 progress。"
+    },
+    {
+      myth: "有了 WM 就不需要 VLA",
+      reality: "短期更现实的是混合系统：VLA 负责语义和动作提议，WM 负责想象、校验和重排。"
+    },
+    {
+      myth: "长视频生成等于长程规划",
+      reality: "长程规划还需要目标、价值、可执行动作、纠错和闭环反馈。连续生成不等于能完成任务。"
+    },
+    {
+      myth: "自动驾驶 WM 可以直接搬到灵巧操作",
+      reality: "驾驶的 BEV/occupancy 和闭环评估值得借鉴，但灵巧操作有更强的遮挡、接触和手物耦合。"
+    }
+  ],
   milestones: [
     { year: "1990", label: "Dyna", lane: "theory", note: "Model learning and planning become one reinforcement learning loop." },
     { year: "2016", label: "Robot Video Prediction", lane: "robot", note: "Action-conditioned video prediction starts to look like a useful robot dynamics model." },

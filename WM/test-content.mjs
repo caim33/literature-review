@@ -26,6 +26,16 @@ assert.ok(Array.isArray(data.equations), "equations should be an array");
 assert.ok(data.equations.length >= 5, "should include at least 5 rendered equations");
 assert.ok(Array.isArray(data.paradigms), "paradigms should be an array");
 assert.ok(data.paradigms.length >= 5, "should compare at least 5 world model paradigms");
+assert.ok(Array.isArray(data.foundations), "foundations should be an array");
+assert.ok(data.foundations.length >= 6, "should explain at least 6 beginner WM concepts");
+assert.ok(Array.isArray(data.modelFreeVsModelBased), "modelFreeVsModelBased should be an array");
+assert.ok(data.modelFreeVsModelBased.length >= 4, "should compare model-free and model-based learning");
+assert.ok(Array.isArray(data.predictionTargets), "predictionTargets should be an array");
+assert.ok(data.predictionTargets.length >= 6, "should explain what WM can predict");
+assert.ok(Array.isArray(data.robotWorkflow), "robotWorkflow should be an array");
+assert.ok(data.robotWorkflow.length >= 5, "should explain robot VLA + WM workflow");
+assert.ok(Array.isArray(data.misconceptions), "misconceptions should be an array");
+assert.ok(data.misconceptions.length >= 5, "should include common WM misconceptions");
 
 const allRefs = data.routes.flatMap((route) => route.references ?? []);
 assert.ok(allRefs.length >= 60, "should include at least 60 references");
@@ -81,12 +91,12 @@ for (const equation of data.equations) {
 }
 
 const html = await readFile(indexPath, "utf8");
-for (const id of ["route-tabs", "route-detail", "reference-grid", "timeline", "search-input", "formula-grid", "paradigm-grid", "evidence-legend", "route-match-count"]) {
+for (const id of ["foundation-grid", "model-comparison", "prediction-targets", "robot-workflow", "misconception-list", "route-tabs", "route-detail", "reference-grid", "timeline", "search-input", "formula-grid", "paradigm-grid", "evidence-legend", "route-match-count"]) {
   assert.ok(html.includes(id), `index should expose #${id}`);
 }
 
 const app = await readFile(appPath, "utf8");
-for (const fn of ["renderRouteTabs", "renderRouteDetail", "renderReferences", "renderTimeline", "renderEquations", "renderParadigms", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
+for (const fn of ["renderFoundations", "renderModelComparison", "renderPredictionTargets", "renderRobotWorkflow", "renderMisconceptions", "renderRouteTabs", "renderRouteDetail", "renderReferences", "renderTimeline", "renderEquations", "renderParadigms", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
   assert.ok(app.includes(fn), `app should include ${fn}`);
 }
 assert.ok(!app.includes("innerHTML = `<strong>${reference.title}"), "mini refs should not interpolate titles with innerHTML");

@@ -36,6 +36,78 @@
     byId("reference-count").textContent = allReferences().length;
   }
 
+  function renderFoundations() {
+    const container = byId("foundation-grid");
+    container.replaceChildren();
+    data.foundations.forEach((item) => {
+      const card = el("article", "foundation-card");
+      card.append(el("p", "foundation-term", item.term));
+      card.append(el("h3", "", item.analogy));
+      card.append(el("p", "", item.meaning));
+      card.append(labelText("机器人例子", item.robotExample));
+      container.append(card);
+    });
+  }
+
+  function renderModelComparison() {
+    const container = byId("model-comparison");
+    container.replaceChildren();
+    const table = el("table", "comparison");
+    const thead = el("thead");
+    const headerRow = el("tr");
+    ["比较轴", "Model-free", "Model-based / WM", "机器人启发"].forEach((heading) => headerRow.append(el("th", "", heading)));
+    thead.append(headerRow);
+    const tbody = el("tbody");
+    data.modelFreeVsModelBased.forEach((row) => {
+      const tr = el("tr");
+      tr.append(el("td", "axis", row.axis));
+      tr.append(el("td", "", row.modelFree));
+      tr.append(el("td", "", row.modelBased));
+      tr.append(el("td", "", row.robotTakeaway));
+      tbody.append(tr);
+    });
+    table.append(thead, tbody);
+    container.append(table);
+  }
+
+  function renderPredictionTargets() {
+    const container = byId("prediction-targets");
+    container.replaceChildren();
+    data.predictionTargets.forEach((target) => {
+      const card = el("article", "target-card");
+      card.append(el("h3", "", target.name));
+      card.append(labelText("预测", target.predicts));
+      card.append(labelText("用途", target.usefulFor));
+      card.append(labelText("注意", target.caution));
+      container.append(card);
+    });
+  }
+
+  function renderRobotWorkflow() {
+    const container = byId("robot-workflow");
+    container.replaceChildren();
+    data.robotWorkflow.forEach((item) => {
+      const card = el("article", "workflow-step");
+      card.append(el("span", "step", item.step));
+      const body = el("div");
+      body.append(el("h3", "", item.title));
+      body.append(el("p", "", item.detail));
+      card.append(body);
+      container.append(card);
+    });
+  }
+
+  function renderMisconceptions() {
+    const container = byId("misconception-list");
+    container.replaceChildren();
+    data.misconceptions.forEach((item) => {
+      const card = el("article", "misconception");
+      card.append(labelText("误区", item.myth));
+      card.append(labelText("更准确的说法", item.reality));
+      container.append(card);
+    });
+  }
+
   function renderRouteTabs() {
     const container = byId("route-tabs");
     container.replaceChildren();
@@ -269,11 +341,16 @@
 
   function init() {
     renderCounts();
+    renderFoundations();
+    renderModelComparison();
+    renderPredictionTargets();
+    renderRobotWorkflow();
     renderRouteTabs();
     renderRouteDetail();
     renderTimeline();
     renderEquations();
     renderParadigms();
+    renderMisconceptions();
     renderReadingPath();
     renderGlossary();
     renderFilters();

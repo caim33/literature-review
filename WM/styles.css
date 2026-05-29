@@ -208,6 +208,127 @@ h3 {
   font-weight: 850;
 }
 
+.foundation-grid,
+.target-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.foundation-card,
+.target-card,
+.misconception {
+  min-width: 0;
+  padding: 1.1rem;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.foundation-term {
+  margin-bottom: 0.55rem;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.foundation-card h3,
+.target-card h3 {
+  color: var(--accent-2);
+  line-height: 1.15;
+}
+
+.comparison-band,
+.workflow-band,
+.misconception-band {
+  width: 100%;
+  padding-left: max(1rem, calc((100vw - 1180px) / 2));
+  padding-right: max(1rem, calc((100vw - 1180px) / 2));
+}
+
+.comparison-band {
+  background: #e8efe9;
+}
+
+.comparison-table {
+  overflow-x: auto;
+  border: 1px solid #cdd8cf;
+  background: #cdd8cf;
+}
+
+.comparison {
+  width: 100%;
+  min-width: 920px;
+  border-collapse: collapse;
+  background: var(--panel);
+}
+
+.comparison th,
+.comparison td {
+  padding: 0.95rem;
+  border: 1px solid #cdd8cf;
+  text-align: left;
+  vertical-align: top;
+}
+
+.comparison th {
+  color: #fff;
+  background: var(--dark);
+  font-size: 0.88rem;
+}
+
+.comparison .axis {
+  color: var(--accent);
+  font-weight: 850;
+}
+
+.workflow-band {
+  background: #eef1e7;
+}
+
+.workflow {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(160px, 1fr));
+  gap: 1px;
+  border: 1px solid #cfd8c8;
+  background: #cfd8c8;
+  overflow-x: auto;
+}
+
+.workflow-step {
+  min-width: 170px;
+  min-height: 230px;
+  padding: 1rem;
+  background: var(--panel);
+}
+
+.workflow-step .step {
+  display: inline-flex;
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: 1rem;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: var(--accent);
+  border-radius: 999px;
+  font-weight: 850;
+}
+
+.workflow-step h3 {
+  color: var(--accent-2);
+}
+
+.misconception-band {
+  background: #f1eee5;
+}
+
+.misconception-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
 .route-tabs {
   display: flex;
   gap: 0.5rem;
@@ -586,6 +707,9 @@ input {
   .principle-grid,
   .formula-grid,
   .paradigm-grid,
+  .foundation-grid,
+  .target-grid,
+  .misconception-list,
   .evidence-legend,
   .reference-grid {
     grid-template-columns: 1fr;
