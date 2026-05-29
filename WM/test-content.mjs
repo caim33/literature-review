@@ -46,6 +46,22 @@ for (const label of ["VLA Policy", "Candidate Actions", "World Model", "Scorer /
 }
 assert.ok(Array.isArray(data.paperFigures), "paperFigures should be an array");
 assert.ok(data.paperFigures.length >= 5, "should include at least 5 simplified paradigm figures");
+const tdMpcFigure = data.paperFigures.find((figure) => figure.title.includes("TD-MPC"));
+assert.ok(tdMpcFigure, "should include a TD-MPC figure");
+assert.ok(tdMpcFigure.thesis.includes("像素重建") && tdMpcFigure.thesis.includes("terminal value"), "TD-MPC should explain decoder-free task-oriented control");
+assert.ok(tdMpcFigure.detail?.includes("decoder-free") && tdMpcFigure.detail?.includes("CEM"), "TD-MPC should include a concrete decoder-free and CEM planning explanation");
+assert.ok(tdMpcFigure.detail?.includes("短 horizon") && tdMpcFigure.detail?.includes("误差"), "TD-MPC should explain why short rollouts reduce compounding error");
+assert.equal(tdMpcFigure.diagramClass, "pipeline", "TD-MPC simplified figure should use the roomier pipeline layout");
+assert.ok(tdMpcFigure.cardClass?.includes("wide"), "TD-MPC card should use full-width space for a readable pipeline");
+const tdMpcLabels = tdMpcFigure.nodes.map((node) => node.label);
+for (const label of ["Replay Buffer", "Encoder h", "Latent z_t", "TOLD Dynamics d", "Reward r", "Q / Terminal Value", "Policy Prior π", "CEM / MPPI Planner", "Action Sequences", "Execute a_t only"]) {
+  assert.ok(tdMpcLabels.includes(label), `TD-MPC simplified pipeline should include ${label}`);
+}
+assert.ok(tdMpcFigure.edges.some(([from, to]) => from === "prior" && to === "planner"), "TD-MPC planner should be guided by a policy prior");
+assert.ok(tdMpcFigure.edges.some(([from, to]) => from === "planner" && to === "seq"), "TD-MPC planner should sample action sequences");
+assert.ok(tdMpcFigure.edges.some(([from, to]) => from === "seq" && to === "dyn"), "TD-MPC action sequences should drive latent dynamics rollouts");
+assert.ok(tdMpcFigure.edges.some(([from, to]) => from === "value" && to === "return"), "TD-MPC terminal value should contribute to trajectory return");
+assert.ok(tdMpcFigure.edges.some(([from, to]) => from === "return" && to === "act"), "TD-MPC trajectory return should select the executed action");
 for (const figure of data.paperFigures) {
   assert.ok(figure.title, "figure needs title");
   assert.ok(figure.source, `${figure.title} needs source`);
@@ -68,6 +84,12 @@ for (const figure of data.paperFigures) {
   }
   assert.ok(Array.isArray(figure.nodes) && figure.nodes.length >= 4, `${figure.title} needs nodes`);
   assert.ok(Array.isArray(figure.edges) && figure.edges.length >= 3, `${figure.title} needs edges`);
+  const nodeIds = new Set(figure.nodes.map((node) => node.id));
+  assert.equal(nodeIds.size, figure.nodes.length, `${figure.title} node ids should be unique`);
+  for (const [from, to] of figure.edges) {
+    assert.ok(nodeIds.has(from), `${figure.title} edge starts from missing node ${from}`);
+    assert.ok(nodeIds.has(to), `${figure.title} edge points to missing node ${to}`);
+  }
   assert.ok(Array.isArray(figure.readingFocus) && figure.readingFocus.length >= 3, `${figure.title} needs readingFocus`);
 }
 
@@ -134,6 +156,9 @@ for (const fn of ["renderArchitecture", "renderPaperFigures", "renderOriginalMed
   assert.ok(app.includes(fn), `app should include ${fn}`);
 }
 assert.ok(app.includes("paper-original-media"), "app should render original paper/project media");
+assert.ok(app.includes("figure-detail"), "app should render detailed paradigm explanations when present");
+assert.ok(app.includes("diagramClass"), "app should allow figures to opt into clearer diagram layouts");
+assert.ok(app.includes("cardClass"), "app should allow complex figure cards to opt into wider layouts");
 assert.ok(app.includes("reference-route"), "references should render route groups");
 assert.ok(app.includes("reference-route-grid"), "references should keep papers grouped within each route");
 assert.ok(app.includes("route.references.map"), "references should be grouped from each route, not one global flat list");

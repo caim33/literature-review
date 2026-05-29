@@ -344,6 +344,7 @@ h3 {
 }
 
 .figure-card.wide {
+  grid-column: 1 / -1;
   padding: 1.2rem;
 }
 
@@ -416,6 +417,10 @@ h3 {
   min-height: 280px;
 }
 
+.paper-figure.pipeline {
+  min-height: 260px;
+}
+
 .figure-edge {
   fill: none;
   stroke: #62756f;
@@ -478,6 +483,13 @@ h3 {
 .figure-caption {
   color: #34423d;
   font-weight: 650;
+}
+
+.figure-detail {
+  margin-top: 0.55rem;
+  color: #50605b;
+  font-size: 0.95rem;
+  line-height: 1.65;
 }
 
 .reading-focus {

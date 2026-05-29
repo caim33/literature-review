@@ -285,21 +285,30 @@ const wmMapData = {
         sourceUrl: "https://www.nicklashansen.com/td-mpc/",
         sourceLabel: "TD-MPC project page"
       },
-      thesis: "不追求像素重建，学习直接服务 reward/Q/value 的 latent dynamics，再用短 horizon MPC 和 terminal value 控制。",
+      viewBox: "0 0 1160 410",
+      cardClass: "wide",
+      diagramClass: "pipeline",
+      thesis: "不追求像素重建，学习直接服务 reward/Q/value 的 latent dynamics；规划时只做短 horizon latent rollout，用 reward 累加加 terminal value/Q 打分，最后只执行第一步动作并重规划。",
+      detail: "decoder-free 的意思是模型不必还原未来图像，而是学习控制要用的量：encoder 得到任务 latent，d(z,a) 预测下一 latent，reward head 估计短期收益，Q/value head bootstrap 更远的回报。CEM/MPPI 采样多条动作序列，policy prior 提供更靠谱的候选或初始化；每条序列在 latent 里短滚动，按短期 reward + terminal value 排序，选出序列后只执行 a_t，下一帧重新观测再规划。这样把模型误差限制在短 horizon 内，长期目标交给从真实 replay 学到的 value。",
       nodes: [
-        { id: "obs", label: "Observation", x: 40, y: 110, w: 130, h: 58, kind: "input" },
-        { id: "enc", label: "Encoder", x: 220, y: 110, w: 110, h: 58, kind: "model" },
-        { id: "latent", label: "Task Latent", x: 380, y: 110, w: 130, h: 58, kind: "state" },
-        { id: "dyn", label: "Latent Dynamics", x: 560, y: 80, w: 160, h: 58, kind: "model" },
-        { id: "q", label: "Reward + Q + Value", x: 560, y: 180, w: 160, h: 58, kind: "score" },
-        { id: "cem", label: "CEM / MPC", x: 780, y: 110, w: 140, h: 78, kind: "policy" },
-        { id: "act", label: "Action", x: 970, y: 120, w: 110, h: 58, kind: "action" }
+        { id: "buffer", label: "Replay Buffer", note: "train heads", x: 35, y: 40, w: 135, h: 58, kind: "input" },
+        { id: "obs", label: "Observation", note: "pixels / state", x: 35, y: 165, w: 135, h: 58, kind: "input" },
+        { id: "enc", label: "Encoder h", note: "compress obs", x: 210, y: 165, w: 120, h: 58, kind: "model" },
+        { id: "latent", label: "Latent z_t", note: "decoder-free", x: 370, y: 165, w: 125, h: 58, kind: "state" },
+        { id: "prior", label: "Policy Prior π", note: "proposal", x: 370, y: 290, w: 125, h: 58, kind: "policy" },
+        { id: "planner", label: "CEM / MPPI Planner", note: "sample + update", x: 535, y: 290, w: 165, h: 58, kind: "policy" },
+        { id: "seq", label: "Action Sequences", note: "a_t:t+H", x: 535, y: 165, w: 165, h: 58, kind: "action" },
+        { id: "dyn", label: "TOLD Dynamics d", note: "z, a -> z'", x: 735, y: 155, w: 155, h: 78, kind: "model" },
+        { id: "reward", label: "Reward r", note: "sum short rollout", x: 930, y: 96, w: 140, h: 58, kind: "score" },
+        { id: "value", label: "Q / Terminal Value", note: "bootstrap horizon", x: 930, y: 214, w: 150, h: 58, kind: "score" },
+        { id: "return", label: "Trajectory Return", note: "rank candidates", x: 995, y: 155, w: 140, h: 68, kind: "score" },
+        { id: "act", label: "Execute a_t only", note: "then replan", x: 995, y: 310, w: 140, h: 58, kind: "action" }
       ],
-      edges: [["obs", "enc"], ["enc", "latent"], ["latent", "dyn"], ["dyn", "q"], ["q", "cem"], ["cem", "act"], ["act", "dyn"]],
+      edges: [["buffer", "enc"], ["obs", "enc"], ["enc", "latent"], ["latent", "dyn"], ["latent", "prior"], ["prior", "planner"], ["planner", "seq"], ["seq", "dyn"], ["dyn", "reward"], ["dyn", "value"], ["reward", "return"], ["value", "return"], ["return", "act"]],
       readingFocus: [
-        "为什么 decoder-free：它预测决策需要的量，不一定重建图像。",
-        "短 horizon rollout + terminal value 如何降低 compounding error。",
-        "CEM 规划时动作序列、policy prior 和 Q/value 怎么结合。"
+        "decoder-free：不要找 pixel decoder，重点看 latent consistency、reward、Q/value 和 policy prior 是否服务控制。",
+        "短 horizon rollout + terminal value：模型只负责近几步后果，远期回报用 TD 学到的 value bootstrap，下一步重新观测纠偏。",
+        "CEM/MPPI：policy prior 给动作序列提案，latent rollout 预测短期 reward，Q/value 给末端估值，planner 只执行第一步。"
       ]
     },
     {

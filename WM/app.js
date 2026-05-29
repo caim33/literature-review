@@ -111,14 +111,17 @@
     const container = byId("figure-grid");
     container.replaceChildren();
     data.paperFigures.forEach((figure) => {
-      const card = el("article", "figure-card");
+      const card = el("article", `figure-card ${figure.cardClass || ""}`.trim());
       card.append(el("p", "figure-source", figure.source));
       card.append(el("h3", "", figure.title));
       card.append(renderOriginalMedia(figure.originalMedia));
       (figure.supportingMedia || []).forEach((media) => card.append(renderOriginalMedia(media, "supporting")));
       card.append(el("p", "simplified-label", "简化读法"));
-      card.append(renderFigure(figure, ""));
+      card.append(renderFigure(figure, figure.diagramClass || ""));
       card.append(el("p", "figure-thesis", figure.thesis));
+      if (figure.detail) {
+        card.append(el("p", "figure-detail", figure.detail));
+      }
       const list = el("ul", "reading-focus");
       figure.readingFocus.forEach((item) => list.append(el("li", "", item)));
       card.append(list);
