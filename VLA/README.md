@@ -10,7 +10,7 @@
 python3 -m http.server 8123
 ```
 
-然后访问 `http://localhost:8123/vla-learning-map/`。
+然后访问 `http://localhost:8123/VLA/`。
 
 ## 内容结构
 
