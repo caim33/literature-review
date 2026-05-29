@@ -355,6 +355,10 @@ h3 {
   margin: 1rem 0 1.15rem;
 }
 
+.paper-original.supporting {
+  margin-top: -0.35rem;
+}
+
 .paper-original-media {
   display: block;
   width: 100%;

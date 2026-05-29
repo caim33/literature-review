@@ -181,21 +181,23 @@ const wmMapData = {
   ],
   systemArchitecture: {
     title: "Robot WM System Architecture",
-    caption: "这张图是机器人 WM 的通用架构：不是每篇论文都有全部模块，但读 Dreamer、Visual Foresight、TD-MPC、UniSim、VLA+WM 时都可以映射到这里。",
+    caption: "这张图把 VLA 放在策略/候选动作生成器的位置：VLA 读取视觉、语言目标、本体状态和历史上下文，提出 action chunk、轨迹或技能调用；WM 再对这些候选做动作条件 rollout，交给 scorer/safety/reranker 选择，最后由低层控制器执行。",
+    viewBox: "0 0 1340 360",
     nodes: [
-      { id: "obs", label: "Observation / State", note: "RGB-D, proprioception, history", x: 40, y: 90, w: 160, h: 64, kind: "input" },
-      { id: "enc", label: "Encoder", note: "pixels -> latent", x: 250, y: 90, w: 130, h: 64, kind: "model" },
-      { id: "latent", label: "Latent State", note: "belief / tokens / slots", x: 430, y: 90, w: 150, h: 64, kind: "state" },
-      { id: "dyn", label: "Dynamics Model", note: "z, a -> future z / o", x: 630, y: 90, w: 170, h: 64, kind: "model" },
-      { id: "rollout", label: "Imagined Rollout", note: "short horizon futures", x: 850, y: 90, w: 170, h: 64, kind: "future" },
-      { id: "score", label: "Reward / Value / Risk", note: "success, collision, progress", x: 850, y: 220, w: 170, h: 64, kind: "score" },
-      { id: "planner", label: "Planner / Reranker", note: "MPC, CEM, critic", x: 630, y: 220, w: 170, h: 64, kind: "policy" },
-      { id: "policy", label: "Policy / VLA", note: "candidate actions", x: 430, y: 220, w: 150, h: 64, kind: "policy" },
-      { id: "act", label: "Action", note: "chunk / trajectory / skill", x: 250, y: 220, w: 130, h: 64, kind: "action" },
-      { id: "world", label: "Real Robot World", note: "feedback logs", x: 40, y: 220, w: 160, h: 64, kind: "world" }
+      { id: "goal", label: "Language Goal", note: "task / instruction", x: 40, y: 50, w: 160, h: 60, kind: "input" },
+      { id: "obs", label: "Observation + State", note: "RGB-D, proprioception", x: 40, y: 145, w: 180, h: 64, kind: "input" },
+      { id: "hist", label: "History / Memory", note: "past obs + actions", x: 40, y: 240, w: 180, h: 60, kind: "state" },
+      { id: "vla", label: "VLA Policy", note: "proposal module", x: 280, y: 110, w: 160, h: 70, kind: "policy" },
+      { id: "cands", label: "Candidate Actions", note: "chunks / trajectories", x: 500, y: 110, w: 180, h: 70, kind: "action" },
+      { id: "wm", label: "World Model", note: "state, action -> future", x: 500, y: 235, w: 180, h: 70, kind: "model" },
+      { id: "future", label: "Imagined Futures", note: "state, video, contact", x: 740, y: 235, w: 180, h: 70, kind: "future" },
+      { id: "score", label: "Scorer / Safety", note: "success, risk, progress", x: 740, y: 110, w: 180, h: 70, kind: "score" },
+      { id: "selected", label: "Selected Action", note: "best safe candidate", x: 980, y: 110, w: 150, h: 70, kind: "action" },
+      { id: "ctrl", label: "Low-Level Controller", note: "tracking / whole-body", x: 980, y: 235, w: 150, h: 70, kind: "action" },
+      { id: "world", label: "Real Robot World", note: "environment feedback", x: 1180, y: 235, w: 140, h: 70, kind: "world" }
     ],
     edges: [
-      ["obs", "enc"], ["enc", "latent"], ["latent", "dyn"], ["dyn", "rollout"], ["rollout", "score"], ["score", "planner"], ["policy", "planner"], ["planner", "act"], ["act", "world"], ["world", "obs"], ["act", "dyn"]
+      ["goal", "vla"], ["obs", "vla"], ["hist", "vla"], ["vla", "cands"], ["obs", "wm"], ["hist", "wm"], ["cands", "wm"], ["wm", "future"], ["future", "score"], ["cands", "score"], ["score", "selected"], ["selected", "ctrl"], ["ctrl", "world"], ["world", "obs"], ["world", "hist"]
     ]
   },
   paperFigures: [
@@ -204,12 +206,22 @@ const wmMapData = {
       source: "Ha & Schmidhuber 2018, PlaNet 2019, Dreamer/DreamerV3",
       originalMedia: {
         type: "image",
-        src: "https://dreamrl.github.io/assets/pages/1.png",
-        alt: "Dreamer paper overview page with latent imagination architecture",
-        caption: "Dreamer 论文页里的总览图：从真实经验训练 latent world model，再在模型想象的轨迹里更新 actor 和 value。",
-        sourceUrl: "https://dreamrl.github.io/",
-        sourceLabel: "Dreamer project page"
+        src: "assets/paper-figures/dreamerv3-method.png",
+        alt: "DreamerV3 method diagram with RSSM world model and actor critic imagination",
+        caption: "DreamerV3 机制图：encoder/RSSM/decoder/reward/value heads 学 world model，actor-critic 在 imagined latent rollout 里学习。",
+        sourceUrl: "https://github.com/danijar/dreamerv3",
+        sourceLabel: "DreamerV3 repository"
       },
+      supportingMedia: [
+        {
+          type: "image",
+          src: "assets/paper-figures/planet-rssm.png",
+          alt: "PlaNet RSSM architecture comparison",
+          caption: "PlaNet 的 RSSM 图：deterministic recurrent memory 加 stochastic state，解释为什么 Dreamer/PlaNet 都围绕 belief state 做 latent dynamics。",
+          sourceUrl: "https://planetrl.github.io/",
+          sourceLabel: "PlaNet project page"
+        }
+      ],
       thesis: "核心不是把视频生成得好看，而是把历史压进 latent belief state，在想象轨迹里训练 actor-critic 或做规划。",
       nodes: [
         { id: "obs", label: "Pixels / State", x: 40, y: 90, w: 130, h: 58, kind: "input" },
@@ -230,12 +242,22 @@ const wmMapData = {
       source: "Finn & Levine 2016, SV2P/SAVP, Visual Foresight 2018",
       originalMedia: {
         type: "image",
-        src: "https://bair.berkeley.edu/static/blog/visual_rl/shorts1.png",
-        alt: "Visual Foresight robot manipulation example with predicted future frames",
-        caption: "Visual Foresight 官方 BAIR 图：机器人用自监督视频预测模型想象动作后果，再用 visual MPC 完成真实操作任务。",
-        sourceUrl: "https://bair.berkeley.edu/blog/2018/11/30/visual-rl/",
-        sourceLabel: "BAIR Visual Foresight post"
+        src: "assets/paper-figures/visual-foresight-mpc-overview.png",
+        alt: "Visual Foresight visual MPC overview figure",
+        caption: "Visual Foresight 论文机制图：训练时收集无标注交互数据学习视频预测模型，测试时用该模型做 sampling-based visual MPC。",
+        sourceUrl: "https://arxiv.org/abs/1812.00568",
+        sourceLabel: "Visual Foresight paper"
       },
+      supportingMedia: [
+        {
+          type: "image",
+          src: "assets/paper-figures/visual-foresight-video-model.png",
+          alt: "Visual Foresight video prediction computation graph",
+          caption: "动作条件视频预测计算图：给历史图像和动作序列，逐步预测未来图像/像素运动，供 MPC 评分候选动作。",
+          sourceUrl: "https://arxiv.org/abs/1812.00568",
+          sourceLabel: "Visual Foresight paper"
+        }
+      ],
       thesis: "给一批候选动作，预测每条动作会产生的视频，再按目标像素/目标图像/分类器 reward 选动作。",
       nodes: [
         { id: "goal", label: "Goal Image / Pixels", x: 40, y: 70, w: 150, h: 58, kind: "score" },
@@ -257,7 +279,7 @@ const wmMapData = {
       source: "TD-MPC 2022, TD-MPC2 2023",
       originalMedia: {
         type: "image",
-        src: "https://www.nicklashansen.com/td-mpc/images/1.png",
+        src: "assets/paper-figures/td-mpc-architecture.png",
         alt: "TD-MPC planning architecture with latent dynamics and value estimates",
         caption: "TD-MPC 官方图：TOLD latent dynamics 负责短程 rollout，reward/Q/value 给 MPC 打分，最后只执行第一步动作。",
         sourceUrl: "https://www.nicklashansen.com/td-mpc/",
@@ -285,7 +307,7 @@ const wmMapData = {
       source: "UniSim 2023, Genie 2024, IRASim 2024, Cosmos 2025",
       originalMedia: {
         type: "image",
-        src: "https://gen-irasim.github.io/assets/images/intro.png",
+        src: "assets/paper-figures/irasim-overview.png",
         alt: "IRASim overview figure for robot manipulation world model",
         caption: "IRASim 官方总览图：把机器人轨迹、动作和视频生成对齐，用 action-aligned simulator 产生可用于训练与评估的机器人未来。",
         sourceUrl: "https://gen-irasim.github.io/",
@@ -311,7 +333,7 @@ const wmMapData = {
       source: "GR-1, OpenVLA/π0 systems, RoboDreamer, IRASim, GR00T/Cosmos direction",
       originalMedia: {
         type: "image",
-        src: "https://research.nvidia.com/labs/gear/flare/videos/flare_architecture.svg",
+        src: "assets/paper-figures/flare-architecture.svg",
         alt: "FLARE architecture diagram for VLA policy with latent world modeling tokens",
         caption: "FLARE 官方架构图：在 VLA 策略里加入 future tokens，让策略不必生成整张未来图像，也能对齐未来 latent state。",
         sourceUrl: "https://research.nvidia.com/labs/gear/flare/",

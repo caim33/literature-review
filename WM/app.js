@@ -115,6 +115,7 @@
       card.append(el("p", "figure-source", figure.source));
       card.append(el("h3", "", figure.title));
       card.append(renderOriginalMedia(figure.originalMedia));
+      (figure.supportingMedia || []).forEach((media) => card.append(renderOriginalMedia(media, "supporting")));
       card.append(el("p", "simplified-label", "简化读法"));
       card.append(renderFigure(figure, ""));
       card.append(el("p", "figure-thesis", figure.thesis));
@@ -125,8 +126,8 @@
     });
   }
 
-  function renderOriginalMedia(media) {
-    const wrap = el("figure", "paper-original");
+  function renderOriginalMedia(media, variant) {
+    const wrap = el("figure", variant ? `paper-original ${variant}` : "paper-original");
     let node;
     if (media.type === "video") {
       node = document.createElement("video");
@@ -167,7 +168,7 @@
   function renderFigure(figure, variant) {
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("class", `paper-figure ${variant || ""}`.trim());
-    svg.setAttribute("viewBox", "0 0 1160 340");
+    svg.setAttribute("viewBox", figure.viewBox || "0 0 1160 340");
     svg.setAttribute("role", "img");
     svg.setAttribute("aria-label", figure.title || "World model diagram");
 
@@ -192,13 +193,42 @@
       const from = nodeById.get(fromId);
       const to = nodeById.get(toId);
       if (!from || !to) return;
-      const x1 = from.x + from.w;
-      const y1 = from.y + from.h / 2;
-      const x2 = to.x;
-      const y2 = to.y + to.h / 2;
+      const fromCenterX = from.x + from.w / 2;
+      const fromCenterY = from.y + from.h / 2;
+      const toCenterX = to.x + to.w / 2;
+      const toCenterY = to.y + to.h / 2;
+      let x1;
+      let y1;
+      let x2;
+      let y2;
+      if (Math.abs(toCenterX - fromCenterX) >= Math.abs(toCenterY - fromCenterY)) {
+        if (toCenterX >= fromCenterX) {
+          x1 = from.x + from.w;
+          x2 = to.x;
+        } else {
+          x1 = from.x;
+          x2 = to.x + to.w;
+        }
+        y1 = fromCenterY;
+        y2 = toCenterY;
+      } else {
+        if (toCenterY >= fromCenterY) {
+          y1 = from.y + from.h;
+          y2 = to.y;
+        } else {
+          y1 = from.y;
+          y2 = to.y + to.h;
+        }
+        x1 = fromCenterX;
+        x2 = toCenterX;
+      }
       const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      const mid = Math.max(28, Math.abs(x2 - x1) / 2);
-      path.setAttribute("d", `M${x1},${y1} C${x1 + mid},${y1} ${x2 - mid},${y2} ${x2},${y2}`);
+      const horizontal = Math.abs(x2 - x1) >= Math.abs(y2 - y1);
+      const mid = Math.max(24, (horizontal ? Math.abs(x2 - x1) : Math.abs(y2 - y1)) / 2);
+      const d = horizontal
+        ? `M${x1},${y1} C${x1 + Math.sign(x2 - x1 || 1) * mid},${y1} ${x2 - Math.sign(x2 - x1 || 1) * mid},${y2} ${x2},${y2}`
+        : `M${x1},${y1} C${x1},${y1 + Math.sign(y2 - y1 || 1) * mid} ${x2},${y2 - Math.sign(y2 - y1 || 1) * mid} ${x2},${y2}`;
+      path.setAttribute("d", d);
       path.setAttribute("class", "figure-edge");
       path.setAttribute("marker-end", markerUrl);
       svg.append(path);

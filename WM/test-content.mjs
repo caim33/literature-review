@@ -39,6 +39,11 @@ assert.ok(data.misconceptions.length >= 5, "should include common WM misconcepti
 assert.ok(data.systemArchitecture, "should include a system architecture diagram");
 assert.ok(Array.isArray(data.systemArchitecture.nodes), "system architecture should include nodes");
 assert.ok(data.systemArchitecture.nodes.length >= 6, "system architecture should show at least 6 modules");
+assert.ok(data.systemArchitecture.caption.includes("候选动作生成器"), "system architecture should position VLA as an action proposal module");
+const architectureLabels = data.systemArchitecture.nodes.map((node) => node.label);
+for (const label of ["VLA Policy", "Candidate Actions", "World Model", "Scorer / Safety", "Low-Level Controller"]) {
+  assert.ok(architectureLabels.includes(label), `system architecture should include ${label}`);
+}
 assert.ok(Array.isArray(data.paperFigures), "paperFigures should be an array");
 assert.ok(data.paperFigures.length >= 5, "should include at least 5 simplified paradigm figures");
 for (const figure of data.paperFigures) {
@@ -46,11 +51,21 @@ for (const figure of data.paperFigures) {
   assert.ok(figure.source, `${figure.title} needs source`);
   assert.ok(figure.originalMedia, `${figure.title} needs original paper/project media`);
   assert.ok(["image", "video"].includes(figure.originalMedia.type), `${figure.title} media needs a supported type`);
-  assert.ok(figure.originalMedia.src?.startsWith("https://"), `${figure.title} media needs an HTTPS src`);
+  assert.ok(figure.originalMedia.src?.startsWith("assets/paper-figures/"), `${figure.title} media should use a local asset`);
+  assert.equal(existsSync(path.join(__dirname, figure.originalMedia.src)), true, `${figure.title} local media asset should exist`);
   assert.ok(figure.originalMedia.caption, `${figure.title} media needs a caption`);
   assert.ok(figure.originalMedia.sourceUrl?.startsWith("https://"), `${figure.title} media needs a source URL`);
   assert.ok(figure.originalMedia.sourceLabel, `${figure.title} media needs a source label`);
   assert.ok(figure.originalMedia.alt, `${figure.title} media needs alt text`);
+  for (const media of figure.supportingMedia ?? []) {
+    assert.ok(["image", "video"].includes(media.type), `${figure.title} supporting media needs a supported type`);
+    assert.ok(media.src?.startsWith("assets/paper-figures/"), `${figure.title} supporting media should use a local asset`);
+    assert.equal(existsSync(path.join(__dirname, media.src)), true, `${figure.title} supporting media asset should exist`);
+    assert.ok(media.caption, `${figure.title} supporting media needs a caption`);
+    assert.ok(media.sourceUrl?.startsWith("https://"), `${figure.title} supporting media needs a source URL`);
+    assert.ok(media.sourceLabel, `${figure.title} supporting media needs a source label`);
+    assert.ok(media.alt, `${figure.title} supporting media needs alt text`);
+  }
   assert.ok(Array.isArray(figure.nodes) && figure.nodes.length >= 4, `${figure.title} needs nodes`);
   assert.ok(Array.isArray(figure.edges) && figure.edges.length >= 3, `${figure.title} needs edges`);
   assert.ok(Array.isArray(figure.readingFocus) && figure.readingFocus.length >= 3, `${figure.title} needs readingFocus`);
