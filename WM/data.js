@@ -202,6 +202,14 @@ const wmMapData = {
     {
       title: "Dreamer / PlaNet：Latent Imagination",
       source: "Ha & Schmidhuber 2018, PlaNet 2019, Dreamer/DreamerV3",
+      originalMedia: {
+        type: "image",
+        src: "https://dreamrl.github.io/assets/pages/1.png",
+        alt: "Dreamer paper overview page with latent imagination architecture",
+        caption: "Dreamer 论文页里的总览图：从真实经验训练 latent world model，再在模型想象的轨迹里更新 actor 和 value。",
+        sourceUrl: "https://dreamrl.github.io/",
+        sourceLabel: "Dreamer project page"
+      },
       thesis: "核心不是把视频生成得好看，而是把历史压进 latent belief state，在想象轨迹里训练 actor-critic 或做规划。",
       nodes: [
         { id: "obs", label: "Pixels / State", x: 40, y: 90, w: 130, h: 58, kind: "input" },
@@ -220,6 +228,14 @@ const wmMapData = {
     {
       title: "Visual Foresight：Video Prediction + MPC",
       source: "Finn & Levine 2016, SV2P/SAVP, Visual Foresight 2018",
+      originalMedia: {
+        type: "image",
+        src: "https://bair.berkeley.edu/static/blog/visual_rl/shorts1.png",
+        alt: "Visual Foresight robot manipulation example with predicted future frames",
+        caption: "Visual Foresight 官方 BAIR 图：机器人用自监督视频预测模型想象动作后果，再用 visual MPC 完成真实操作任务。",
+        sourceUrl: "https://bair.berkeley.edu/blog/2018/11/30/visual-rl/",
+        sourceLabel: "BAIR Visual Foresight post"
+      },
       thesis: "给一批候选动作，预测每条动作会产生的视频，再按目标像素/目标图像/分类器 reward 选动作。",
       nodes: [
         { id: "goal", label: "Goal Image / Pixels", x: 40, y: 70, w: 150, h: 58, kind: "score" },
@@ -239,6 +255,14 @@ const wmMapData = {
     {
       title: "TD-MPC / TD-MPC2：Task-Oriented Latent MPC",
       source: "TD-MPC 2022, TD-MPC2 2023",
+      originalMedia: {
+        type: "image",
+        src: "https://www.nicklashansen.com/td-mpc/images/1.png",
+        alt: "TD-MPC planning architecture with latent dynamics and value estimates",
+        caption: "TD-MPC 官方图：TOLD latent dynamics 负责短程 rollout，reward/Q/value 给 MPC 打分，最后只执行第一步动作。",
+        sourceUrl: "https://www.nicklashansen.com/td-mpc/",
+        sourceLabel: "TD-MPC project page"
+      },
       thesis: "不追求像素重建，学习直接服务 reward/Q/value 的 latent dynamics，再用短 horizon MPC 和 terminal value 控制。",
       nodes: [
         { id: "obs", label: "Observation", x: 40, y: 110, w: 130, h: 58, kind: "input" },
@@ -259,6 +283,14 @@ const wmMapData = {
     {
       title: "Genie / UniSim / IRASim：Interactive Simulator",
       source: "UniSim 2023, Genie 2024, IRASim 2024, Cosmos 2025",
+      originalMedia: {
+        type: "image",
+        src: "https://gen-irasim.github.io/assets/images/intro.png",
+        alt: "IRASim overview figure for robot manipulation world model",
+        caption: "IRASim 官方总览图：把机器人轨迹、动作和视频生成对齐，用 action-aligned simulator 产生可用于训练与评估的机器人未来。",
+        sourceUrl: "https://gen-irasim.github.io/",
+        sourceLabel: "IRASim project page"
+      },
       thesis: "把生成模型变成可交互环境：给历史、prompt 或动作，生成下一帧/下一状态，让 agent 能继续闭环。",
       nodes: [
         { id: "context", label: "Prompt / History", x: 40, y: 100, w: 150, h: 64, kind: "input" },
@@ -277,6 +309,14 @@ const wmMapData = {
     {
       title: "VLA + WM Hybrid：Proposal, Rollout, Rerank",
       source: "GR-1, OpenVLA/π0 systems, RoboDreamer, IRASim, GR00T/Cosmos direction",
+      originalMedia: {
+        type: "image",
+        src: "https://research.nvidia.com/labs/gear/flare/videos/flare_architecture.svg",
+        alt: "FLARE architecture diagram for VLA policy with latent world modeling tokens",
+        caption: "FLARE 官方架构图：在 VLA 策略里加入 future tokens，让策略不必生成整张未来图像，也能对齐未来 latent state。",
+        sourceUrl: "https://research.nvidia.com/labs/gear/flare/",
+        sourceLabel: "NVIDIA FLARE project page"
+      },
       thesis: "现实机器人系统最可能是混合架构：VLA 给动作候选，WM 做短程想象，critic/safety/controller 决定是否执行。",
       nodes: [
         { id: "obs", label: "Vision + Language + State", x: 40, y: 110, w: 190, h: 64, kind: "input" },

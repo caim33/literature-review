@@ -114,6 +114,8 @@
       const card = el("article", "figure-card");
       card.append(el("p", "figure-source", figure.source));
       card.append(el("h3", "", figure.title));
+      card.append(renderOriginalMedia(figure.originalMedia));
+      card.append(el("p", "simplified-label", "简化读法"));
       card.append(renderFigure(figure, ""));
       card.append(el("p", "figure-thesis", figure.thesis));
       const list = el("ul", "reading-focus");
@@ -121,6 +123,45 @@
       card.append(list);
       container.append(card);
     });
+  }
+
+  function renderOriginalMedia(media) {
+    const wrap = el("figure", "paper-original");
+    let node;
+    if (media.type === "video") {
+      node = document.createElement("video");
+      node.className = "paper-original-media";
+      node.controls = true;
+      node.muted = true;
+      node.loop = true;
+      node.playsInline = true;
+      node.preload = "metadata";
+      const source = document.createElement("source");
+      source.src = media.src;
+      source.type = "video/mp4";
+      node.append(source);
+    } else {
+      node = document.createElement("img");
+      node.className = "paper-original-media";
+      node.src = media.src;
+      node.alt = media.alt;
+      node.loading = "lazy";
+      node.decoding = "async";
+    }
+    if (media.type === "video") {
+      node.setAttribute("aria-label", media.alt);
+    }
+
+    const caption = el("figcaption", "original-caption");
+    caption.append(document.createTextNode(media.caption));
+    const sourceLink = el("a", "", media.sourceLabel);
+    sourceLink.href = media.sourceUrl;
+    sourceLink.target = "_blank";
+    sourceLink.rel = "noreferrer";
+    caption.append(document.createTextNode(" "));
+    caption.append(sourceLink);
+    wrap.append(node, caption);
+    return wrap;
   }
 
   function renderFigure(figure, variant) {

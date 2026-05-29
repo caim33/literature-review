@@ -44,6 +44,13 @@ assert.ok(data.paperFigures.length >= 5, "should include at least 5 simplified p
 for (const figure of data.paperFigures) {
   assert.ok(figure.title, "figure needs title");
   assert.ok(figure.source, `${figure.title} needs source`);
+  assert.ok(figure.originalMedia, `${figure.title} needs original paper/project media`);
+  assert.ok(["image", "video"].includes(figure.originalMedia.type), `${figure.title} media needs a supported type`);
+  assert.ok(figure.originalMedia.src?.startsWith("https://"), `${figure.title} media needs an HTTPS src`);
+  assert.ok(figure.originalMedia.caption, `${figure.title} media needs a caption`);
+  assert.ok(figure.originalMedia.sourceUrl?.startsWith("https://"), `${figure.title} media needs a source URL`);
+  assert.ok(figure.originalMedia.sourceLabel, `${figure.title} media needs a source label`);
+  assert.ok(figure.originalMedia.alt, `${figure.title} media needs alt text`);
   assert.ok(Array.isArray(figure.nodes) && figure.nodes.length >= 4, `${figure.title} needs nodes`);
   assert.ok(Array.isArray(figure.edges) && figure.edges.length >= 3, `${figure.title} needs edges`);
   assert.ok(Array.isArray(figure.readingFocus) && figure.readingFocus.length >= 3, `${figure.title} needs readingFocus`);
@@ -108,9 +115,10 @@ for (const id of ["architecture-diagram", "figure-grid", "foundation-grid", "mod
 }
 
 const app = await readFile(appPath, "utf8");
-for (const fn of ["renderArchitecture", "renderPaperFigures", "renderFigure", "renderFoundations", "renderModelComparison", "renderPredictionTargets", "renderRobotWorkflow", "renderMisconceptions", "renderRouteTabs", "renderRouteDetail", "renderReferences", "renderTimeline", "renderEquations", "renderParadigms", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
+for (const fn of ["renderArchitecture", "renderPaperFigures", "renderOriginalMedia", "renderFigure", "renderFoundations", "renderModelComparison", "renderPredictionTargets", "renderRobotWorkflow", "renderMisconceptions", "renderRouteTabs", "renderRouteDetail", "renderReferences", "renderTimeline", "renderEquations", "renderParadigms", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
   assert.ok(app.includes(fn), `app should include ${fn}`);
 }
+assert.ok(app.includes("paper-original-media"), "app should render original paper/project media");
 assert.ok(!app.includes("innerHTML = `<strong>${reference.title}"), "mini refs should not interpolate titles with innerHTML");
 
 console.log(`OK: ${data.routes.length} routes, ${allRefs.length} references`);
