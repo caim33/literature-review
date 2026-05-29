@@ -310,24 +310,52 @@
   function renderReferences() {
     const container = byId("reference-grid");
     container.replaceChildren();
-    const references = allReferences().filter(applyFilters);
+    container.className = "reference-groups";
+    const routeGroups = data.routes
+      .map((route) => ({
+        route,
+        references: route.references
+          .map((reference) => ({ ...reference, route: route.title, routeId: route.id }))
+          .filter(applyFilters)
+      }))
+      .filter((group) => group.references.length);
 
-    if (!references.length) {
+    if (!routeGroups.length) {
       container.append(el("p", "empty", "没有匹配结果，换个关键词试试。"));
       return;
     }
 
+    routeGroups.forEach((group) => container.append(renderRouteReferenceGroup(group.route, group.references)));
+  }
+
+  function renderRouteReferenceGroup(route, references) {
+    const group = el("section", "reference-route-group");
+    const head = el("div", "route-group-head");
+    const titleWrap = el("div");
+    titleWrap.append(el("p", "eyebrow", route.priority));
+    titleWrap.append(el("h3", "", route.title));
+    titleWrap.append(el("p", "", route.question));
+    head.append(titleWrap, el("span", "route-ref-count", `${references.length} 项资料`));
+
+    const grid = el("div", "route-reference-grid");
     references.forEach((reference) => {
-      const card = el("article", "reference-card");
-      const meta = el("p", "ref-meta", `${reference.year} · ${reference.type} · ${reference.evidence} · ${reference.route}`);
-      const link = el("a", "ref-title");
-      link.href = reference.url;
-      link.target = "_blank";
-      link.rel = "noreferrer";
-      link.textContent = reference.title;
-      card.append(meta, link, el("p", "", reference.value));
-      container.append(card);
+      grid.append(renderReferenceCard(reference));
     });
+
+    group.append(head, grid);
+    return group;
+  }
+
+  function renderReferenceCard(reference) {
+    const card = el("article", "reference-card");
+    const meta = el("p", "ref-meta", `${reference.year} · ${reference.type} · ${reference.evidence}`);
+    const link = el("a", "ref-title");
+    link.href = reference.url;
+    link.target = "_blank";
+    link.rel = "noreferrer";
+    link.textContent = reference.title;
+    card.append(meta, link, el("p", "", reference.value));
+    return card;
   }
 
   function bindSearch() {

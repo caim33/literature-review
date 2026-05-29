@@ -97,9 +97,14 @@ for (const id of ["route-tabs", "route-detail", "reference-grid", "timeline", "s
 }
 
 const app = await readFile(appPath, "utf8");
-for (const fn of ["renderRouteTabs", "renderRouteDetail", "renderReferences", "renderTimeline", "renderEquations", "renderParadigms", "renderArchitectureDiagrams", "renderPaperFigureGuides", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
+for (const fn of ["renderRouteTabs", "renderRouteDetail", "renderReferences", "renderRouteReferenceGroup", "renderTimeline", "renderEquations", "renderParadigms", "renderArchitectureDiagrams", "renderPaperFigureGuides", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
   assert.ok(app.includes(fn), `app should include ${fn}`);
 }
 assert.ok(!app.includes("innerHTML = `<strong>${reference.title}"), "mini refs should not interpolate titles with innerHTML");
+
+const styles = await readFile(stylePath, "utf8");
+for (const className of ["reference-groups", "reference-route-group", "route-reference-grid", "route-group-head"]) {
+  assert.ok(styles.includes(className), `styles should include ${className}`);
+}
 
 console.log(`OK: ${data.routes.length} routes, ${allRefs.length} references`);
