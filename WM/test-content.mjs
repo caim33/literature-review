@@ -115,10 +115,13 @@ for (const id of ["architecture-diagram", "figure-grid", "foundation-grid", "mod
 }
 
 const app = await readFile(appPath, "utf8");
-for (const fn of ["renderArchitecture", "renderPaperFigures", "renderOriginalMedia", "renderFigure", "renderFoundations", "renderModelComparison", "renderPredictionTargets", "renderRobotWorkflow", "renderMisconceptions", "renderRouteTabs", "renderRouteDetail", "renderReferences", "renderTimeline", "renderEquations", "renderParadigms", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
+for (const fn of ["renderArchitecture", "renderPaperFigures", "renderOriginalMedia", "renderFigure", "renderFoundations", "renderModelComparison", "renderPredictionTargets", "renderRobotWorkflow", "renderMisconceptions", "renderRouteTabs", "renderRouteDetail", "renderReferences", "renderReferenceCard", "renderTimeline", "renderEquations", "renderParadigms", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
   assert.ok(app.includes(fn), `app should include ${fn}`);
 }
 assert.ok(app.includes("paper-original-media"), "app should render original paper/project media");
+assert.ok(app.includes("reference-route"), "references should render route groups");
+assert.ok(app.includes("reference-route-grid"), "references should keep papers grouped within each route");
+assert.ok(app.includes("route.references.map"), "references should be grouped from each route, not one global flat list");
 assert.ok(!app.includes("innerHTML = `<strong>${reference.title}"), "mini refs should not interpolate titles with innerHTML");
 
 console.log(`OK: ${data.routes.length} routes, ${allRefs.length} references`);

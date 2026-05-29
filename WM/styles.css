@@ -822,12 +822,55 @@ input {
 
 .reference-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.1rem;
+}
+
+.reference-route {
+  min-width: 0;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.reference-route-head {
+  display: flex;
   gap: 1rem;
+  align-items: end;
+  justify-content: space-between;
+  padding: 1rem 1.1rem;
+  border-bottom: 1px solid var(--line);
+  background: #f7f9f4;
+}
+
+.reference-route-head h3 {
+  margin-bottom: 0;
+  color: var(--accent);
+}
+
+.route-kicker {
+  margin-bottom: 0.25rem;
+  color: var(--accent-2);
+  font-size: 0.78rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.route-ref-count {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.reference-route-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
 }
 
 .reference-card {
   min-height: 190px;
+  border: 0;
 }
 
 .ref-meta {
@@ -878,6 +921,7 @@ input {
   .target-grid,
   .misconception-list,
   .figure-grid,
+  .reference-route-grid,
   .evidence-legend,
   .reference-grid {
     grid-template-columns: 1fr;
@@ -903,6 +947,11 @@ input {
 
   .filter-buttons {
     justify-content: flex-start;
+  }
+
+  .reference-route-head {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
 

@@ -443,24 +443,43 @@
   function renderReferences() {
     const container = byId("reference-grid");
     container.replaceChildren();
-    const references = allReferences().filter(applyFilters);
+    let visibleCount = 0;
 
-    if (!references.length) {
-      container.append(el("p", "empty", "没有匹配结果，换个关键词试试。"));
-      return;
-    }
+    data.routes.forEach((route) => {
+      const references = route.references
+        .map((reference) => ({ ...reference, route: route.title, routeId: route.id }))
+        .filter(applyFilters);
+      if (!references.length) return;
 
-    references.forEach((reference) => {
-      const card = el("article", "reference-card");
-      const meta = el("p", "ref-meta", `${reference.year} · ${reference.type} · ${reference.evidence} · ${reference.route}`);
-      const link = el("a", "ref-title");
-      link.href = reference.url;
-      link.target = "_blank";
-      link.rel = "noreferrer";
-      link.textContent = reference.title;
-      card.append(meta, link, el("p", "", reference.value));
-      container.append(card);
+      visibleCount += references.length;
+      const section = el("section", "reference-route");
+      const header = el("div", "reference-route-head");
+      const titleWrap = el("div");
+      titleWrap.append(el("p", "route-kicker", route.priority));
+      titleWrap.append(el("h3", "", route.title));
+      header.append(titleWrap, el("span", "route-ref-count", `${references.length} 篇`));
+
+      const grid = el("div", "reference-route-grid");
+      references.forEach((reference) => grid.append(renderReferenceCard(reference)));
+      section.append(header, grid);
+      container.append(section);
     });
+
+    if (!visibleCount) {
+      container.append(el("p", "empty", "没有匹配结果，换个关键词试试。"));
+    }
+  }
+
+  function renderReferenceCard(reference) {
+    const card = el("article", "reference-card");
+    const meta = el("p", "ref-meta", `${reference.year} · ${reference.type} · ${reference.evidence}`);
+    const link = el("a", "ref-title");
+    link.href = reference.url;
+    link.target = "_blank";
+    link.rel = "noreferrer";
+    link.textContent = reference.title;
+    card.append(meta, link, el("p", "", reference.value));
+    return card;
   }
 
   function bindSearch() {
