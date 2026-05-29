@@ -36,6 +36,18 @@ assert.ok(Array.isArray(data.robotWorkflow), "robotWorkflow should be an array")
 assert.ok(data.robotWorkflow.length >= 5, "should explain robot VLA + WM workflow");
 assert.ok(Array.isArray(data.misconceptions), "misconceptions should be an array");
 assert.ok(data.misconceptions.length >= 5, "should include common WM misconceptions");
+assert.ok(data.systemArchitecture, "should include a system architecture diagram");
+assert.ok(Array.isArray(data.systemArchitecture.nodes), "system architecture should include nodes");
+assert.ok(data.systemArchitecture.nodes.length >= 6, "system architecture should show at least 6 modules");
+assert.ok(Array.isArray(data.paperFigures), "paperFigures should be an array");
+assert.ok(data.paperFigures.length >= 5, "should include at least 5 simplified paradigm figures");
+for (const figure of data.paperFigures) {
+  assert.ok(figure.title, "figure needs title");
+  assert.ok(figure.source, `${figure.title} needs source`);
+  assert.ok(Array.isArray(figure.nodes) && figure.nodes.length >= 4, `${figure.title} needs nodes`);
+  assert.ok(Array.isArray(figure.edges) && figure.edges.length >= 3, `${figure.title} needs edges`);
+  assert.ok(Array.isArray(figure.readingFocus) && figure.readingFocus.length >= 3, `${figure.title} needs readingFocus`);
+}
 
 const allRefs = data.routes.flatMap((route) => route.references ?? []);
 assert.ok(allRefs.length >= 60, "should include at least 60 references");
@@ -91,12 +103,12 @@ for (const equation of data.equations) {
 }
 
 const html = await readFile(indexPath, "utf8");
-for (const id of ["foundation-grid", "model-comparison", "prediction-targets", "robot-workflow", "misconception-list", "route-tabs", "route-detail", "reference-grid", "timeline", "search-input", "formula-grid", "paradigm-grid", "evidence-legend", "route-match-count"]) {
+for (const id of ["architecture-diagram", "figure-grid", "foundation-grid", "model-comparison", "prediction-targets", "robot-workflow", "misconception-list", "route-tabs", "route-detail", "reference-grid", "timeline", "search-input", "formula-grid", "paradigm-grid", "evidence-legend", "route-match-count"]) {
   assert.ok(html.includes(id), `index should expose #${id}`);
 }
 
 const app = await readFile(appPath, "utf8");
-for (const fn of ["renderFoundations", "renderModelComparison", "renderPredictionTargets", "renderRobotWorkflow", "renderMisconceptions", "renderRouteTabs", "renderRouteDetail", "renderReferences", "renderTimeline", "renderEquations", "renderParadigms", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
+for (const fn of ["renderArchitecture", "renderPaperFigures", "renderFigure", "renderFoundations", "renderModelComparison", "renderPredictionTargets", "renderRobotWorkflow", "renderMisconceptions", "renderRouteTabs", "renderRouteDetail", "renderReferences", "renderTimeline", "renderEquations", "renderParadigms", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
   assert.ok(app.includes(fn), `app should include ${fn}`);
 }
 assert.ok(!app.includes("innerHTML = `<strong>${reference.title}"), "mini refs should not interpolate titles with innerHTML");

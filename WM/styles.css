@@ -319,6 +319,136 @@ h3 {
   color: var(--accent-2);
 }
 
+.architecture-diagram {
+  margin-bottom: 1rem;
+}
+
+.figures-band {
+  width: 100%;
+  padding-left: max(1rem, calc((100vw - 1180px) / 2));
+  padding-right: max(1rem, calc((100vw - 1180px) / 2));
+  background: #edf2f0;
+}
+
+.figure-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.figure-card {
+  min-width: 0;
+  padding: 1.1rem;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.figure-card.wide {
+  padding: 1.2rem;
+}
+
+.figure-card h3 {
+  color: var(--accent);
+}
+
+.figure-source {
+  margin-bottom: 0.35rem;
+  color: var(--accent-2);
+  font-size: 0.78rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.paper-figure {
+  display: block;
+  width: 100%;
+  min-height: 210px;
+  margin: 0.9rem 0;
+  border: 1px solid #d0d9d3;
+  background:
+    linear-gradient(#f8fbf8, #f8fbf8) padding-box,
+    repeating-linear-gradient(0deg, rgba(47, 111, 70, 0.06) 0, rgba(47, 111, 70, 0.06) 1px, transparent 1px, transparent 28px),
+    repeating-linear-gradient(90deg, rgba(47, 111, 70, 0.05) 0, rgba(47, 111, 70, 0.05) 1px, transparent 1px, transparent 28px);
+}
+
+.paper-figure.wide {
+  min-height: 280px;
+}
+
+.figure-edge {
+  fill: none;
+  stroke: #62756f;
+  stroke-width: 2.2;
+}
+
+.figure-node rect {
+  stroke-width: 1.5;
+}
+
+.figure-node.input rect {
+  fill: #eef6fb;
+  stroke: #7fa5bf;
+}
+
+.figure-node.model rect {
+  fill: #eff6ee;
+  stroke: #7aa06f;
+}
+
+.figure-node.state rect {
+  fill: #f7f1df;
+  stroke: #bda45d;
+}
+
+.figure-node.future rect {
+  fill: #f3edf8;
+  stroke: #9f82b8;
+}
+
+.figure-node.score rect {
+  fill: #fff0e8;
+  stroke: #bf8766;
+}
+
+.figure-node.policy rect,
+.figure-node.action rect {
+  fill: #edf1f8;
+  stroke: #758db4;
+}
+
+.figure-node.world rect {
+  fill: #eef2ed;
+  stroke: #879780;
+}
+
+.figure-label {
+  fill: #1b2b2a;
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.figure-note {
+  fill: #667085;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.figure-thesis,
+.figure-caption {
+  color: #34423d;
+  font-weight: 650;
+}
+
+.reading-focus {
+  margin: 0.8rem 0 0;
+  padding-left: 1.2rem;
+  color: #34423d;
+}
+
+.reading-focus li + li {
+  margin-top: 0.35rem;
+}
+
 .misconception-band {
   background: #f1eee5;
 }
@@ -710,6 +840,7 @@ input {
   .foundation-grid,
   .target-grid,
   .misconception-list,
+  .figure-grid,
   .evidence-legend,
   .reference-grid {
     grid-template-columns: 1fr;

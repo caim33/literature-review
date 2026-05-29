@@ -97,6 +97,106 @@
     });
   }
 
+  function renderArchitecture() {
+    const container = byId("architecture-diagram");
+    container.replaceChildren();
+    const section = el("article", "figure-card wide");
+    section.append(el("h3", "", data.systemArchitecture.title));
+    section.append(renderFigure(data.systemArchitecture, "wide"));
+    section.append(el("p", "figure-caption", data.systemArchitecture.caption));
+    container.append(section);
+  }
+
+  function renderPaperFigures() {
+    const container = byId("figure-grid");
+    container.replaceChildren();
+    data.paperFigures.forEach((figure) => {
+      const card = el("article", "figure-card");
+      card.append(el("p", "figure-source", figure.source));
+      card.append(el("h3", "", figure.title));
+      card.append(renderFigure(figure, ""));
+      card.append(el("p", "figure-thesis", figure.thesis));
+      const list = el("ul", "reading-focus");
+      figure.readingFocus.forEach((item) => list.append(el("li", "", item)));
+      card.append(list);
+      container.append(card);
+    });
+  }
+
+  function renderFigure(figure, variant) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", `paper-figure ${variant || ""}`.trim());
+    svg.setAttribute("viewBox", "0 0 1160 340");
+    svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label", figure.title || "World model diagram");
+
+    const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+    marker.setAttribute("id", `arrow-${Math.random().toString(36).slice(2)}`);
+    marker.setAttribute("markerWidth", "10");
+    marker.setAttribute("markerHeight", "10");
+    marker.setAttribute("refX", "8");
+    marker.setAttribute("refY", "3");
+    marker.setAttribute("orient", "auto");
+    const arrow = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    arrow.setAttribute("d", "M0,0 L0,6 L8,3 z");
+    arrow.setAttribute("fill", "#62756f");
+    marker.append(arrow);
+    defs.append(marker);
+    svg.append(defs);
+    const markerUrl = `url(#${marker.id})`;
+
+    const nodeById = new Map(figure.nodes.map((node) => [node.id, node]));
+    figure.edges.forEach(([fromId, toId]) => {
+      const from = nodeById.get(fromId);
+      const to = nodeById.get(toId);
+      if (!from || !to) return;
+      const x1 = from.x + from.w;
+      const y1 = from.y + from.h / 2;
+      const x2 = to.x;
+      const y2 = to.y + to.h / 2;
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      const mid = Math.max(28, Math.abs(x2 - x1) / 2);
+      path.setAttribute("d", `M${x1},${y1} C${x1 + mid},${y1} ${x2 - mid},${y2} ${x2},${y2}`);
+      path.setAttribute("class", "figure-edge");
+      path.setAttribute("marker-end", markerUrl);
+      svg.append(path);
+    });
+
+    figure.nodes.forEach((node) => {
+      const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      group.setAttribute("class", `figure-node ${node.kind || "model"}`);
+      const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      rect.setAttribute("x", node.x);
+      rect.setAttribute("y", node.y);
+      rect.setAttribute("width", node.w);
+      rect.setAttribute("height", node.h);
+      rect.setAttribute("rx", "8");
+      group.append(rect);
+
+      const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      label.setAttribute("x", node.x + node.w / 2);
+      label.setAttribute("y", node.y + node.h / 2 - (node.note ? 5 : -4));
+      label.setAttribute("text-anchor", "middle");
+      label.setAttribute("class", "figure-label");
+      label.textContent = node.label;
+      group.append(label);
+
+      if (node.note) {
+        const note = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        note.setAttribute("x", node.x + node.w / 2);
+        note.setAttribute("y", node.y + node.h / 2 + 16);
+        note.setAttribute("text-anchor", "middle");
+        note.setAttribute("class", "figure-note");
+        note.textContent = node.note;
+        group.append(note);
+      }
+      svg.append(group);
+    });
+
+    return svg;
+  }
+
   function renderMisconceptions() {
     const container = byId("misconception-list");
     container.replaceChildren();
@@ -344,7 +444,9 @@
     renderFoundations();
     renderModelComparison();
     renderPredictionTargets();
+    renderArchitecture();
     renderRobotWorkflow();
+    renderPaperFigures();
     renderRouteTabs();
     renderRouteDetail();
     renderTimeline();

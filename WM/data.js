@@ -179,6 +179,122 @@ const wmMapData = {
       detail: "执行结果、失败、人工接管和纠错数据回到数据池，用于更新 VLA、WM 或 critic。"
     }
   ],
+  systemArchitecture: {
+    title: "Robot WM System Architecture",
+    caption: "这张图是机器人 WM 的通用架构：不是每篇论文都有全部模块，但读 Dreamer、Visual Foresight、TD-MPC、UniSim、VLA+WM 时都可以映射到这里。",
+    nodes: [
+      { id: "obs", label: "Observation / State", note: "RGB-D, proprioception, history", x: 40, y: 90, w: 160, h: 64, kind: "input" },
+      { id: "enc", label: "Encoder", note: "pixels -> latent", x: 250, y: 90, w: 130, h: 64, kind: "model" },
+      { id: "latent", label: "Latent State", note: "belief / tokens / slots", x: 430, y: 90, w: 150, h: 64, kind: "state" },
+      { id: "dyn", label: "Dynamics Model", note: "z, a -> future z / o", x: 630, y: 90, w: 170, h: 64, kind: "model" },
+      { id: "rollout", label: "Imagined Rollout", note: "short horizon futures", x: 850, y: 90, w: 170, h: 64, kind: "future" },
+      { id: "score", label: "Reward / Value / Risk", note: "success, collision, progress", x: 850, y: 220, w: 170, h: 64, kind: "score" },
+      { id: "planner", label: "Planner / Reranker", note: "MPC, CEM, critic", x: 630, y: 220, w: 170, h: 64, kind: "policy" },
+      { id: "policy", label: "Policy / VLA", note: "candidate actions", x: 430, y: 220, w: 150, h: 64, kind: "policy" },
+      { id: "act", label: "Action", note: "chunk / trajectory / skill", x: 250, y: 220, w: 130, h: 64, kind: "action" },
+      { id: "world", label: "Real Robot World", note: "feedback logs", x: 40, y: 220, w: 160, h: 64, kind: "world" }
+    ],
+    edges: [
+      ["obs", "enc"], ["enc", "latent"], ["latent", "dyn"], ["dyn", "rollout"], ["rollout", "score"], ["score", "planner"], ["policy", "planner"], ["planner", "act"], ["act", "world"], ["world", "obs"], ["act", "dyn"]
+    ]
+  },
+  paperFigures: [
+    {
+      title: "Dreamer / PlaNet：Latent Imagination",
+      source: "Ha & Schmidhuber 2018, PlaNet 2019, Dreamer/DreamerV3",
+      thesis: "核心不是把视频生成得好看，而是把历史压进 latent belief state，在想象轨迹里训练 actor-critic 或做规划。",
+      nodes: [
+        { id: "obs", label: "Pixels / State", x: 40, y: 90, w: 130, h: 58, kind: "input" },
+        { id: "enc", label: "Encoder", x: 220, y: 90, w: 120, h: 58, kind: "model" },
+        { id: "rssm", label: "RSSM / Latent Dynamics", x: 390, y: 80, w: 180, h: 78, kind: "state" },
+        { id: "imag", label: "Imagined Trajectories", x: 620, y: 80, w: 180, h: 78, kind: "future" },
+        { id: "actor", label: "Actor + Critic", x: 850, y: 90, w: 130, h: 58, kind: "policy" }
+      ],
+      edges: [["obs", "enc"], ["enc", "rssm"], ["rssm", "imag"], ["imag", "actor"], ["actor", "rssm"]],
+      readingFocus: [
+        "RSSM/belief state 怎么融合历史动作和观测。",
+        "训练 loss 是重建、reward、discount、value，还是多步 latent prediction。",
+        "策略是在模型里训练，还是每步在线规划。"
+      ]
+    },
+    {
+      title: "Visual Foresight：Video Prediction + MPC",
+      source: "Finn & Levine 2016, SV2P/SAVP, Visual Foresight 2018",
+      thesis: "给一批候选动作，预测每条动作会产生的视频，再按目标像素/目标图像/分类器 reward 选动作。",
+      nodes: [
+        { id: "goal", label: "Goal Image / Pixels", x: 40, y: 70, w: 150, h: 58, kind: "score" },
+        { id: "cands", label: "Action Candidates", x: 40, y: 180, w: 150, h: 58, kind: "action" },
+        { id: "video", label: "Action-Conditioned Video Model", x: 250, y: 120, w: 220, h: 78, kind: "model" },
+        { id: "future", label: "Predicted Futures", x: 540, y: 120, w: 170, h: 78, kind: "future" },
+        { id: "score", label: "Goal Scoring", x: 780, y: 120, w: 140, h: 78, kind: "score" },
+        { id: "mpc", label: "MPC Execute First Action", x: 970, y: 120, w: 170, h: 78, kind: "policy" }
+      ],
+      edges: [["cands", "video"], ["video", "future"], ["goal", "score"], ["future", "score"], ["score", "mpc"], ["mpc", "cands"]],
+      readingFocus: [
+        "动作候选怎么采样：random shooting、CEM 还是 policy proposal。",
+        "目标怎么定义：像素点、目标图像、语言还是 learned reward。",
+        "预测 horizon 多长，receding horizon 怎么闭环纠错。"
+      ]
+    },
+    {
+      title: "TD-MPC / TD-MPC2：Task-Oriented Latent MPC",
+      source: "TD-MPC 2022, TD-MPC2 2023",
+      thesis: "不追求像素重建，学习直接服务 reward/Q/value 的 latent dynamics，再用短 horizon MPC 和 terminal value 控制。",
+      nodes: [
+        { id: "obs", label: "Observation", x: 40, y: 110, w: 130, h: 58, kind: "input" },
+        { id: "enc", label: "Encoder", x: 220, y: 110, w: 110, h: 58, kind: "model" },
+        { id: "latent", label: "Task Latent", x: 380, y: 110, w: 130, h: 58, kind: "state" },
+        { id: "dyn", label: "Latent Dynamics", x: 560, y: 80, w: 160, h: 58, kind: "model" },
+        { id: "q", label: "Reward + Q + Value", x: 560, y: 180, w: 160, h: 58, kind: "score" },
+        { id: "cem", label: "CEM / MPC", x: 780, y: 110, w: 140, h: 78, kind: "policy" },
+        { id: "act", label: "Action", x: 970, y: 120, w: 110, h: 58, kind: "action" }
+      ],
+      edges: [["obs", "enc"], ["enc", "latent"], ["latent", "dyn"], ["dyn", "q"], ["q", "cem"], ["cem", "act"], ["act", "dyn"]],
+      readingFocus: [
+        "为什么 decoder-free：它预测决策需要的量，不一定重建图像。",
+        "短 horizon rollout + terminal value 如何降低 compounding error。",
+        "CEM 规划时动作序列、policy prior 和 Q/value 怎么结合。"
+      ]
+    },
+    {
+      title: "Genie / UniSim / IRASim：Interactive Simulator",
+      source: "UniSim 2023, Genie 2024, IRASim 2024, Cosmos 2025",
+      thesis: "把生成模型变成可交互环境：给历史、prompt 或动作，生成下一帧/下一状态，让 agent 能继续闭环。",
+      nodes: [
+        { id: "context", label: "Prompt / History", x: 40, y: 100, w: 150, h: 64, kind: "input" },
+        { id: "action", label: "Action / Latent Action", x: 250, y: 190, w: 170, h: 64, kind: "action" },
+        { id: "sim", label: "Generative World Simulator", x: 250, y: 80, w: 220, h: 78, kind: "model" },
+        { id: "next", label: "Next Frame / State", x: 560, y: 100, w: 170, h: 64, kind: "future" },
+        { id: "agent", label: "Agent / Policy", x: 780, y: 100, w: 150, h: 64, kind: "policy" }
+      ],
+      edges: [["context", "sim"], ["action", "sim"], ["sim", "next"], ["next", "agent"], ["agent", "action"], ["next", "sim"]],
+      readingFocus: [
+        "action 是真实机器人动作、键鼠动作，还是从视频里学到的 latent action。",
+        "是否支持 step-by-step 交互，而不是一次性生成整段视频。",
+        "生成数据是否真的提升下游机器人或 agent 表现。"
+      ]
+    },
+    {
+      title: "VLA + WM Hybrid：Proposal, Rollout, Rerank",
+      source: "GR-1, OpenVLA/π0 systems, RoboDreamer, IRASim, GR00T/Cosmos direction",
+      thesis: "现实机器人系统最可能是混合架构：VLA 给动作候选，WM 做短程想象，critic/safety/controller 决定是否执行。",
+      nodes: [
+        { id: "obs", label: "Vision + Language + State", x: 40, y: 110, w: 190, h: 64, kind: "input" },
+        { id: "vla", label: "VLA Proposal", x: 280, y: 110, w: 140, h: 64, kind: "policy" },
+        { id: "wm", label: "WM Rollout", x: 470, y: 80, w: 150, h: 64, kind: "model" },
+        { id: "critic", label: "Critic / Reranker", x: 670, y: 80, w: 160, h: 64, kind: "score" },
+        { id: "safety", label: "Safety Filter", x: 670, y: 190, w: 160, h: 64, kind: "score" },
+        { id: "ctrl", label: "Whole-Body Controller", x: 880, y: 110, w: 190, h: 64, kind: "action" },
+        { id: "logs", label: "Real Robot Logs", x: 470, y: 250, w: 150, h: 64, kind: "world" }
+      ],
+      edges: [["obs", "vla"], ["vla", "wm"], ["wm", "critic"], ["wm", "safety"], ["critic", "ctrl"], ["safety", "ctrl"], ["ctrl", "logs"], ["logs", "vla"], ["logs", "wm"]],
+      readingFocus: [
+        "VLA 输出的是单步动作、action chunk、轨迹、技能，还是 visual subgoal。",
+        "WM 是在线重排、离线生成数据，还是训练辅助 loss。",
+        "系统如何处理延迟、安全、失败恢复和真实部署日志。"
+      ]
+    }
+  ],
   misconceptions: [
     {
       myth: "会生成视频就是 World Model",
