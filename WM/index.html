@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WM 学习地图</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <header class="hero">
+      <nav class="topbar" aria-label="Primary">
+        <a href="../">首页</a>
+        <a href="#routes">路线</a>
+        <a href="#systems">范式</a>
+        <a href="#references">文献</a>
+        <a href="#study">学习路径</a>
+      </nav>
+      <div class="hero-grid">
+        <section>
+          <p class="eyebrow">World Models / Robot Imagination / VLA + WM</p>
+          <h1>WM 学习地图</h1>
+          <p class="lead">
+            按机器人优先的视角拆解 World Model：经典 MBRL、视觉动力学、真实机器人 latent WM、生成式交互模拟器、VLA+WM、人形慢速想象层、表示学习和少量自动驾驶/3D 仿真旁支。
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#routes">开始看路线</a>
+            <a class="button" href="#references">查文献库</a>
+          </div>
+        </section>
+        <aside class="hero-panel" aria-label="Quick map">
+          <div class="metric">
+            <span id="route-count">0</span>
+            <strong>条路线</strong>
+          </div>
+          <div class="metric">
+            <span id="reference-count">0</span>
+            <strong>篇/项资料</strong>
+          </div>
+          <div class="metric">
+            <span>5</span>
+            <strong>阶段学习路径</strong>
+          </div>
+        </aside>
+      </div>
+    </header>
+
+    <main>
+      <section class="band intro" id="systems">
+        <div class="section-head">
+          <p class="eyebrow">Mental Model</p>
+          <h2>先把 WM 看成机器人系统里的想象层</h2>
+        </div>
+        <div class="principle-grid">
+          <article>
+            <span>01</span>
+            <h3>不是所有视频生成都是 WM</h3>
+            <p>机器人 WM 至少要能接受动作或控制条件，预测后果，并能服务规划、评估或数据生成。</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>预测对象决定用途</h3>
+            <p>预测像素、latent、reward、value、接触、occupancy 或任务进度，会导向完全不同的模型和评估。</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>VLA 负责快反应</h3>
+            <p>VLA 擅长从视觉和语言直接出动作；WM 擅长反事实 rollout、失败预判和候选动作重排。</p>
+          </article>
+          <article>
+            <span>04</span>
+            <h3>人形需要慢速校验</h3>
+            <p>双手、全身平衡、接触和长程任务需要 WM 与 whole-body controller、安全过滤器一起工作。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="band" id="routes">
+        <div class="section-head row">
+          <div>
+            <p class="eyebrow">Routes</p>
+            <h2>八条主路线</h2>
+          </div>
+          <label class="search">
+            <span>搜索</span>
+            <input id="search-input" type="search" placeholder="Dreamer / Visual Foresight / UniSim / GR-1 / V-JEPA">
+          </label>
+        </div>
+        <p id="route-match-count" class="match-count" aria-live="polite">显示全部路线</p>
+        <div id="route-tabs" class="route-tabs" role="tablist" aria-label="WM routes"></div>
+        <div id="route-detail" class="route-detail"></div>
+      </section>
+
+      <section class="band timeline-band">
+        <div class="section-head">
+          <p class="eyebrow">Timeline</p>
+          <h2>关键节点</h2>
+        </div>
+        <div id="timeline" class="timeline"></div>
+      </section>
+
+      <section class="band formula-band" id="formulas">
+        <div class="section-head">
+          <p class="eyebrow">Formulas</p>
+          <h2>把几个核心范式写成公式</h2>
+        </div>
+        <div id="formula-grid" class="formula-grid"></div>
+      </section>
+
+      <section class="band" id="paradigms">
+        <div class="section-head">
+          <p class="eyebrow">Paradigms</p>
+          <h2>不同范式怎么取舍</h2>
+        </div>
+        <div id="paradigm-grid" class="paradigm-grid"></div>
+      </section>
+
+      <section class="band split" id="study">
+        <div>
+          <div class="section-head compact">
+            <p class="eyebrow">Study Path</p>
+            <h2>建议学习顺序</h2>
+          </div>
+          <div id="reading-path" class="reading-path"></div>
+        </div>
+        <aside class="glossary">
+          <div class="section-head compact">
+            <p class="eyebrow">Glossary</p>
+            <h2>核心术语</h2>
+          </div>
+          <div id="glossary-list"></div>
+        </aside>
+      </section>
+
+      <section class="band" id="references">
+        <div class="section-head row">
+          <div>
+            <p class="eyebrow">References</p>
+            <h2>论文、项目与官方资料</h2>
+          </div>
+          <div id="filter-buttons" class="filter-buttons" aria-label="Reference filters"></div>
+        </div>
+        <div id="evidence-legend" class="evidence-legend" aria-label="Evidence legend"></div>
+        <div id="reference-grid" class="reference-grid"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Updated 2026-05-29. 以机器人/VLA 视角整理；自动驾驶仅保留可迁移的 world model 与仿真线索。</p>
+    </footer>
+
+    <script src="./data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
