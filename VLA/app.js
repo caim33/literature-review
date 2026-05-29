@@ -12,6 +12,7 @@
   const allReferences = () => data.routes.flatMap((route) =>
     route.references.map((reference) => ({ ...reference, route: route.title, routeId: route.id }))
   );
+  const findNodeLabel = (diagram, id) => diagram.nodes.find((node) => node.id === id)?.label || id;
   const scoreRoute = (route, term) => {
     if (!term) return 0;
     const titleText = normalize(`${route.title} ${route.references.map((reference) => reference.title).join(" ")}`);
@@ -153,6 +154,85 @@
     });
   }
 
+  function renderArchitectureDiagrams() {
+    const container = byId("architecture-gallery");
+    container.replaceChildren();
+    data.architectureDiagrams.forEach((diagram) => {
+      const card = el("article", "architecture-card");
+      const head = el("div", "diagram-head");
+      head.append(el("span", "diagram-kicker", diagram.kicker));
+      head.append(el("h3", "", diagram.title));
+      head.append(el("p", "", diagram.takeaway));
+
+      const flow = el("div", "diagram-flow");
+      diagram.nodes.forEach((node, index) => {
+        const nodeEl = el("section", "diagram-node");
+        nodeEl.append(el("span", "node-index", String(index + 1).padStart(2, "0")));
+        nodeEl.append(el("strong", "", node.label));
+        nodeEl.append(el("p", "", node.detail));
+        flow.append(nodeEl);
+      });
+
+      const edges = el("div", "diagram-edges");
+      diagram.edges.forEach((edge) => {
+        const edgeEl = el("p", "diagram-edge");
+        edgeEl.append(el("strong", "", `${findNodeLabel(diagram, edge.from)} → ${findNodeLabel(diagram, edge.to)}`));
+        edgeEl.append(el("span", "", edge.label));
+        edges.append(edgeEl);
+      });
+
+      card.append(head, flow, edges);
+      container.append(card);
+    });
+  }
+
+  function renderPaperFigureGuides() {
+    const container = byId("paper-figure-guides");
+    container.replaceChildren();
+    data.paperFigureGuides.forEach((figure) => {
+      const card = el("article", "figure-guide");
+
+      const media = el("a", figure.imageUrl ? "figure-media has-image" : "figure-media");
+      media.href = figure.sourceUrl;
+      media.target = "_blank";
+      media.rel = "noreferrer";
+      if (figure.imageUrl) {
+        const img = document.createElement("img");
+        img.src = figure.imageUrl;
+        img.alt = `${figure.title} original figure`;
+        img.loading = "lazy";
+        media.append(img);
+        media.append(el("span", "figure-open-label", "点击查看原图来源"));
+      } else {
+        media.append(el("span", "figure-placeholder", "原图见论文 / 官方页"));
+      }
+
+      const body = el("div", "figure-body");
+      const source = el("a", "figure-source", figure.sourceTitle);
+      source.href = figure.sourceUrl;
+      source.target = "_blank";
+      source.rel = "noreferrer";
+      body.append(el("h3", "", figure.title), source);
+      body.append(labelText("原图入口", figure.originalFigure));
+
+      const steps = el("ol", "figure-steps");
+      figure.simplified.forEach((step) => steps.append(el("li", "", step)));
+      body.append(steps);
+      body.append(labelText("读图重点", figure.watchFor));
+
+      const simplified = el("div", "simplified-flow");
+      figure.simplified.forEach((step, index) => {
+        const shortStep = step.split("，")[0].replaceAll("。", "");
+        const stepNode = el("span", "simple-step", `${index + 1}. ${shortStep}`);
+        simplified.append(stepNode);
+      });
+      body.append(simplified);
+
+      card.append(media, body);
+      container.append(card);
+    });
+  }
+
   function labelText(label, text) {
     const row = el("p", "label-text");
     const strong = el("strong", "", `${label}: `);
@@ -274,6 +354,8 @@
     renderTimeline();
     renderEquations();
     renderParadigms();
+    renderArchitectureDiagrams();
+    renderPaperFigureGuides();
     renderReadingPath();
     renderGlossary();
     renderFilters();

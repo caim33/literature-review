@@ -392,6 +392,249 @@ input {
   background: #f0ebe2;
 }
 
+.architecture-band {
+  width: 100%;
+  padding-left: max(1rem, calc((100vw - 1180px) / 2));
+  padding-right: max(1rem, calc((100vw - 1180px) / 2));
+  background: #eef0e7;
+}
+
+.architecture-gallery {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.architecture-card {
+  min-width: 0;
+  border: 1px solid #cfd6c5;
+  background: #fffdf8;
+  box-shadow: var(--shadow);
+}
+
+.diagram-head {
+  display: grid;
+  gap: 0.45rem;
+  padding: 1.2rem;
+  border-bottom: 1px solid #cfd6c5;
+}
+
+.diagram-head h3 {
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  line-height: 1.12;
+}
+
+.diagram-head p {
+  max-width: 900px;
+  margin-bottom: 0;
+  color: #3d4951;
+  font-weight: 650;
+}
+
+.diagram-kicker {
+  color: var(--accent-2);
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.diagram-flow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.7rem;
+  padding: 1.2rem;
+}
+
+.diagram-node {
+  position: relative;
+  min-width: 0;
+  min-height: 156px;
+  padding: 0.9rem;
+  border: 1px solid #d8d6cc;
+  background: #ffffff;
+}
+
+.diagram-node::after {
+  position: absolute;
+  top: 50%;
+  right: -0.62rem;
+  width: 0.62rem;
+  height: 1px;
+  background: #aeb9aa;
+  content: "";
+}
+
+.diagram-node:last-child::after {
+  display: none;
+}
+
+.node-index {
+  display: block;
+  margin-bottom: 0.7rem;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.diagram-node strong {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.diagram-node p {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.diagram-edges {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1px;
+  border-top: 1px solid #d8d6cc;
+  background: #d8d6cc;
+}
+
+.diagram-edge {
+  min-width: 0;
+  margin: 0;
+  padding: 0.8rem;
+  background: #f8f8f0;
+}
+
+.diagram-edge strong,
+.diagram-edge span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.diagram-edge strong {
+  color: var(--accent-3);
+  font-size: 0.82rem;
+}
+
+.diagram-edge span {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.paper-figures-band {
+  width: 100%;
+  padding-left: max(1rem, calc((100vw - 1180px) / 2));
+  padding-right: max(1rem, calc((100vw - 1180px) / 2));
+  background: #f7f5ef;
+}
+
+.paper-figure-guides {
+  display: grid;
+  gap: 1rem;
+}
+
+.figure-guide {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.9fr) minmax(0, 1.3fr);
+  min-width: 0;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.figure-media {
+  position: relative;
+  min-width: 0;
+  min-height: 260px;
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  border-right: 1px solid var(--line);
+  color: var(--accent);
+  background:
+    linear-gradient(135deg, rgba(37, 111, 115, 0.08), rgba(165, 71, 53, 0.08)),
+    #f8f8f0;
+  text-align: center;
+  text-decoration: none;
+}
+
+.figure-media img {
+  width: 100%;
+  height: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  padding: 1rem;
+}
+
+.figure-open-label {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  max-width: calc(100% - 1.5rem);
+  padding: 0.28rem 0.5rem;
+  border: 1px solid rgba(28, 36, 48, 0.16);
+  border-radius: 8px;
+  color: #24343a;
+  background: rgba(255, 253, 248, 0.86);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.figure-placeholder {
+  max-width: 220px;
+  padding: 1rem;
+  border: 1px dashed #aeb9aa;
+  background: rgba(255, 255, 255, 0.72);
+  font-weight: 850;
+}
+
+.figure-body {
+  min-width: 0;
+  padding: 1.2rem;
+}
+
+.figure-body h3 {
+  font-size: clamp(1.3rem, 3vw, 2rem);
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+}
+
+.figure-source {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: var(--accent);
+  font-size: 0.92rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+  text-underline-offset: 3px;
+}
+
+.figure-steps {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0.8rem 0 1rem;
+  padding-left: 1.3rem;
+}
+
+.figure-steps li {
+  padding-left: 0.2rem;
+}
+
+.simplified-flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 1rem;
+}
+
+.simple-step {
+  max-width: 100%;
+  padding: 0.35rem 0.52rem;
+  border: 1px solid #d4c8bb;
+  border-radius: 8px;
+  color: #3e4a2f;
+  background: #fffaf2;
+  font-size: 0.82rem;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
 .formula-grid,
 .paradigm-grid {
   display: grid;
@@ -583,6 +826,7 @@ input {
   .detail-header,
   .detail-columns,
   .split,
+  .figure-guide,
   .principle-grid,
   .formula-grid,
   .paradigm-grid,
@@ -609,6 +853,11 @@ input {
     border-bottom: 0;
   }
 
+  .figure-media {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
   .filter-buttons {
     justify-content: flex-start;
   }
@@ -626,6 +875,22 @@ input {
 
   .hero-panel {
     grid-template-columns: 1fr;
+  }
+
+  .diagram-flow {
+    grid-template-columns: 1fr;
+  }
+
+  .diagram-node::after {
+    top: auto;
+    right: 50%;
+    bottom: -0.7rem;
+    width: 1px;
+    height: 0.7rem;
+  }
+
+  .figure-media {
+    min-height: 190px;
   }
 
   .band {

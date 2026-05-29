@@ -105,6 +105,320 @@ const vlaMapData = {
       caution: "接口和安全边界复杂，需要明确技能可供性、状态反馈和失败恢复。"
     }
   ],
+  architectureDiagrams: [
+    {
+      title: "End-to-End VLA 基础架构",
+      kicker: "从像素到动作",
+      nodes: [
+        {
+          id: "observations",
+          label: "观测与状态",
+          detail: "RGB / wrist camera / depth / tactile / proprioception 进入同一 episode schema。"
+        },
+        {
+          id: "instruction",
+          label: "语言与任务上下文",
+          detail: "自然语言、子任务、metadata、visual goal 或历史记忆提供意图。"
+        },
+        {
+          id: "backbone",
+          label: "VLM / Robot Backbone",
+          detail: "视觉编码器、LLM/VLM、robot state projector 融合语义和场景。"
+        },
+        {
+          id: "action-head",
+          label: "动作头",
+          detail: "token action、continuous regression、diffusion 或 flow action expert。"
+        },
+        {
+          id: "robot-loop",
+          label: "控制闭环",
+          detail: "动作 chunk 进入低层控制器，执行后把新观测写回下一步。"
+        }
+      ],
+      edges: [
+        { from: "observations", to: "backbone", label: "视觉/状态 token" },
+        { from: "instruction", to: "backbone", label: "任务条件" },
+        { from: "backbone", to: "action-head", label: "语义到控制" },
+        { from: "action-head", to: "robot-loop", label: "动作 chunk" },
+        { from: "robot-loop", to: "observations", label: "反馈" }
+      ],
+      takeaway: "先抓住这条主线：VLA 不是一个聊天模型加机械臂，而是把观测、语言、状态和动作接口共同训练成闭环策略。"
+    },
+    {
+      title: "动作表示：Token、Diffusion、Flow 的分叉",
+      kicker: "动作接口",
+      nodes: [
+        {
+          id: "trajectory",
+          label: "连续轨迹",
+          detail: "原始动作通常是 delta pose、joint、gripper、base velocity 或 finger command。"
+        },
+        {
+          id: "tokenizer",
+          label: "离散化 / 压缩",
+          detail: "RT-2/OpenVLA 把动作写成 token；FAST 把动作序列看成时序压缩问题。"
+        },
+        {
+          id: "generative-head",
+          label: "生成式动作头",
+          detail: "Diffusion/flow 直接生成连续多步动作，适合多峰和高频精细控制。"
+        },
+        {
+          id: "chunk-buffer",
+          label: "Action Chunk Buffer",
+          detail: "一次预测 H 步动作，用 receding horizon 或 smoothing 降低抖动。"
+        },
+        {
+          id: "controller",
+          label: "低层控制器",
+          detail: "把模型动作转成机器人可执行的 joint/EEF/hand/base command。"
+        }
+      ],
+      edges: [
+        { from: "trajectory", to: "tokenizer", label: "action-as-language" },
+        { from: "trajectory", to: "generative-head", label: "continuous action" },
+        { from: "tokenizer", to: "chunk-buffer", label: "decode" },
+        { from: "generative-head", to: "chunk-buffer", label: "sample" },
+        { from: "chunk-buffer", to: "controller", label: "execute" }
+      ],
+      takeaway: "动作表示决定可学习性和部署延迟：token 友好但可能粗，diffusion/flow 精细但要优化实时推理。"
+    },
+    {
+      title: "VLA + WM / WAM 混合架构",
+      kicker: "想象与重排",
+      nodes: [
+        {
+          id: "history",
+          label: "当前历史",
+          detail: "观测、语言、状态、近期动作和记忆组成可供预测的上下文。"
+        },
+        {
+          id: "vla-proposals",
+          label: "VLA 候选动作",
+          detail: "反应式策略给出若干 action chunk 或高层子目标。"
+        },
+        {
+          id: "wm-rollout",
+          label: "World Model Rollout",
+          detail: "在 latent 或 video 空间预测执行这些动作之后会发生什么。"
+        },
+        {
+          id: "critic",
+          label: "Critic / Safety Rerank",
+          detail: "用成功概率、碰撞风险、约束满足度对候选进行重排。"
+        },
+        {
+          id: "wam-policy",
+          label: "WAM 联合生成",
+          detail: "DreamZero 类模型同时生成未来视频和动作，把世界模型推向可执行策略。"
+        },
+        {
+          id: "execute",
+          label: "执行与数据回流",
+          detail: "执行最优候选，并把失败、纠错和 rollout 误差回流到数据飞轮。"
+        }
+      ],
+      edges: [
+        { from: "history", to: "vla-proposals", label: "propose" },
+        { from: "vla-proposals", to: "wm-rollout", label: "imagine" },
+        { from: "wm-rollout", to: "critic", label: "score" },
+        { from: "history", to: "wam-policy", label: "joint model" },
+        { from: "critic", to: "execute", label: "select" },
+        { from: "wam-policy", to: "execute", label: "direct act" }
+      ],
+      takeaway: "WM/WAM 的价值不是替代 VLA，而是让机器人先想象后果，再把候选动作变得更可验证、更安全。"
+    },
+    {
+      title: "Whole-Body Humanoid VLA Stack",
+      kicker: "人形全身",
+      nodes: [
+        {
+          id: "er-planner",
+          label: "Embodied Reasoner",
+          detail: "长程任务分解、空间记忆、工具调用、失败恢复和多机器人协作。"
+        },
+        {
+          id: "vla-policy",
+          label: "VLA Policy",
+          detail: "把视觉、语言和 proprioception 映射到上身/手/移动底盘动作。"
+        },
+        {
+          id: "whole-body-control",
+          label: "Whole-Body Controller",
+          detail: "平衡、碰撞、关节限制、接触稳定和时延补偿。"
+        },
+        {
+          id: "hands-base",
+          label: "Hands / Base / Head",
+          detail: "灵巧手、腕、躯干、头部 gaze 和移动底盘协同执行。"
+        },
+        {
+          id: "safety",
+          label: "Safety Monitor",
+          detail: "力控边界、急停、任务终止、自检和人机共处约束。"
+        }
+      ],
+      edges: [
+        { from: "er-planner", to: "vla-policy", label: "subgoal" },
+        { from: "vla-policy", to: "whole-body-control", label: "continuous command" },
+        { from: "whole-body-control", to: "hands-base", label: "stabilize" },
+        { from: "hands-base", to: "vla-policy", label: "sensor feedback" },
+        { from: "safety", to: "whole-body-control", label: "guardrail" }
+      ],
+      takeaway: "人形 VLA 的难点在系统耦合：语言泛化只是入口，真正要同时处理全身平衡、双手接触、空间导航和安全闭环。"
+    },
+    {
+      title: "机器人数据飞轮",
+      kicker: "数据层",
+      nodes: [
+        {
+          id: "sources",
+          label: "数据来源",
+          detail: "遥操、仿真、MimicGen、human video、部署日志和自动探索数据。"
+        },
+        {
+          id: "alignment",
+          label: "Schema / Retarget",
+          detail: "统一 observation、state、action、language、metadata 与 embodiment 描述。"
+        },
+        {
+          id: "train",
+          label: "Pretrain / SFT / RL",
+          detail: "跨 embodiment 预训练，任务后训练，失败纠错和 RL/偏好优化。"
+        },
+        {
+          id: "eval",
+          label: "评测与部署",
+          detail: "LIBERO、DROID、SimplerEnv、真机任务和长程成功率一起看。"
+        },
+        {
+          id: "mine",
+          label: "失败挖掘",
+          detail: "把 OOD 场景、接触失败、语言误解、恢复轨迹重新标注入库。"
+        }
+      ],
+      edges: [
+        { from: "sources", to: "alignment", label: "curate" },
+        { from: "alignment", to: "train", label: "mix" },
+        { from: "train", to: "eval", label: "deploy" },
+        { from: "eval", to: "mine", label: "inspect" },
+        { from: "mine", to: "sources", label: "collect again" }
+      ],
+      takeaway: "公司级 VLA 的护城河往往是数据飞轮：真实部署越多，失败越可挖，下一版模型越能覆盖长尾。"
+    }
+  ],
+  paperFigureGuides: [
+    {
+      title: "RT-2：把动作当作另一种语言",
+      sourceTitle: "RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control",
+      sourceUrl: "https://robotics-transformer2.github.io/",
+      imageUrl: "https://robotics-transformer2.github.io/img/fig2.png",
+      originalFigure: "项目页 Approach Overview / 论文核心图：看 image + prompt 如何进入 VLM，并把 action token de-tokenize 成机器人动作。",
+      simplified: [
+        "输入当前图像和问题模板：What should the robot do to <task>?",
+        "把机器人动作离散成类似文本的 token 序列。",
+        "VLM 在 web VQA 数据和 robot action 数据上 co-fine-tune。",
+        "推理时把输出 token 反解成 delta translation、rotation 和 gripper command。"
+      ],
+      watchFor: "关键不是图里的大模型名字，而是 action-as-language 让 web-scale VLM 训练范式直接接上机器人控制。"
+    },
+    {
+      title: "OpenVLA：开源 VLM 到动作 token 的基线",
+      sourceTitle: "OpenVLA: An Open-Source Vision-Language-Action Model",
+      sourceUrl: "https://openvla.github.io/",
+      imageUrl: "https://openvla.github.io/static/images/openvla_model.jpg",
+      originalFigure: "项目页 The OpenVLA Model / 论文模型架构图：DINOv2 + SigLIP、MLP projector、Llama 2 7B 和 Action De-Tokenizer。",
+      simplified: [
+        "多视角/单视角图像进入 DINOv2 与 SigLIP 融合视觉编码器。",
+        "MLP projector 把视觉 embedding 对齐到 LLM token 空间。",
+        "Llama 2 7B 自回归预测离散动作 token。",
+        "Action de-tokenizer 还原 7D robot action 并直接执行。"
+      ],
+      watchFor: "OpenVLA 的学习价值在开源复现：它牺牲一些精细动作能力，换来清晰、可 fine-tune 的 VLA baseline。"
+    },
+    {
+      title: "Octo：通用策略 + Diffusion Action Head",
+      sourceTitle: "Octo: An Open-Source Generalist Robot Policy",
+      sourceUrl: "https://octo-models.github.io/",
+      imageUrl: "https://octo-models.github.io/architecture.jpg",
+      originalFigure: "项目页 The Model / 论文 model architecture 图：task tokens、observation tokens、Octo Transformer、readout token 和 action head。",
+      simplified: [
+        "语言或 goal image 变成 task tokens，历史图像和 state 变成 observation tokens。",
+        "Octo Transformer 在多数据集 robot episodes 上预训练共享表征。",
+        "Readout token 连接 diffusion action head，输出多模态连续动作分布。",
+        "Fine-tuning 时可替换 observation 或 action space，保留通用 backbone。"
+      ],
+      watchFor: "Octo 是理解 observation/task/action 接口可插拔性的好图：它比单一动作 token 路线更像通用 robot policy 框架。"
+    },
+    {
+      title: "π0 / OpenPI：VLM Backbone + Flow Action Expert",
+      sourceTitle: "π0: A Vision-Language-Action Flow Model for General Robot Control",
+      sourceUrl: "https://www.pi.website/blog/pi0",
+      originalFigure: "官方 blog 的 cross-embodiment training 图和 π0 论文 overview/framework 图：重点看 pre-trained VLM、cross-embodiment data 与 Action Expert。",
+      simplified: [
+        "从预训练 VLM 继承视觉语义和语言理解。",
+        "把多机器人、多任务、灵巧操作数据混合进同一个策略。",
+        "新增 continuous Action Expert，用 flow matching 生成高频动作 chunk。",
+        "再用高质量任务数据 post-train，覆盖洗衣、收桌、装盒等长程任务。"
+      ],
+      watchFor: "π0 系列的范式转折是把语义 backbone 和连续动作专家分工，而不是把所有动作都塞进离散 token。"
+    },
+    {
+      title: "FAST：把连续动作序列压缩成高效 token",
+      sourceTitle: "FAST: Efficient Action Tokenization for Vision-Language-Action Models",
+      sourceUrl: "https://arxiv.org/abs/2501.09747",
+      originalFigure: "论文的 FAST tokenizer 图：重点看动作 chunk 如何经过频域/量化/BPE 式压缩，再接入 next-token prediction。",
+      simplified: [
+        "先把一段连续动作 chunk 当作多维时间序列。",
+        "用频域变换压缩主要运动模式，减少高频冗余。",
+        "量化并合并成更短的离散 action tokens。",
+        "让自回归 VLA 以更少 token 预测长动作序列，兼顾效率和精度。"
+      ],
+      watchFor: "FAST 是 token 路线和连续控制之间的桥：它承认动作是连续时序，但仍想吃到 LLM next-token training 的规模化红利。"
+    },
+    {
+      title: "GR00T N1/N1.7：System 2 语义 + System 1 动作生成",
+      sourceTitle: "NVIDIA Isaac GR00T N1 Technical Blog / GR00T N1.7 Model Card",
+      sourceUrl: "https://developer.nvidia.com/blog/accelerate-generalist-humanoid-robot-development-with-nvidia-isaac-gr00t-n1/",
+      imageUrl: "https://developer-blogs.nvidia.com/wp-content/uploads/2025/03/gr00t-n1-model-architecture-1024x576.png",
+      originalFigure: "NVIDIA 技术博客 Figure 2：传感器/文本 token 进入 VLM System 2，再由 Diffusion Transformer System 1 生成 humanoid action。",
+      simplified: [
+        "传感器图像、文本指令和 proprioception 编码成多模态 tokens。",
+        "VLM/System 2 负责语义理解、场景 grounding 和动作计划表征。",
+        "Diffusion/flow action transformer/System 1 条件在这些表征上生成动作 chunk。",
+        "N1.7 进一步以 Cosmos-Reason2 等 backbone 和开源 post-training 入口面向 humanoid。"
+      ],
+      watchFor: "GR00T 图要和 Figure Helix 一起看：两者都在做快慢系统，但公开程度、数据来源和 action 模块细节不同。"
+    },
+    {
+      title: "DreamZero：WAM 同时预测未来视频和动作",
+      sourceTitle: "DreamZero: World Action Models are Zero-shot Policies",
+      sourceUrl: "https://dreamzero0.github.io/",
+      imageUrl: "https://dreamzero0.github.io/images/project_overview.png",
+      originalFigure: "项目页 DreamZero Method Overview / 论文总览图：看 World Action Model 如何用 video、language、proprio 联合生成 future videos 与 continuous actions。",
+      simplified: [
+        "输入历史视频、语言指令和 proprioception，而不是只输入当前帧。",
+        "视频 diffusion backbone 学习物理世界如何随动作演化。",
+        "模型联合预测未来观测和连续动作，把 world modeling 变成 policy。",
+        "通过系统优化把大视频模型压到实时闭环控制。"
+      ],
+      watchFor: "WAM 的核心判断题是：未来视频是否足够 action-controllable。只有能闭环执行，才不只是漂亮的生成模型。"
+    },
+    {
+      title: "Figure Helix：高频上身控制的快慢系统",
+      sourceTitle: "Helix: A Vision-Language-Action Model for Generalist Humanoid Control",
+      sourceUrl: "https://www.figure.ai/news/helix",
+      originalFigure: "官方 blog 的 System 1 / System 2 架构段落与多机器人协作视频：重点看 S2 低频语义 latent 如何喂给 S1 高频 visuomotor policy。",
+      simplified: [
+        "S2 是 onboard VLM，以较低频率理解场景、语言和任务语义。",
+        "S1 是快速 visuomotor transformer，以高频率输出上身、手和头/躯干控制。",
+        "S2 通过 latent vector 给 S1 条件，二者端到端训练但部署时异步运行。",
+        "同一组权重可驱动两个机器人协作完成长程家务任务。"
+      ],
+      watchFor: "Helix 的学习点不是论文 benchmark，而是工业系统如何为高维 humanoid action space 处理实时性和协作。"
+    }
+  ],
   readingPath: [
     {
       phase: "Phase 1",
