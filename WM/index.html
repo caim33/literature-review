@@ -10,10 +10,10 @@
     <header class="hero">
       <nav class="topbar" aria-label="Primary">
         <a href="../">首页</a>
+        <a href="#paradigms">范式</a>
         <a href="#basics">基础</a>
         <a href="#routes">路线</a>
-        <a href="#systems">心智模型</a>
-        <a href="#paradigms">范式</a>
+        <a href="#figures">论文图</a>
         <a href="#references">文献</a>
         <a href="#study">学习路径</a>
       </nav>
@@ -25,7 +25,7 @@
             按机器人优先的视角拆解 World Model：经典 MBRL、视觉动力学、真实机器人 latent WM、生成式交互模拟器、VLA+WM、人形慢速想象层、表示学习和少量自动驾驶/3D 仿真旁支。
           </p>
           <div class="hero-actions">
-            <a class="button primary" href="#routes">开始看路线</a>
+            <a class="button primary" href="#paradigms">先看范式坐标</a>
             <a class="button" href="#references">查文献库</a>
           </div>
         </section>
@@ -51,6 +51,14 @@
     </header>
 
     <main>
+      <section class="band" id="paradigms">
+        <div class="section-head">
+          <p class="eyebrow">Paradigms</p>
+          <h2>读论文前先分清几个坐标</h2>
+        </div>
+        <div id="paradigm-grid" class="paradigm-grid"></div>
+      </section>
+
       <section class="band basics" id="basics">
         <div class="section-head">
           <p class="eyebrow">Basics</p>
@@ -82,14 +90,6 @@
         </div>
         <div id="architecture-diagram" class="architecture-diagram"></div>
         <div id="robot-workflow" class="workflow"></div>
-      </section>
-
-      <section class="band figures-band" id="figures">
-        <div class="section-head">
-          <p class="eyebrow">Paper-Style Figures</p>
-          <h2>主流范式用图看：从 Dreamer 到 VLA + WM</h2>
-        </div>
-        <div id="figure-grid" class="figure-grid"></div>
       </section>
 
       <section class="band intro" id="systems">
@@ -137,6 +137,14 @@
         <div id="route-detail" class="route-detail"></div>
       </section>
 
+      <section class="band figures-band" id="figures">
+        <div class="section-head">
+          <p class="eyebrow">Paper-Style Figures</p>
+          <h2>再用论文 pipeline 图对照每条路线</h2>
+        </div>
+        <div id="figure-grid" class="figure-grid"></div>
+      </section>
+
       <section class="band timeline-band">
         <div class="section-head">
           <p class="eyebrow">Timeline</p>
@@ -151,14 +159,6 @@
           <h2>把几个核心范式写成公式</h2>
         </div>
         <div id="formula-grid" class="formula-grid"></div>
-      </section>
-
-      <section class="band" id="paradigms">
-        <div class="section-head">
-          <p class="eyebrow">Paradigms</p>
-          <h2>不同范式怎么取舍</h2>
-        </div>
-        <div id="paradigm-grid" class="paradigm-grid"></div>
       </section>
 
       <section class="band misconception-band" id="misconceptions">

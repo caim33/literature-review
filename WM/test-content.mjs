@@ -207,6 +207,15 @@ const html = await readFile(indexPath, "utf8");
 for (const id of ["architecture-diagram", "figure-grid", "foundation-grid", "model-comparison", "prediction-targets", "robot-workflow", "misconception-list", "route-tabs", "route-detail", "reference-grid", "timeline", "search-input", "formula-grid", "paradigm-grid", "evidence-legend", "route-match-count"]) {
   assert.ok(html.includes(id), `index should expose #${id}`);
 }
+const sectionOrder = ["paradigms", "basics", "model-based", "targets", "workflow", "routes", "figures"];
+for (let index = 0; index < sectionOrder.length - 1; index += 1) {
+  const current = `id="${sectionOrder[index]}"`;
+  const next = `id="${sectionOrder[index + 1]}"`;
+  assert.ok(html.indexOf(current) < html.indexOf(next), `#${sectionOrder[index]} should appear before #${sectionOrder[index + 1]} in the learning flow`);
+}
+assert.ok(html.includes('href="#paradigms">范式'), "top navigation should expose paradigms before later reading sections");
+assert.ok(html.includes('class="button primary" href="#paradigms"'), "hero primary CTA should start with the paradigm map");
+assert.ok(html.includes("读论文前先分清几个坐标"), "paradigm section should explain that it comes before paper reading");
 
 const app = await readFile(appPath, "utf8");
 for (const fn of ["renderArchitecture", "renderPaperFigures", "renderOriginalMedia", "renderFigure", "renderFoundations", "renderModelComparison", "renderPredictionTargets", "renderRobotWorkflow", "renderMisconceptions", "renderRouteTabs", "renderRouteDetail", "renderReferences", "renderReferenceCard", "renderTimeline", "renderEquations", "renderParadigms", "renderParadigmOverview", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
