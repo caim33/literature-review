@@ -812,6 +812,75 @@ input {
   background: var(--panel);
 }
 
+.paradigm-overview {
+  grid-column: 1 / -1;
+  min-width: 0;
+  padding: 1.25rem;
+  border: 1px solid #b8c8b5;
+  background: #fbfff7;
+}
+
+.paradigm-overview h3 {
+  color: var(--accent);
+}
+
+.overview-intro {
+  max-width: 980px;
+  color: #33404a;
+}
+
+.taxonomy-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  background: var(--line);
+}
+
+.taxonomy-table {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+  background: var(--panel);
+}
+
+.taxonomy-table th,
+.taxonomy-table td {
+  padding: 0.78rem 0.85rem;
+  border: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.taxonomy-table th {
+  color: var(--accent);
+  background: #eef5eb;
+  font-size: 0.86rem;
+}
+
+.taxonomy-axis {
+  width: 150px;
+  color: var(--accent-2);
+  font-weight: 850;
+}
+
+.taxonomy-rule {
+  margin: 1rem 0 0;
+  color: #33404a;
+  font-weight: 700;
+}
+
+.layer-chip {
+  display: inline-flex;
+  max-width: 100%;
+  margin-bottom: 0.7rem;
+  padding: 0.25rem 0.55rem;
+  border: 1px solid #d8cabb;
+  border-radius: 999px;
+  color: var(--accent-3);
+  background: #fffaf2;
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+
 .formula-card h3,
 .paradigm-card h3 {
   color: var(--accent);

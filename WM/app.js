@@ -439,14 +439,48 @@
   function renderParadigms() {
     const container = byId("paradigm-grid");
     container.replaceChildren();
+    container.append(renderParadigmOverview());
     data.paradigms.forEach((paradigm) => {
       const card = el("article", "paradigm-card");
+      card.append(el("p", "layer-chip", paradigm.layer));
       card.append(el("h3", "", paradigm.name));
       card.append(el("p", "examples", paradigm.examples));
+      card.append(labelText("读法", paradigm.readingHint));
+      card.append(labelText("区分轴", paradigm.axis));
+      card.append(labelText("核心问题", paradigm.question));
       card.append(labelText("强项", paradigm.strength));
       card.append(labelText("注意", paradigm.caution));
+      card.append(labelText("不要混同", paradigm.notSameAs));
       container.append(card);
     });
+  }
+
+  function renderParadigmOverview() {
+    const overview = data.paradigmOverview;
+    const wrap = el("article", "paradigm-overview");
+    wrap.append(el("h3", "", "先按层级读，不要当成互斥分类"));
+    wrap.append(el("p", "overview-intro", overview.intro));
+
+    const tableWrap = el("div", "taxonomy-scroll");
+    const table = el("table", "taxonomy-table");
+    const thead = el("thead");
+    const headerRow = el("tr");
+    ["看法", "它真正问什么", "代表路线", "机器人/VLA 用法"].forEach((heading) => headerRow.append(el("th", "", heading)));
+    thead.append(headerRow);
+    const tbody = el("tbody");
+    overview.axes.forEach((axis) => {
+      const row = el("tr");
+      row.append(el("td", "taxonomy-axis", axis.label));
+      row.append(el("td", "", axis.question));
+      row.append(el("td", "", axis.examples));
+      row.append(el("td", "", axis.robotUse));
+      tbody.append(row);
+    });
+    table.append(thead, tbody);
+    tableWrap.append(table);
+    wrap.append(tableWrap);
+    wrap.append(el("p", "taxonomy-rule", overview.rule));
+    return wrap;
   }
 
   function labelText(label, text) {

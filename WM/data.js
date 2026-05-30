@@ -510,7 +510,7 @@ const wmMapData = {
       ]
     },
     {
-      title: "VLA + WM Hybrid：Proposal, Rollout, Rerank",
+      title: "VLA + WM Integration：Proposal, Rollout, Rerank",
       source: "GR-1, OpenVLA/π0 systems, RoboDreamer, IRASim, GR00T/Cosmos direction",
       originalMedia: {
         type: "image",
@@ -523,26 +523,26 @@ const wmMapData = {
       viewBox: "0 0 1160 420",
       cardClass: "wide",
       diagramClass: "pipeline",
-      thesis: "现实机器人系统最可能是混合架构：VLA 给动作候选，WM 做短程想象，critic/safety/controller 决定是否执行。",
-      detail: "这张图把 VLA 放在 proposal policy，而不是 world model 内部。VLA 根据视觉、语言、本体和历史提出多个 action chunk、轨迹或技能；WM 对每个候选做反事实 rollout；critic/safety 根据成功率、接触、碰撞、进度和约束重排或拒绝；最后 controller 执行可落地动作，真实日志再回流改进 VLA、WM 和 critic。",
+      thesis: "这不是另一种“未来生成目标”，而是系统组合方式：VLA 负责提出动作候选，WM 负责想象/校验/重排，controller 负责真实执行。",
+      detail: "区别不在于 WM 是否生成未来视频或 token；其他路线问的是“世界模型生成什么、怎么训练”，VLA + WM Integration 问的是“这些预测在机器人系统里怎么用”。VLA 根据视觉、语言、本体和历史提出多个 action chunk、轨迹或技能；WM 对候选做反事实 rollout；critic/safety 按成功率、接触、碰撞、进度和约束重排或拒绝；controller 执行可落地动作，真实日志再回流改进 VLA、WM 和 critic。",
       deepDive: {
-        summary: "机器人系统里 VLA 负责提案，WM 负责想象和校验。",
+        summary: "这类不是预测目标范式，而是 VLA 和 WM 的系统集成范式。",
         sections: [
           {
             title: "先看什么",
-            body: "先看 VLA 的位置：它读取视觉、语言、本体和历史，不是直接替代 world model，而是提出候选 action chunk、轨迹或技能。后面的 WM、critic 和 safety 才负责比较这些候选的后果。"
+            body: "先看它回答的问题：不是“WM 生成什么”，而是“VLA、WM、critic、安全过滤和控制器怎么接起来”。所以它可以内部使用未来视频、latent token、reward/value 或 contact prediction，但重点是这些预测如何服务候选动作选择。"
           },
           {
             title: "机制怎么跑",
             body: "VLA 先生成 K 个候选动作；world model 对每个候选做短程反事实 rollout，预测成功率、接触、碰撞、进度或风险；critic/reranker 给候选排序，safety filter 拒绝危险选项，controller 执行最终动作。"
           },
           {
-            title: "为什么重要",
-            body: "VLA 擅长语义泛化，但它不一定知道某个动作在当前物理状态下会不会撞、滑、卡住。WM 像慢速 System 2，能在执行前做后果检查，让机器人少用真机试错。"
+            title: "和别的范式差在哪",
+            body: "Visual Foresight、Dreamer、TD-MPC、IRASim 主要按“生成什么/学什么”区分：未来视频、latent dynamics、reward/value、交互式 simulator。VLA + WM Integration 按“怎么用”区分：不管 WM 生成视频还是 token，它都被拿来评估 VLA 的候选动作，而不是单独作为控制算法。"
           },
           {
             title: "容易误解",
-            body: "不要把 WM 画成 VLA 后面的万能大脑，也不要把 VLA 画成只输出单步动作。真实系统通常是混合栈：VLA 提议，WM 想象，critic/safety 重排，低层控制器负责可执行性和全身稳定。"
+            body: "不要把它当成另一种预测目标，也不要说“反正都是生成未来 token”。关键轴不一样：别的路线强调生成什么，Integration 强调预测结果怎么接入策略、重排、安全和控制。真实系统通常是 VLA 提议，WM 想象，critic/safety 重排，低层控制器保证可执行性。"
           }
         ]
       },
@@ -656,42 +656,108 @@ const wmMapData = {
       explain: "JEPA 不预测高熵像素细节，而预测抽象表征；这对物理理解和规划更有吸引力。"
     }
   ],
+  paradigmOverview: {
+    intro: "读这些范式时，先不要把它们都当成同一级模型类别。机器人里的 WM 更像一组坐标：预测什么、优化什么、是否学表征、接口是不是可交互环境、以及在 VLA/控制栈里扮演什么角色。一个真实 VLA+WM 系统可以同时用视频预测、latent dynamics、reward/value 预测和 JEPA 表征；它们不是互斥选项。",
+    axes: [
+      {
+        label: "预测目标",
+        question: "未来画面、latent state、reward/value、接触、风险，模型到底预测什么？",
+        examples: "Pixel video prediction / Latent dynamics / reward-value prediction",
+        robotUse: "决定 WM 输出能否直接接到目标图像、任务进度、失败预测或控制评分。"
+      },
+      {
+        label: "表征学习",
+        question: "模型是不是先学一个更稳定的物理/语义 embedding，再交给动作模型、VLA 或 planner？",
+        examples: "CPC / I-JEPA / V-JEPA / V-JEPA 2",
+        robotUse: "决定它更像视觉物理底座，而不是完整的 action-conditioned 控制模型。"
+      },
+      {
+        label: "控制用途",
+        question: "预测结果是拿来 MPC、actor-critic 想象学习、CEM 重排，还是生成数据？",
+        examples: "Dreamer / TD-MPC / Visual MPC",
+        robotUse: "决定是在线规划、训练 policy，还是对 VLA 的 action chunk 做候选排序。"
+      },
+      {
+        label: "交互接口",
+        question: "模型能不能像环境一样 step-by-step 接收动作、返回下一观测、继续闭环？",
+        examples: "UniSim / Genie / IRASim / Cosmos",
+        robotUse: "决定它能不能成为训练/评估环境，而不只是一次性生成未来片段。"
+      },
+      {
+        label: "系统位置",
+        question: "它接在 VLA 前面做表征、后面做慢速校验，还是作为训练/评估环境？",
+        examples: "VLA proposal + WM rollout + critic/safety + controller",
+        robotUse: "决定它是表征底座、慢速想象层、critic/reranker，还是仿真数据源。"
+      }
+    ],
+    rule: "最实用的判断法：如果它主要回答“生成什么”，就看预测目标；如果回答“学到什么表示”，就看表征学习；如果回答“怎么优化动作”，就看控制用途；如果回答“能不能当环境交互”，就看接口形态；如果回答“VLA、WM、critic、controller 怎么接”，它就是系统集成范式。"
+  },
   paradigms: [
     {
       name: "Pixel video prediction",
       examples: "Finn video prediction, SV2P, Visual Foresight",
+      layer: "预测目标 / 视觉动力学模型",
+      readingHint: "先问它预测的未来帧怎样被转成 reward 或目标距离，再看 MPC 怎样选动作。",
+      axis: "预测目标：未来像素/视频。",
+      question: "如果执行这串动作，未来画面会怎样，离视觉目标有多近？",
       strength: "直观，可用于目标图像、像素点或视频 rollout。",
-      caution: "长时程容易模糊漂移，视觉真实不等于控制可靠。"
+      caution: "长时程容易模糊漂移，视觉真实不等于控制可靠。",
+      notSameAs: "它和 TD-MPC 的区别不是有没有未来，而是评分主要在视频/像素空间，不是直接学 reward/Q/value latent。"
     },
     {
       name: "Latent model-based RL",
       examples: "PlaNet, DreamerV3, TD-MPC2",
+      layer: "控制优化 / latent dynamics",
+      readingHint: "先问 latent 里是否有 action dynamics、reward/value/Q，再看 planner 或 actor-critic 怎么用它。",
+      axis: "预测目标：latent dynamics、reward、value 或 Q。",
+      question: "能否在压缩状态里想象后果，并直接优化控制目标？",
       strength: "直接服务 reward/value/control，样本效率和规划接口清楚。",
-      caution: "表示是否捕捉接触、物体状态和长程任务进度，需要下游验证。"
+      caution: "表示是否捕捉接触、物体状态和长程任务进度，需要下游验证。",
+      notSameAs: "它不一定生成可看的未来视频；latent 是否好，要看它能不能提升规划、actor-critic 或 MPC。"
     },
     {
       name: "Interactive generative simulator",
       examples: "UniSim, Genie, IRASim, Cosmos",
+      layer: "交互接口 / 生成式环境",
+      readingHint: "先问它是不是能被 agent 连续 step，而不是只看生成视频是否清晰。",
+      axis: "接口形态：能否 step-by-step 交互。",
+      question: "模型能不能像环境一样接收动作、吐出下一观测，再继续闭环？",
       strength: "能生成可交互环境、长尾数据和机器人训练/评估样本。",
-      caution: "关键看 action controllability、闭环稳定和 sim-to-real，而不是 demo 画质。"
+      caution: "关键看 action controllability、闭环稳定和 sim-to-real，而不是 demo 画质。",
+      notSameAs: "它不只是生成未来视频；重点是有动作接口、可连续交互、能被 agent 用来训练或评估。"
     },
     {
-      name: "VLA + WM hybrid",
+      name: "VLA + WM system integration",
       examples: "GR-1, OpenVLA + critic, π0 + rollout, GR00T stack",
+      layer: "系统集成 / 机器人部署架构",
+      readingHint: "先问 VLA、WM、critic/safety、controller 的输入输出怎么接，而不是问它属于哪种预测目标。",
+      axis: "系统组合：VLA、WM、critic/safety、controller 怎么分工。",
+      question: "VLA 提出的候选动作，如何被 WM 想象、评分、过滤并交给控制器？",
       strength: "把 VLA 的语义泛化和 WM 的反事实想象结合，最贴近可部署机器人系统。",
-      caution: "接口复杂：候选动作粒度、延迟、评分函数和安全边界都要设计。"
+      caution: "接口复杂：候选动作粒度、延迟、评分函数和安全边界都要设计。",
+      notSameAs: "它不是另一种未来生成目标；内部 WM 可以是视频、latent、reward 或 simulator，重点是预测结果怎么用。"
     },
     {
       name: "JEPA / masked latent prediction",
       examples: "CPC, I-JEPA, V-JEPA, V-JEPA 2",
+      layer: "表征学习 / 预训练目标",
+      readingHint: "先问它学到的 embedding 能否被动作条件 dynamics、planner 或 VLA 复用。",
+      axis: "表征学习目标：预测抽象 embedding，而不是像素细节。",
+      question: "能否学到更稳定的物理/语义表征，再迁移给控制或规划？",
       strength: "避免浪费容量预测像素噪声，更可能学到可规划表征。",
-      caution: "自监督表征强不等于自动有动作条件和可控 dynamics。"
+      caution: "自监督表征强不等于自动有动作条件和可控 dynamics。",
+      notSameAs: "它不是完整机器人控制栈；没有动作条件、reward/value 或 planner 时，只是候选表征底座。"
     },
     {
       name: "Driving / 3D simulation side route",
       examples: "GAIA-1, Vista, OccWorld, Waymax",
+      layer: "旁支迁移 / 3D 场景评估",
+      readingHint: "先借鉴闭环评估和空间表示，再判断哪些能迁移到接触丰富的机器人操作。",
+      axis: "空间表示与评估场景：BEV/occupancy/闭环驾驶仿真。",
+      question: "多传感器世界如何在 3D/BEV 空间中生成、评估和闭环测试？",
       strength: "闭环评估、多传感器一致性、长尾场景生成非常成熟。",
-      caution: "驾驶动作空间和机器人接触操作差异大，只借鉴仿真与评估方法。"
+      caution: "驾驶动作空间和机器人接触操作差异大，只借鉴仿真与评估方法。",
+      notSameAs: "它不是灵巧操作的直接答案；机器人接触、手物遮挡和全身控制要另行处理。"
     }
   ],
   readingPath: [

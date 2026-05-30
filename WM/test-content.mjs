@@ -24,8 +24,32 @@ assert.ok(Array.isArray(data.routes), "routes should be an array");
 assert.ok(data.routes.length >= 8, "should cover at least 8 world model routes");
 assert.ok(Array.isArray(data.equations), "equations should be an array");
 assert.ok(data.equations.length >= 5, "should include at least 5 rendered equations");
+assert.ok(data.paradigmOverview, "should include a paradigm overview/reading guide");
+assert.ok(data.paradigmOverview.intro.includes("同一级") && data.paradigmOverview.intro.includes("不是互斥"), "paradigm overview should warn that paradigms are not one mutually-exclusive level");
+assert.ok(data.paradigmOverview.rule.includes("生成什么") && data.paradigmOverview.rule.includes("学到什么表示") && data.paradigmOverview.rule.includes("系统集成"), "paradigm overview should explain the main axis differences");
+assert.ok(Array.isArray(data.paradigmOverview.axes) && data.paradigmOverview.axes.length >= 5, "paradigm overview should include multiple reading axes");
+for (const label of ["预测目标", "表征学习", "控制用途", "交互接口", "系统位置"]) {
+  assert.ok(data.paradigmOverview.axes.some((axis) => axis.label === label), `paradigm overview should include ${label}`);
+}
+assert.ok(!data.paradigmOverview.axes.find((axis) => axis.label === "预测目标")?.examples.includes("JEPA"), "JEPA should not be folded into the prediction-target overview axis");
+for (const axis of data.paradigmOverview.axes) {
+  assert.ok(axis.question, `${axis.label} needs a question`);
+  assert.ok(axis.examples, `${axis.label} needs examples`);
+  assert.ok(axis.robotUse, `${axis.label} needs robot/VLA use`);
+}
 assert.ok(Array.isArray(data.paradigms), "paradigms should be an array");
 assert.ok(data.paradigms.length >= 5, "should compare at least 5 world model paradigms");
+for (const paradigm of data.paradigms) {
+  assert.ok(paradigm.layer, `${paradigm.name} needs a primary layer`);
+  assert.ok(paradigm.readingHint, `${paradigm.name} needs a reading hint`);
+  assert.ok(paradigm.axis, `${paradigm.name} needs an axis that explains what dimension separates it`);
+  assert.ok(paradigm.question, `${paradigm.name} needs a core question`);
+  assert.ok(paradigm.notSameAs, `${paradigm.name} should explain what it is not the same as`);
+}
+assert.ok(data.paradigms.find((item) => item.name.includes("Pixel"))?.layer.includes("预测目标"), "Pixel video prediction should be framed as a prediction-target route");
+assert.ok(data.paradigms.find((item) => item.name.includes("Interactive"))?.layer.includes("交互接口"), "Interactive simulator should be framed as an interaction interface");
+assert.ok(data.paradigms.find((item) => item.name.includes("VLA + WM"))?.layer.includes("系统集成"), "VLA + WM should be framed as system integration");
+assert.ok(data.paradigms.find((item) => item.name.includes("JEPA"))?.layer.includes("表征学习"), "JEPA should be framed as representation learning");
 assert.ok(Array.isArray(data.foundations), "foundations should be an array");
 assert.ok(data.foundations.length >= 6, "should explain at least 6 beginner WM concepts");
 assert.ok(Array.isArray(data.modelFreeVsModelBased), "modelFreeVsModelBased should be an array");
@@ -51,7 +75,7 @@ const expectedPipelineFigures = [
   "Visual Foresight：Video Prediction + MPC",
   "TD-MPC / TD-MPC2：Task-Oriented Latent MPC",
   "Genie / UniSim / IRASim：Interactive Simulator",
-  "VLA + WM Hybrid：Proposal, Rollout, Rerank",
+  "VLA + WM Integration：Proposal, Rollout, Rerank",
 ];
 for (const title of expectedPipelineFigures) {
   const figure = data.paperFigures.find((item) => item.title === title);
@@ -63,10 +87,15 @@ for (const title of expectedPipelineFigures) {
   assert.ok((figure.edges ?? []).some((edge) => typeof edge === "object" && edge.label), `${title} should label key arrows`);
 }
 const tdMpcFigure = data.paperFigures.find((figure) => figure.title.includes("TD-MPC"));
+const hybridFigure = data.paperFigures.find((figure) => figure.title.includes("VLA + WM Integration"));
 const hasEdge = (figure, fromId, toId) => figure.edges.some((edge) => {
   const [from, to] = Array.isArray(edge) ? edge : [edge.from, edge.to];
   return from === fromId && to === toId;
 });
+assert.ok(hybridFigure, "should include VLA + WM hybrid figure");
+assert.ok(hybridFigure.thesis.includes("系统组合") || hybridFigure.detail.includes("系统组合"), "VLA + WM hybrid should be framed as a system composition, not a prediction target");
+assert.ok(hybridFigure.deepDive.sections.some((section) => section.body.includes("不是另一种预测目标") || section.body.includes("不要把它当成另一种预测目标")), "VLA + WM deep dive should contrast system composition vs future prediction targets");
+assert.ok(hybridFigure.deepDive.sections.some((section) => section.body.includes("生成什么") && section.body.includes("怎么用")), "VLA + WM deep dive should explain the key axis difference");
 assert.ok(tdMpcFigure, "should include a TD-MPC figure");
 assert.ok(tdMpcFigure.thesis.includes("像素重建") && tdMpcFigure.thesis.includes("terminal value"), "TD-MPC should explain decoder-free task-oriented control");
 assert.ok(tdMpcFigure.detail?.includes("decoder-free") && tdMpcFigure.detail?.includes("CEM"), "TD-MPC should include a concrete decoder-free and CEM planning explanation");
@@ -180,13 +209,17 @@ for (const id of ["architecture-diagram", "figure-grid", "foundation-grid", "mod
 }
 
 const app = await readFile(appPath, "utf8");
-for (const fn of ["renderArchitecture", "renderPaperFigures", "renderOriginalMedia", "renderFigure", "renderFoundations", "renderModelComparison", "renderPredictionTargets", "renderRobotWorkflow", "renderMisconceptions", "renderRouteTabs", "renderRouteDetail", "renderReferences", "renderReferenceCard", "renderTimeline", "renderEquations", "renderParadigms", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
+for (const fn of ["renderArchitecture", "renderPaperFigures", "renderOriginalMedia", "renderFigure", "renderFoundations", "renderModelComparison", "renderPredictionTargets", "renderRobotWorkflow", "renderMisconceptions", "renderRouteTabs", "renderRouteDetail", "renderReferences", "renderReferenceCard", "renderTimeline", "renderEquations", "renderParadigms", "renderParadigmOverview", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
   assert.ok(app.includes(fn), `app should include ${fn}`);
 }
 assert.ok(app.includes("paper-original-media"), "app should render original paper/project media");
 assert.ok(app.includes("figure-detail"), "app should render detailed paradigm explanations when present");
 assert.ok(app.includes("renderDeepDive"), "app should render collapsible detailed paper interpretations");
 assert.ok(app.includes("paper-deep-dive"), "app should use a dedicated deep dive details component");
+assert.ok(app.includes("paradigmOverview"), "app should consume paradigm overview data");
+assert.ok(app.includes("taxonomy-table"), "app should render the paradigm overview as a matrix/table");
+assert.ok(app.includes("readingHint"), "paradigm cards should include reading hints");
+assert.ok(app.includes("notSameAs"), "paradigm cards should explain what each paradigm is not");
 assert.ok(app.includes("diagramClass"), "app should allow figures to opt into clearer diagram layouts");
 assert.ok(app.includes("cardClass"), "app should allow complex figure cards to opt into wider layouts");
 assert.ok(app.includes("figure.stages"), "app should render stage backgrounds for pipeline figures");
@@ -195,5 +228,10 @@ assert.ok(app.includes("reference-route"), "references should render route group
 assert.ok(app.includes("reference-route-grid"), "references should keep papers grouped within each route");
 assert.ok(app.includes("route.references.map"), "references should be grouped from each route, not one global flat list");
 assert.ok(!app.includes("innerHTML = `<strong>${reference.title}"), "mini refs should not interpolate titles with innerHTML");
+
+const css = await readFile(stylePath, "utf8");
+assert.ok(css.includes(".paradigm-overview"), "styles should include paradigm overview module styles");
+assert.ok(css.includes(".taxonomy-table"), "styles should include taxonomy table styles");
+assert.ok(css.includes(".layer-chip"), "styles should include paradigm layer labels");
 
 console.log(`OK: ${data.routes.length} routes, ${allRefs.length} references`);
