@@ -154,6 +154,32 @@
     });
   }
 
+  function renderDesignAxes() {
+    const container = byId("design-axis-grid");
+    container.replaceChildren();
+    data.designAxes.forEach((axis, index) => {
+      const card = el("article", "axis-card");
+
+      const head = el("div", "axis-head");
+      head.append(el("span", "axis-number", String(index + 1).padStart(2, "0")));
+      const titleWrap = el("div");
+      titleWrap.append(el("h3", "", axis.title));
+      titleWrap.append(el("p", "axis-question", axis.question));
+      head.append(titleWrap);
+
+      const options = el("ul", "axis-options");
+      axis.options.forEach((option) => options.append(el("li", "", option)));
+
+      card.append(head);
+      card.append(el("p", "axis-summary", axis.summary));
+      card.append(labelText("为什么重要", axis.why));
+      card.append(options);
+      card.append(labelText("读论文时看", axis.probe));
+      card.append(labelText("容易误判", axis.trap));
+      container.append(card);
+    });
+  }
+
   function renderArchitectureDiagrams() {
     const container = byId("architecture-gallery");
     container.replaceChildren();
@@ -229,6 +255,32 @@
       body.append(simplified);
 
       card.append(media, body);
+      container.append(card);
+    });
+  }
+
+  function renderCaseStudies() {
+    const container = byId("case-study-grid");
+    container.replaceChildren();
+    data.caseStudies.forEach((study) => {
+      const card = el("article", "case-card");
+      const head = el("div", "case-head");
+      head.append(el("span", "case-kicker", study.kicker));
+      head.append(el("h3", "", study.title));
+      head.append(el("p", "", study.answer));
+
+      const flow = el("ol", "case-flow");
+      study.flow.forEach((step) => flow.append(el("li", "", step)));
+
+      const notes = el("div", "case-notes");
+      study.notes.forEach((note) => notes.append(labelText(note.label, note.text)));
+
+      const link = el("a", "case-link", study.sourceTitle);
+      link.href = study.sourceUrl;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+
+      card.append(head, flow, notes, link);
       container.append(card);
     });
   }
@@ -382,7 +434,9 @@
     renderTimeline();
     renderEquations();
     renderParadigms();
+    renderDesignAxes();
     renderArchitectureDiagrams();
+    renderCaseStudies();
     renderPaperFigureGuides();
     renderReadingPath();
     renderGlossary();

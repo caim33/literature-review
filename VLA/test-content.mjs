@@ -25,10 +25,14 @@ assert.ok(Array.isArray(data.equations), "equations should be an array");
 assert.ok(data.equations.length >= 5, "should include at least 5 rendered equations");
 assert.ok(Array.isArray(data.paradigms), "paradigms should be an array");
 assert.ok(data.paradigms.length >= 5, "should compare at least 5 VLA paradigms");
+assert.ok(Array.isArray(data.designAxes), "designAxes should be an array");
+assert.equal(data.designAxes.length, 6, "should include the 6-paper-reading VLA design axes");
 assert.ok(Array.isArray(data.architectureDiagrams), "architectureDiagrams should be an array");
 assert.ok(data.architectureDiagrams.length >= 4, "should include at least 4 architecture diagrams");
 assert.ok(Array.isArray(data.paperFigureGuides), "paperFigureGuides should be an array");
 assert.ok(data.paperFigureGuides.length >= 5, "should include at least 5 paper figure guides");
+assert.ok(Array.isArray(data.caseStudies), "caseStudies should be an array");
+assert.ok(data.caseStudies.length >= 2, "should include Figure case studies");
 
 const allRefs = data.routes.flatMap((route) => route.references ?? []);
 assert.ok(allRefs.length >= 50, "should include at least 50 references");
@@ -40,6 +44,7 @@ const requiredNames = [
   "pi0.7",
   "GR00T N1.7",
   "Figure Helix",
+  "Helix-02 Bedroom Tidy",
   "DreamZero",
   "StarVLA",
   "SpatialVLA",
@@ -83,6 +88,16 @@ for (const diagram of data.architectureDiagrams) {
   assert.ok(diagram.takeaway, `${diagram.title} needs takeaway`);
 }
 
+for (const axis of data.designAxes) {
+  assert.ok(axis.title, "design axis needs title");
+  assert.ok(axis.question, `${axis.title} needs guiding question`);
+  assert.ok(axis.summary, `${axis.title} needs summary`);
+  assert.ok(axis.why, `${axis.title} needs why`);
+  assert.ok(Array.isArray(axis.options) && axis.options.length >= 3, `${axis.title} needs options`);
+  assert.ok(axis.probe, `${axis.title} needs paper-reading probe`);
+  assert.ok(axis.trap, `${axis.title} needs common trap`);
+}
+
 for (const figure of data.paperFigureGuides) {
   assert.ok(figure.title, "paper figure guide needs title");
   assert.ok(figure.sourceTitle, `${figure.title} needs sourceTitle`);
@@ -93,19 +108,27 @@ for (const figure of data.paperFigureGuides) {
   assert.ok(Array.isArray(figure.simplified) && figure.simplified.length >= 3, `${figure.title} needs simplified steps`);
 }
 
+for (const study of data.caseStudies) {
+  assert.ok(study.title, "case study needs title");
+  assert.ok(study.answer, `${study.title} needs answer`);
+  assert.ok(study.sourceUrl?.startsWith("http"), `${study.title} needs source URL`);
+  assert.ok(Array.isArray(study.flow) && study.flow.length >= 3, `${study.title} needs mechanism flow`);
+  assert.ok(Array.isArray(study.notes) && study.notes.length >= 1, `${study.title} needs notes`);
+}
+
 const html = await readFile(indexPath, "utf8");
-for (const id of ["route-tabs", "route-detail", "reference-grid", "timeline", "search-input", "formula-grid", "paradigm-grid", "architecture-gallery", "paper-figure-guides", "evidence-legend", "route-match-count"]) {
+for (const id of ["route-tabs", "route-detail", "reference-grid", "timeline", "search-input", "formula-grid", "paradigm-grid", "design-axis-grid", "architecture-gallery", "case-study-grid", "paper-figure-guides", "evidence-legend", "route-match-count"]) {
   assert.ok(html.includes(id), `index should expose #${id}`);
 }
 
 const app = await readFile(appPath, "utf8");
-for (const fn of ["renderRouteTabs", "renderRouteDetail", "renderReferences", "renderRouteReferenceGroup", "renderTimeline", "renderEquations", "renderParadigms", "renderArchitectureDiagrams", "renderPaperFigureGuides", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
+for (const fn of ["renderRouteTabs", "renderRouteDetail", "renderReferences", "renderRouteReferenceGroup", "renderTimeline", "renderEquations", "renderParadigms", "renderDesignAxes", "renderArchitectureDiagrams", "renderCaseStudies", "renderPaperFigureGuides", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
   assert.ok(app.includes(fn), `app should include ${fn}`);
 }
 assert.ok(!app.includes("innerHTML = `<strong>${reference.title}"), "mini refs should not interpolate titles with innerHTML");
 
 const styles = await readFile(stylePath, "utf8");
-for (const className of ["reference-groups", "reference-route-group", "route-reference-grid", "route-group-head"]) {
+for (const className of ["reference-groups", "reference-route-group", "route-reference-grid", "route-group-head", "design-axis-grid", "axis-card"]) {
   assert.ok(styles.includes(className), `styles should include ${className}`);
 }
 

@@ -10,7 +10,9 @@
     <header class="hero">
       <nav class="topbar" aria-label="Primary">
         <a href="#routes">路线</a>
+        <a href="#design-axes">六轴</a>
         <a href="#architecture">架构图</a>
+        <a href="#case-studies">案例</a>
         <a href="#paper-figures">论文图</a>
         <a href="#systems">范式</a>
         <a href="#references">文献</a>
@@ -75,12 +77,31 @@
         </div>
       </section>
 
+      <section class="band axis-band" id="design-axes">
+        <div class="section-head">
+          <p class="eyebrow">Dissection Checklist</p>
+          <h2>六个设计轴：拆开“VLM token + action head”</h2>
+        </div>
+        <p class="section-intro">
+          粗看 VLA 都像 VLM 给 token、action head 输出动作；真正的分叉藏在动作表示、生成目标、时间结构、数据配方、embodiment 接口和 VLM 的实际职责里。
+        </p>
+        <div id="design-axis-grid" class="design-axis-grid"></div>
+      </section>
+
       <section class="band architecture-band" id="architecture">
         <div class="section-head">
           <p class="eyebrow">Architecture</p>
           <h2>把 VLA 先画成几类系统图</h2>
         </div>
         <div id="architecture-gallery" class="architecture-gallery"></div>
+      </section>
+
+      <section class="band case-band" id="case-studies">
+        <div class="section-head">
+          <p class="eyebrow">Case Studies</p>
+          <h2>重点 demo 怎么做：Figure 叠衣服 / 铺床</h2>
+        </div>
+        <div id="case-study-grid" class="case-study-grid"></div>
       </section>
 
       <section class="band paper-figures-band" id="paper-figures">

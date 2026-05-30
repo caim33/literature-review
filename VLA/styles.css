@@ -208,6 +208,91 @@ h3 {
   font-weight: 850;
 }
 
+.section-intro {
+  max-width: 880px;
+  margin: -0.4rem 0 1.35rem;
+  color: #38454d;
+  font-size: 1.02rem;
+  font-weight: 650;
+}
+
+.axis-band {
+  width: 100%;
+  padding-left: max(1rem, calc((100vw - 1180px) / 2));
+  padding-right: max(1rem, calc((100vw - 1180px) / 2));
+  background: #fffaf2;
+}
+
+.design-axis-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.axis-card {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 0.8rem;
+  padding: 1.1rem;
+  border: 1px solid #d9cbb8;
+  background: #fffdf8;
+}
+
+.axis-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.axis-number {
+  display: inline-grid;
+  width: 2.3rem;
+  height: 2.3rem;
+  align-items: center;
+  justify-items: center;
+  border: 1px solid #c7d4cf;
+  color: var(--accent);
+  background: #eef5f2;
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+
+.axis-head h3 {
+  margin-bottom: 0.25rem;
+  color: var(--accent);
+  font-size: clamp(1.1rem, 2vw, 1.45rem);
+}
+
+.axis-question {
+  margin-bottom: 0;
+  color: #2d3b43;
+  font-weight: 800;
+}
+
+.axis-summary {
+  margin-bottom: 0;
+  color: #4f5c63;
+}
+
+.axis-options {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.axis-options li {
+  min-width: 0;
+  padding: 0.58rem 0.7rem;
+  border-left: 3px solid #aeb9aa;
+  background: #f8f8f0;
+  color: #33404a;
+  overflow-wrap: anywhere;
+}
+
 .route-tabs {
   display: flex;
   gap: 0.5rem;
@@ -516,6 +601,77 @@ input {
 .diagram-edge span {
   color: var(--muted);
   font-size: 0.8rem;
+}
+
+.case-band {
+  width: 100%;
+  padding-left: max(1rem, calc((100vw - 1180px) / 2));
+  padding-right: max(1rem, calc((100vw - 1180px) / 2));
+  background: #edf3f2;
+}
+
+.case-study-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.case-card {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1fr) minmax(260px, 0.8fr);
+  gap: 1px;
+  border: 1px solid #c8d8d6;
+  background: #c8d8d6;
+}
+
+.case-card > * {
+  min-width: 0;
+  background: #fffdf8;
+}
+
+.case-head,
+.case-notes {
+  padding: 1.1rem;
+}
+
+.case-kicker {
+  display: block;
+  margin-bottom: 0.55rem;
+  color: var(--accent-2);
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.case-head h3 {
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  line-height: 1.12;
+}
+
+.case-head p {
+  color: #344348;
+  font-weight: 650;
+}
+
+.case-flow {
+  display: grid;
+  align-content: start;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 1.1rem 1.1rem 1.1rem 2.35rem;
+}
+
+.case-flow li {
+  padding-left: 0.15rem;
+}
+
+.case-link {
+  grid-column: 1 / -1;
+  display: block;
+  padding: 0.85rem 1.1rem;
+  color: var(--accent);
+  background: #f6faf9;
+  font-weight: 850;
+  overflow-wrap: anywhere;
+  text-underline-offset: 3px;
 }
 
 .paper-figures-band {
@@ -873,6 +1029,8 @@ input {
   .detail-columns,
   .split,
   .figure-guide,
+  .case-card,
+  .design-axis-grid,
   .principle-grid,
   .formula-grid,
   .paradigm-grid,

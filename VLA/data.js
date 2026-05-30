@@ -105,6 +105,91 @@ const vlaMapData = {
       caution: "接口和安全边界复杂，需要明确技能可供性、状态反馈和失败恢复。"
     }
   ],
+  designAxes: [
+    {
+      title: "Action 表示",
+      question: "action 是离散 token、连续向量，还是 learned action code？",
+      summary: "这是最先要看的轴。它决定模型把机器人动作当语言、当连续控制量，还是当一个先学出来的运动符号系统。",
+      why: "同样叫 action head，输出空间可以完全不同。离散 token 更容易复用 LLM 训练范式，连续向量更贴近控制，learned action code 则试图把高频轨迹压缩成可生成的低频符号。",
+      options: [
+        "离散 action token：RT-2 / OpenVLA 把连续动作量化成 token，用 next-token loss 学动作。",
+        "连续 action vector：Octo / Diffusion Policy / π0 / GR00T / RDT 直接生成 EEF、joint、gripper 或 whole-body chunk。",
+        "learned action code：FAST / VQ-VLA / OAT 先训练动作 tokenizer 或 codec，再让大模型生成压缩后的运动码。"
+      ],
+      probe: "读论文时找 action space、tokenization、action normalization、chunk horizon、control frequency。这里比 backbone 名字更影响真机手感。",
+      trap: "不要把所有 action head 都看成 MLP。token head、diffusion denoiser、flow action expert、motion codec 的训练和部署代价完全不同。"
+    },
+    {
+      title: "生成动作的训练目标",
+      question: "动作靠 next-token、regression、diffusion、flow matching，还是 world model planning？",
+      summary: "这一轴回答模型到底在学一个点估计、一个动作分布，还是先想象未来再选动作。",
+      why: "机器人动作常常多峰：杯子可以从左边抓，也可以从右边抓。训练目标决定模型能不能表达多种可行轨迹，以及推理时需要几步采样。",
+      options: [
+        "next-token：RT-2 / OpenVLA 像语言模型一样生成动作 token，工程简单但连续精度和速度要处理。",
+        "regression / BC：直接拟合专家动作，快而稳定，但多峰任务容易平均化。",
+        "diffusion / flow matching：Diffusion Policy / π0 / GR00T / RDT 从噪声动作生成连续 chunk，更适合精细、多峰和长 horizon 控制。",
+        "world model planning：Dreamer / TD-MPC / DreamZero 先预测动作后果，再用 value、reward 或 safety cost 选择动作。"
+      ],
+      probe: "看 loss 写的是 cross entropy、L2/L1、denoising score、flow matching vector field，还是 rollout value optimization。",
+      trap: "论文图里都叫 generator，但 next-token generator 和 flow generator 不是一回事。前者生成符号序列，后者生成连续轨迹场。"
+    },
+    {
+      title: "时间结构",
+      question: "是 single-step、chunk、receding horizon，还是 fast-slow hierarchy？",
+      summary: "这一轴区分模型是每次吐一个动作，还是吐一段动作，以及有没有慢语义和快控制的分频结构。",
+      why: "chunk 解决平滑和吞吐，receding horizon 解决实时纠错，fast-slow hierarchy 解决语义推理和高频控制的速度矛盾。",
+      options: [
+        "single-step：每次观测后输出一个动作，闭环强但吞吐和稳定性可能受限。",
+        "action chunking：ACT / Diffusion Policy / π0 / GR00T 一次输出未来 H 步动作，执行时要处理 chunk blending。",
+        "receding horizon：只执行 chunk 前几步，然后重新感知和重规划，降低 open-loop 漂移。",
+        "fast-slow hierarchy：GR00T / Helix 类系统把低频 VLM 语义模块和高频 visuomotor policy 分开部署。"
+      ],
+      probe: "查 inference loop：模型多久跑一次，chunk 长度是多少，执行几步后重算，低层 controller 的频率是多少。",
+      trap: "50 帧动作不自动等于快慢系统。只有存在不同频率、不同抽象层级的模块分工，才适合叫 fast-slow。"
+    },
+    {
+      title: "数据来源和配方",
+      question: "数据主要来自 robot demo、human video、web data、sim，还是 synthetic？",
+      summary: "VLA 的上限常常不在模型结构，而在数据能否覆盖语义、接触、失败恢复和目标机器人分布。",
+      why: "robot demo 教可执行动作，human video 教人类任务先验，web data 教语义，sim 和 synthetic 扩规模，但每种数据都带来 action 缺失、domain gap 或标注噪声。",
+      options: [
+        "真实 robot demo / teleop：Open X-Embodiment、DROID、π0 数据栈的核心，最接近执行但昂贵。",
+        "human video：GR00T、DreamZero、一些 latent action 路线试图从无动作视频中学习任务和运动先验。",
+        "web VLM data：π0.5 / Gemini Robotics 类路线利用通用视觉语言知识补 open-world 语义。",
+        "sim / synthetic / MimicGen：RoboCasa、MimicGen、Isaac 系工具扩展长尾场景，但要评估 sim2real。"
+      ],
+      probe: "看数据表而不是只看参数量：episode 数、小时数、embodiment 数、任务数、是否含失败、是否含部署回流。",
+      trap: "web knowledge 不等于 robot skill。模型知道杯子是什么，不代表知道在你的手爪、相机和控制频率下怎么抓。"
+    },
+    {
+      title: "Embodiment 和 action space",
+      question: "action space 是 EEF、joint、whole-body，还是跨 embodiment latent action？",
+      summary: "这一轴决定模型到底在控制什么身体。单臂 EEF、双臂、灵巧手、人形全身并不是同一个问题。",
+      why: "跨机器人泛化最难的地方往往不是图像语言，而是动作接口。不同 DOF、相机、夹爪、手指和底盘会让同一个任务变成不同控制问题。",
+      options: [
+        "EEF delta / gripper：很多桌面 manipulation VLA 使用，容易跨臂迁移但会隐藏关节和接触细节。",
+        "joint / velocity / torque：更贴近硬件控制，适合灵巧手和全身，但跨机器人难度高。",
+        "whole-body action：GR00T、Helix、Gemini Robotics humanoid demo 要同时处理手、腕、躯干、头、腿或底盘。",
+        "cross-embodiment latent action：用 embodiment adapter、relative action 或 learned latent bridge 统一不同机器人。"
+      ],
+      probe: "找 observation schema 和 action schema：相机视角、proprioception、控制维度、单位、频率、是否有 embodiment ID 或 adapter。",
+      trap: "同一个 VLA backbone 接不同 action decoder，不代表已经解决跨 embodiment。真问题在 retarget、标定、控制闭环和数据平衡。"
+    },
+    {
+      title: "VLM 的真实作用",
+      question: "VLM 真的在做语义推理，还是只是 feature encoder？",
+      summary: "很多模型都接 VLM token，但这些 token 可能承担完全不同的角色，从视觉特征到任务规划都有可能。",
+      why: "如果 VLM 只是冻结的视觉语言特征提取器，模型的语义泛化主要来自预训练表征。如果 VLM 参与任务分解、subgoal 或 object grounding，它就更接近慢系统或 embodied reasoner。",
+      options: [
+        "feature encoder：VLM 输出视觉语言 latent，action module 负责几乎全部控制，例如一些 VLM-conditioned policy。",
+        "semantic grounding：VLM 识别物体、属性、关系和可供性，帮助 policy 对准语言目标。",
+        "task decomposition：SayCan、PaLM-E、Gemini Robotics 1.5、Figure/Helix 式系统让语义模块处理长程阶段或子目标。",
+        "closed-loop critic / verifier：VLM 或 VLM-like 模块检查是否完成、是否偏离任务、是否需要恢复。"
+      ],
+      probe: "看 VLM 是否冻结、是否和 action loss 共训、是否输出 subgoal/plan，是否在执行中多次调用，以及失败恢复是否依赖它。",
+      trap: "不要因为论文用了大 VLM 就默认它会推理。很多时候 VLM 只是昂贵但好用的视觉特征前端。"
+    }
+  ],
   architectureDiagrams: [
     {
       title: "End-to-End VLA 基础架构",
@@ -246,7 +331,7 @@ const vlaMapData = {
         {
           id: "whole-body-control",
           label: "Whole-Body Controller",
-          detail: "平衡、碰撞、关节限制、接触稳定和时延补偿。"
+          detail: "平衡、碰撞、关节限制、接触稳定和时延补偿；Helix-02 公开称其底层为 System 0。"
         },
         {
           id: "hands-base",
@@ -306,6 +391,59 @@ const vlaMapData = {
         { from: "mine", to: "sources", label: "collect again" }
       ],
       takeaway: "公司级 VLA 的护城河往往是数据飞轮：真实部署越多，失败越可挖，下一版模型越能覆盖长尾。"
+    }
+  ],
+  caseStudies: [
+    {
+      title: "Figure 叠衣服：是 Helix 吗？",
+      kicker: "Helix Learns to Fold Laundry",
+      answer: "是 Helix 家族。这个 demo 更准确地叫 Helix learns to fold laundry：单台 Figure 机器人用 Helix 的快慢系统执行毛巾/衣物折叠，重点在长程布料接触、双手协调和视觉闭环。",
+      sourceTitle: "Figure AI: Helix Learns to Fold Laundry",
+      sourceUrl: "https://www.figure.ai/news/helix-learns-to-fold-laundry",
+      flow: [
+        "System 2 用视觉和语言理解任务语义、物体状态和当前步骤。",
+        "System 1 高频 visuomotor policy 接收 S2 latent，连续输出上身、手腕、手指等动作。",
+        "动作不是一次性脚本，而是在执行中不断看布料边缘、折痕、手的位置并重规划局部动作。",
+        "学习价值：布料会遮挡、变形、滑动，要求模型同时学 contact-rich manipulation 和阶段进度判断。"
+      ],
+      notes: [
+        { label: "不要误标", text: "它不是 Helix-02 Bedroom Tidy；它是 Helix 在 laundry/folding 任务上的展示。" },
+        { label: "读 demo 的问题", text: "是否用同一模型覆盖不同衣物？是否 task-specific data？失败后能否自己恢复？这些比视频是否流畅更关键。" }
+      ]
+    },
+    {
+      title: "Figure 铺床 / 叠被子：更准确是 Helix-02 Bedroom Tidy",
+      kicker: "Helix-02 Bedroom Tidy",
+      answer: "如果你说的是两个 Figure humanoid 协作拉被子、整理床铺、reset bedroom，那它应标为 Helix-02 / Bedroom Tidy。它仍在 Helix 路线里，但比早期 Helix 多了全身移动和多机器人长程协作。",
+      sourceTitle: "Figure AI: Helix-02 Bedroom Tidy",
+      sourceUrl: "https://www.figure.ai/news/helix-02-bedroom-tidy",
+      flow: [
+        "每台机器人各自 onboard 感知房间、床、被子和对方位置，执行同一个 learned policy。",
+        "公开说法强调没有中央协调器：协作来自各自根据视觉观察对方动作并实时调整。",
+        "Helix-02 在 S1/S2 之外加入 System 0，用于全身运动、平衡和底盘/腿部 loco-manipulation。",
+        "长程任务被拆成拾取、拉平、对齐、整理、检查等隐式阶段；模型需要在布料变形和机器人互相遮挡下维持进度。"
+      ],
+      notes: [
+        { label: "核心难点", text: "布料状态不可完全观测、双机器人动作会相互影响，失败恢复比单臂抓放重要得多。" },
+        { label: "学习定位", text: "把它当作工业 humanoid VLA 系统样本，而不是可复现 benchmark；公开证据主要来自官方 blog/demo。" }
+      ]
+    },
+    {
+      title: "Helix 到 Helix-02：怎么放进 VLA 地图",
+      kicker: "System 2 / System 1 / System 0",
+      answer: "Helix 原始公开重点是 S2 语义理解 + S1 高频上身控制；Helix-02 把同一思路推向全身任务，多出底层 whole-body motor layer。学习时应把模型、控制和任务证据拆开看。",
+      sourceTitle: "Figure AI: Helix",
+      sourceUrl: "https://www.figure.ai/news/helix",
+      flow: [
+        "S2：较低频率的 VLM/semantic model，处理语言、场景和任务语义。",
+        "S1：快速 visuomotor transformer，生成连续上身/手/头/躯干动作。",
+        "S0：Helix-02 公开描述中的全身运动层，处理移动、平衡和底层控制。",
+        "Bedroom Tidy 的价值在于三层同时工作：高层知道要整理床，低层能走到位置，中层能用双手处理柔性物体。"
+      ],
+      notes: [
+        { label: "和 GR00T 对比", text: "二者都像快慢系统，但 GR00T 有更明确的开放模型/模型卡路线，Figure 更多是官方工程披露。" },
+        { label: "和 PI 对比", text: "π0/π0.5 更强调跨 embodiment VLA 和 flow action expert；Figure 更强调 humanoid onboard、实时和协作任务。" }
+      ]
     }
   ],
   paperFigureGuides: [
@@ -417,9 +555,9 @@ const vlaMapData = {
         "S2 是 onboard VLM，以较低频率理解场景、语言和任务语义。",
         "S1 是快速 visuomotor transformer，以高频率输出上身、手和头/躯干控制。",
         "S2 通过 latent vector 给 S1 条件，二者端到端训练但部署时异步运行。",
-        "同一组权重可驱动两个机器人协作完成长程家务任务。"
+        "后续 Helix-02 在这条路线外接 System 0 全身运动层，用于卧室整理和铺床等 loco-manipulation。"
       ],
-      watchFor: "Helix 的学习点不是论文 benchmark，而是工业系统如何为高维 humanoid action space 处理实时性和协作。"
+      watchFor: "Helix 的学习点不是论文 benchmark，而是工业系统如何为高维 humanoid action space 处理实时性；铺床/叠被子请进一步看 Helix-02 Bedroom Tidy。"
     }
   ],
   readingPath: [
@@ -786,7 +924,14 @@ const vlaMapData = {
           year: "2025",
           type: "blog",
           url: "https://www.figure.ai/news/helix?_bhlid=b8b2b559cbd15863672a12df457ee8a00d3dd03c",
-          value: "Figure 官方发布的 humanoid VLA，展示上半身控制、双机器人协作和长程家庭任务。"
+          value: "Figure 官方发布的 humanoid VLA，重点是 System 2 低频语义模型 + System 1 高频上身 visuomotor policy。"
+        },
+        {
+          title: "Figure Helix-02 Bedroom Tidy",
+          year: "2026",
+          type: "blog",
+          url: "https://www.figure.ai/news/helix-02-bedroom-tidy",
+          value: "两个 Figure 机器人协作整理卧室/铺床/处理被子；应和早期 Helix、fold laundry 分开标注。"
         },
         {
           title: "Figure Helix Logistics",
@@ -1052,7 +1197,21 @@ const vlaMapData = {
           year: "2025",
           type: "blog",
           url: "https://www.figure.ai/news/helix?_bhlid=b8b2b559cbd15863672a12df457ee8a00d3dd03c",
-          value: "双机器人协作和长程家庭任务，适合作为人形 VLA 系统学习案例。"
+          value: "Helix 原始系统：S2 语义 latent 条件化 S1 高频上身控制，是理解 Figure 路线的基础。"
+        },
+        {
+          title: "Figure Helix Learns to Fold Laundry",
+          year: "2025",
+          type: "blog",
+          url: "https://www.figure.ai/news/helix-learns-to-fold-laundry",
+          value: "单机器人 Helix 折叠毛巾/衣物案例，适合看布料接触、双手协调和长程进度判断。"
+        },
+        {
+          title: "Figure Helix-02 Bedroom Tidy",
+          year: "2026",
+          type: "blog",
+          url: "https://www.figure.ai/news/helix-02-bedroom-tidy",
+          value: "两个 Helix-02 机器人协作整理床铺和卧室，重点看无中央协调器的多机器人 VLA 协作。"
         },
         {
           title: "Gemini Robotics Technical Report",
