@@ -192,7 +192,27 @@
     const markerUrl = `url(#${marker.id})`;
 
     const nodeById = new Map(figure.nodes.map((node) => [node.id, node]));
-    figure.edges.forEach(([fromId, toId]) => {
+    (figure.stages || []).forEach((stage) => {
+      const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      group.setAttribute("class", "figure-stage");
+      const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      rect.setAttribute("x", stage.x);
+      rect.setAttribute("y", stage.y);
+      rect.setAttribute("width", stage.w);
+      rect.setAttribute("height", stage.h);
+      rect.setAttribute("rx", "12");
+      group.append(rect);
+      const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      label.setAttribute("x", stage.x + 14);
+      label.setAttribute("y", stage.y + 24);
+      label.setAttribute("class", "figure-stage-label");
+      label.textContent = stage.label;
+      group.append(label);
+      svg.append(group);
+    });
+
+    figure.edges.forEach((edge) => {
+      const [fromId, toId] = Array.isArray(edge) ? edge : [edge.from, edge.to];
       const from = nodeById.get(fromId);
       const to = nodeById.get(toId);
       if (!from || !to) return;
@@ -235,6 +255,15 @@
       path.setAttribute("class", "figure-edge");
       path.setAttribute("marker-end", markerUrl);
       svg.append(path);
+      if (!Array.isArray(edge) && edge.label) {
+        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        label.setAttribute("x", (x1 + x2) / 2);
+        label.setAttribute("y", (y1 + y2) / 2 - 8);
+        label.setAttribute("text-anchor", "middle");
+        label.setAttribute("class", "figure-edge-label");
+        label.textContent = edge.label;
+        svg.append(label);
+      }
     });
 
     figure.nodes.forEach((node) => {

@@ -348,6 +348,10 @@ h3 {
   padding: 1.2rem;
 }
 
+.figure-grid .figure-card {
+  grid-column: 1 / -1;
+}
+
 .figure-card h3 {
   color: var(--accent);
 }
@@ -418,13 +422,36 @@ h3 {
 }
 
 .paper-figure.pipeline {
-  min-height: 260px;
+  min-height: 360px;
+}
+
+.figure-stage rect {
+  fill: rgba(232, 239, 233, 0.54);
+  stroke: #d0d9d3;
+  stroke-width: 1;
+}
+
+.figure-stage-label {
+  fill: #53635f;
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: 0;
+  text-transform: uppercase;
 }
 
 .figure-edge {
   fill: none;
   stroke: #62756f;
   stroke-width: 2.2;
+}
+
+.figure-edge-label {
+  paint-order: stroke;
+  fill: #43514d;
+  stroke: #f8fbf8;
+  stroke-width: 5px;
+  font-size: 11px;
+  font-weight: 800;
 }
 
 .figure-node rect {

@@ -222,15 +222,39 @@ const wmMapData = {
           sourceLabel: "PlaNet project page"
         }
       ],
+      viewBox: "0 0 1160 420",
+      cardClass: "wide",
+      diagramClass: "pipeline",
       thesis: "核心不是把视频生成得好看，而是把历史压进 latent belief state，在想象轨迹里训练 actor-critic 或做规划。",
-      nodes: [
-        { id: "obs", label: "Pixels / State", x: 40, y: 90, w: 130, h: 58, kind: "input" },
-        { id: "enc", label: "Encoder", x: 220, y: 90, w: 120, h: 58, kind: "model" },
-        { id: "rssm", label: "RSSM / Latent Dynamics", x: 390, y: 80, w: 180, h: 78, kind: "state" },
-        { id: "imag", label: "Imagined Trajectories", x: 620, y: 80, w: 180, h: 78, kind: "future" },
-        { id: "actor", label: "Actor + Critic", x: 850, y: 90, w: 130, h: 58, kind: "policy" }
+      detail: "这条线先用 encoder 把当前观测压到 stochastic + deterministic belief state，再用 RSSM 根据动作在 latent 里往前滚。decoder/reward/discount/value heads 让 world model 学到可训练信号；actor 和 critic 不直接在真环境里反复试，而是在 imagined latent trajectory 上优化策略。",
+      stages: [
+        { label: "Representation", x: 24, y: 34, w: 320, h: 340 },
+        { label: "Latent World Model", x: 370, y: 34, w: 350, h: 340 },
+        { label: "Imagination Control", x: 746, y: 34, w: 390, h: 340 }
       ],
-      edges: [["obs", "enc"], ["enc", "rssm"], ["rssm", "imag"], ["imag", "actor"], ["actor", "rssm"]],
+      nodes: [
+        { id: "hist", label: "History", note: "obs + actions", x: 52, y: 82, w: 120, h: 58, kind: "input" },
+        { id: "obs", label: "Pixels / State", note: "o_t", x: 52, y: 194, w: 120, h: 58, kind: "input" },
+        { id: "enc", label: "Encoder", note: "embed o_t", x: 210, y: 194, w: 110, h: 58, kind: "model" },
+        { id: "belief", label: "RSSM Belief", note: "h_t + z_t", x: 406, y: 150, w: 150, h: 72, kind: "state" },
+        { id: "dyn", label: "Latent Dynamics", note: "z,a -> z'", x: 588, y: 150, w: 120, h: 72, kind: "model" },
+        { id: "heads", label: "Prediction Heads", note: "image / reward / discount", x: 494, y: 270, w: 170, h: 62, kind: "score" },
+        { id: "imag", label: "Imagined Rollout", note: "latent trajectory", x: 770, y: 150, w: 150, h: 72, kind: "future" },
+        { id: "critic", label: "Critic Value", note: "score futures", x: 962, y: 82, w: 130, h: 58, kind: "score" },
+        { id: "actor", label: "Actor Policy", note: "improve actions", x: 962, y: 236, w: 130, h: 58, kind: "policy" }
+      ],
+      edges: [
+        { from: "hist", to: "belief", label: "memory" },
+        { from: "obs", to: "enc", label: "encode" },
+        { from: "enc", to: "belief", label: "posterior" },
+        { from: "belief", to: "dyn", label: "state" },
+        { from: "dyn", to: "belief", label: "prior update" },
+        { from: "belief", to: "heads", label: "train WM" },
+        { from: "dyn", to: "imag", label: "rollout" },
+        { from: "imag", to: "critic", label: "value" },
+        { from: "imag", to: "actor", label: "policy grad" },
+        { from: "actor", to: "dyn", label: "actions" }
+      ],
       readingFocus: [
         "RSSM/belief state 怎么融合历史动作和观测。",
         "训练 loss 是重建、reward、discount、value，还是多步 latent prediction。",
@@ -258,16 +282,39 @@ const wmMapData = {
           sourceLabel: "Visual Foresight paper"
         }
       ],
+      viewBox: "0 0 1160 420",
+      cardClass: "wide",
+      diagramClass: "pipeline",
       thesis: "给一批候选动作，预测每条动作会产生的视频，再按目标像素/目标图像/分类器 reward 选动作。",
-      nodes: [
-        { id: "goal", label: "Goal Image / Pixels", x: 40, y: 70, w: 150, h: 58, kind: "score" },
-        { id: "cands", label: "Action Candidates", x: 40, y: 180, w: 150, h: 58, kind: "action" },
-        { id: "video", label: "Action-Conditioned Video Model", x: 250, y: 120, w: 220, h: 78, kind: "model" },
-        { id: "future", label: "Predicted Futures", x: 540, y: 120, w: 170, h: 78, kind: "future" },
-        { id: "score", label: "Goal Scoring", x: 780, y: 120, w: 140, h: 78, kind: "score" },
-        { id: "mpc", label: "MPC Execute First Action", x: 970, y: 120, w: 170, h: 78, kind: "policy" }
+      detail: "Visual Foresight 是典型 receding-horizon visual MPC：从当前图像和历史帧出发，采样多条未来动作序列，用动作条件视频模型预测每条序列的未来画面，再按目标图像、指定像素或 learned reward 打分。执行时只落地第一步动作，拿到新相机观测后重新采样和规划。",
+      stages: [
+        { label: "Visual Context", x: 24, y: 34, w: 275, h: 340 },
+        { label: "Video Prediction", x: 324, y: 34, w: 345, h: 340 },
+        { label: "MPC Selection", x: 694, y: 34, w: 442, h: 340 }
       ],
-      edges: [["cands", "video"], ["video", "future"], ["goal", "score"], ["future", "score"], ["score", "mpc"], ["mpc", "cands"]],
+      nodes: [
+        { id: "hist", label: "Image History", note: "frames + robot state", x: 52, y: 98, w: 150, h: 58, kind: "input" },
+        { id: "goal", label: "Visual Goal", note: "image / pixels / reward", x: 52, y: 238, w: 150, h: 58, kind: "score" },
+        { id: "cands", label: "Candidate Actions", note: "sample sequences", x: 250, y: 168, w: 150, h: 58, kind: "action" },
+        { id: "video", label: "Video Predictor", note: "action-conditioned", x: 442, y: 150, w: 160, h: 78, kind: "model" },
+        { id: "future", label: "Predicted Videos", note: "future frames / flow", x: 710, y: 100, w: 150, h: 68, kind: "future" },
+        { id: "cost", label: "Trajectory Cost", note: "compare to goal", x: 710, y: 238, w: 150, h: 68, kind: "score" },
+        { id: "rank", label: "Rank Candidates", note: "lowest cost", x: 902, y: 168, w: 140, h: 58, kind: "score" },
+        { id: "act", label: "Execute a_t", note: "first action only", x: 998, y: 290, w: 125, h: 58, kind: "action" },
+        { id: "feedback", label: "New Observation", note: "replan", x: 902, y: 60, w: 140, h: 58, kind: "world" }
+      ],
+      edges: [
+        { from: "hist", to: "video", label: "condition" },
+        { from: "cands", to: "video", label: "actions" },
+        { from: "video", to: "future", label: "predict" },
+        { from: "goal", to: "cost", label: "target" },
+        { from: "future", to: "cost", label: "score frames" },
+        { from: "cost", to: "rank", label: "rank" },
+        { from: "rank", to: "act", label: "choose first" },
+        { from: "act", to: "feedback", label: "real step" },
+        { from: "feedback", to: "hist", label: "new frame" },
+        { from: "rank", to: "cands", label: "resample" }
+      ],
       readingFocus: [
         "动作候选怎么采样：random shooting、CEM 还是 policy proposal。",
         "目标怎么定义：像素点、目标图像、语言还是 learned reward。",
@@ -290,6 +337,11 @@ const wmMapData = {
       diagramClass: "pipeline",
       thesis: "不追求像素重建，学习直接服务 reward/Q/value 的 latent dynamics；规划时只做短 horizon latent rollout，用 reward 累加加 terminal value/Q 打分，最后只执行第一步动作并重规划。",
       detail: "decoder-free 的意思是模型不必还原未来图像，而是学习控制要用的量：encoder 得到任务 latent，d(z,a) 预测下一 latent，reward head 估计短期收益，Q/value head bootstrap 更远的回报。CEM/MPPI 采样多条动作序列，policy prior 提供更靠谱的候选或初始化；每条序列在 latent 里短滚动，按短期 reward + terminal value 排序，选出序列后只执行 a_t，下一帧重新观测再规划。这样把模型误差限制在短 horizon 内，长期目标交给从真实 replay 学到的 value。",
+      stages: [
+        { label: "Replay + Encoding", x: 24, y: 34, w: 300, h: 340 },
+        { label: "Task Latent Model", x: 350, y: 34, w: 370, h: 340 },
+        { label: "MPC Scoring", x: 746, y: 34, w: 390, h: 340 }
+      ],
       nodes: [
         { id: "buffer", label: "Replay Buffer", note: "train heads", x: 35, y: 40, w: 135, h: 58, kind: "input" },
         { id: "obs", label: "Observation", note: "pixels / state", x: 35, y: 165, w: 135, h: 58, kind: "input" },
@@ -304,7 +356,21 @@ const wmMapData = {
         { id: "return", label: "Trajectory Return", note: "rank candidates", x: 995, y: 155, w: 140, h: 68, kind: "score" },
         { id: "act", label: "Execute a_t only", note: "then replan", x: 995, y: 310, w: 140, h: 58, kind: "action" }
       ],
-      edges: [["buffer", "enc"], ["obs", "enc"], ["enc", "latent"], ["latent", "dyn"], ["latent", "prior"], ["prior", "planner"], ["planner", "seq"], ["seq", "dyn"], ["dyn", "reward"], ["dyn", "value"], ["reward", "return"], ["value", "return"], ["return", "act"]],
+      edges: [
+        { from: "buffer", to: "enc", label: "train" },
+        { from: "obs", to: "enc", label: "encode" },
+        { from: "enc", to: "latent", label: "task state" },
+        { from: "latent", to: "dyn", label: "start rollout" },
+        { from: "latent", to: "prior", label: "condition" },
+        { from: "prior", to: "planner", label: "proposal" },
+        { from: "planner", to: "seq", label: "sample/update" },
+        { from: "seq", to: "dyn", label: "H-step actions" },
+        { from: "dyn", to: "reward", label: "predict r" },
+        { from: "dyn", to: "value", label: "terminal" },
+        { from: "reward", to: "return", label: "sum" },
+        { from: "value", to: "return", label: "bootstrap" },
+        { from: "return", to: "act", label: "best first action" }
+      ],
       readingFocus: [
         "decoder-free：不要找 pixel decoder，重点看 latent consistency、reward、Q/value 和 policy prior 是否服务控制。",
         "短 horizon rollout + terminal value：模型只负责近几步后果，远期回报用 TD 学到的 value bootstrap，下一步重新观测纠偏。",
@@ -322,15 +388,37 @@ const wmMapData = {
         sourceUrl: "https://gen-irasim.github.io/",
         sourceLabel: "IRASim project page"
       },
+      viewBox: "0 0 1160 420",
+      cardClass: "wide",
+      diagramClass: "pipeline",
       thesis: "把生成模型变成可交互环境：给历史、prompt 或动作，生成下一帧/下一状态，让 agent 能继续闭环。",
-      nodes: [
-        { id: "context", label: "Prompt / History", x: 40, y: 100, w: 150, h: 64, kind: "input" },
-        { id: "action", label: "Action / Latent Action", x: 250, y: 190, w: 170, h: 64, kind: "action" },
-        { id: "sim", label: "Generative World Simulator", x: 250, y: 80, w: 220, h: 78, kind: "model" },
-        { id: "next", label: "Next Frame / State", x: 560, y: 100, w: 170, h: 64, kind: "future" },
-        { id: "agent", label: "Agent / Policy", x: 780, y: 100, w: 150, h: 64, kind: "policy" }
+      detail: "Interactive simulator 和普通 text-to-video 的区别在交互接口：它接收历史上下文和动作，生成下一步观测或状态，再把这个结果交回 agent 继续选择动作。机器人场景里关键不是画面多漂亮，而是 action alignment、step-by-step controllability，以及生成 rollout 是否能用于训练、评估或规划。",
+      stages: [
+        { label: "World Data", x: 24, y: 34, w: 280, h: 340 },
+        { label: "Action-Aligned Simulator", x: 330, y: 34, w: 390, h: 340 },
+        { label: "Agent Loop", x: 746, y: 34, w: 390, h: 340 }
       ],
-      edges: [["context", "sim"], ["action", "sim"], ["sim", "next"], ["next", "agent"], ["agent", "action"], ["next", "sim"]],
+      nodes: [
+        { id: "data", label: "Video / Robot Data", note: "trajectories", x: 52, y: 90, w: 150, h: 58, kind: "input" },
+        { id: "labels", label: "Actions", note: "real or latent", x: 52, y: 240, w: 150, h: 58, kind: "action" },
+        { id: "context", label: "Prompt + History", note: "context window", x: 365, y: 90, w: 150, h: 58, kind: "input" },
+        { id: "action", label: "Step Action", note: "a_t token / control", x: 365, y: 240, w: 150, h: 58, kind: "action" },
+        { id: "sim", label: "World Simulator", note: "generate next step", x: 555, y: 155, w: 145, h: 78, kind: "model" },
+        { id: "next", label: "Next Obs / State", note: "frame, pose, contact", x: 770, y: 155, w: 150, h: 78, kind: "future" },
+        { id: "agent", label: "Agent / Policy", note: "choose next action", x: 966, y: 88, w: 130, h: 58, kind: "policy" },
+        { id: "rollout", label: "Synthetic Rollout", note: "train / eval / plan", x: 966, y: 240, w: 130, h: 58, kind: "score" }
+      ],
+      edges: [
+        { from: "data", to: "sim", label: "train model" },
+        { from: "labels", to: "sim", label: "align actions" },
+        { from: "context", to: "sim", label: "condition" },
+        { from: "action", to: "sim", label: "apply" },
+        { from: "sim", to: "next", label: "generate" },
+        { from: "next", to: "agent", label: "observe" },
+        { from: "agent", to: "action", label: "act again" },
+        { from: "next", to: "rollout", label: "record" },
+        { from: "rollout", to: "agent", label: "improve" }
+      ],
       readingFocus: [
         "action 是真实机器人动作、键鼠动作，还是从视频里学到的 latent action。",
         "是否支持 step-by-step 交互，而不是一次性生成整段视频。",
@@ -348,17 +436,46 @@ const wmMapData = {
         sourceUrl: "https://research.nvidia.com/labs/gear/flare/",
         sourceLabel: "NVIDIA FLARE project page"
       },
+      viewBox: "0 0 1160 420",
+      cardClass: "wide",
+      diagramClass: "pipeline",
       thesis: "现实机器人系统最可能是混合架构：VLA 给动作候选，WM 做短程想象，critic/safety/controller 决定是否执行。",
-      nodes: [
-        { id: "obs", label: "Vision + Language + State", x: 40, y: 110, w: 190, h: 64, kind: "input" },
-        { id: "vla", label: "VLA Proposal", x: 280, y: 110, w: 140, h: 64, kind: "policy" },
-        { id: "wm", label: "WM Rollout", x: 470, y: 80, w: 150, h: 64, kind: "model" },
-        { id: "critic", label: "Critic / Reranker", x: 670, y: 80, w: 160, h: 64, kind: "score" },
-        { id: "safety", label: "Safety Filter", x: 670, y: 190, w: 160, h: 64, kind: "score" },
-        { id: "ctrl", label: "Whole-Body Controller", x: 880, y: 110, w: 190, h: 64, kind: "action" },
-        { id: "logs", label: "Real Robot Logs", x: 470, y: 250, w: 150, h: 64, kind: "world" }
+      detail: "这张图把 VLA 放在 proposal policy，而不是 world model 内部。VLA 根据视觉、语言、本体和历史提出多个 action chunk、轨迹或技能；WM 对每个候选做反事实 rollout；critic/safety 根据成功率、接触、碰撞、进度和约束重排或拒绝；最后 controller 执行可落地动作，真实日志再回流改进 VLA、WM 和 critic。",
+      stages: [
+        { label: "Multimodal Context", x: 24, y: 34, w: 270, h: 340 },
+        { label: "Proposal + Rollout", x: 320, y: 34, w: 390, h: 340 },
+        { label: "Rerank + Execute", x: 736, y: 34, w: 400, h: 340 }
       ],
-      edges: [["obs", "vla"], ["vla", "wm"], ["wm", "critic"], ["wm", "safety"], ["critic", "ctrl"], ["safety", "ctrl"], ["ctrl", "logs"], ["logs", "vla"], ["logs", "wm"]],
+      nodes: [
+        { id: "obs", label: "Vision + State", note: "RGB-D, proprio", x: 52, y: 88, w: 135, h: 58, kind: "input" },
+        { id: "goal", label: "Language Goal", note: "task intent", x: 52, y: 196, w: 135, h: 58, kind: "input" },
+        { id: "hist", label: "History", note: "past obs/actions", x: 52, y: 300, w: 135, h: 58, kind: "state" },
+        { id: "vla", label: "VLA Proposal", note: "semantic policy", x: 340, y: 150, w: 130, h: 68, kind: "policy" },
+        { id: "cands", label: "K Candidates", note: "chunks / skills", x: 512, y: 150, w: 130, h: 68, kind: "action" },
+        { id: "wm", label: "WM Rollout", note: "counterfactual", x: 512, y: 270, w: 130, h: 68, kind: "model" },
+        { id: "future", label: "Imagined Outcomes", note: "success, contact, risk", x: 755, y: 270, w: 155, h: 68, kind: "future" },
+        { id: "critic", label: "Critic / Reranker", note: "progress + value", x: 755, y: 82, w: 155, h: 62, kind: "score" },
+        { id: "safety", label: "Safety Filter", note: "constraints", x: 755, y: 174, w: 155, h: 62, kind: "score" },
+        { id: "selected", label: "Selected Action", note: "best safe option", x: 960, y: 150, w: 140, h: 68, kind: "action" },
+        { id: "ctrl", label: "Controller", note: "tracking / whole-body", x: 960, y: 270, w: 140, h: 68, kind: "action" },
+        { id: "logs", label: "Real Robot Logs", note: "success/failure", x: 340, y: 300, w: 130, h: 58, kind: "world" }
+      ],
+      edges: [
+        { from: "obs", to: "vla", label: "perceive" },
+        { from: "goal", to: "vla", label: "condition" },
+        { from: "hist", to: "vla", label: "memory" },
+        { from: "vla", to: "cands", label: "propose K" },
+        { from: "cands", to: "wm", label: "simulate" },
+        { from: "wm", to: "future", label: "predict" },
+        { from: "future", to: "critic", label: "score" },
+        { from: "future", to: "safety", label: "check risk" },
+        { from: "critic", to: "selected", label: "rerank" },
+        { from: "safety", to: "selected", label: "filter" },
+        { from: "selected", to: "ctrl", label: "execute command" },
+        { from: "ctrl", to: "logs", label: "real outcome" },
+        { from: "logs", to: "vla", label: "fine-tune" },
+        { from: "logs", to: "wm", label: "update WM" }
+      ],
       readingFocus: [
         "VLA 输出的是单步动作、action chunk、轨迹、技能，还是 visual subgoal。",
         "WM 是在线重排、离线生成数据，还是训练辅助 loss。",
