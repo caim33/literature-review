@@ -104,6 +104,13 @@ for (const figure of data.paperFigures) {
   }
   assert.ok(Array.isArray(figure.nodes) && figure.nodes.length >= 4, `${figure.title} needs nodes`);
   assert.ok(Array.isArray(figure.edges) && figure.edges.length >= 3, `${figure.title} needs edges`);
+  assert.ok(figure.deepDive, `${figure.title} needs a collapsible detailed interpretation`);
+  assert.ok(figure.deepDive.summary, `${figure.title} deepDive needs summary text`);
+  assert.ok(Array.isArray(figure.deepDive.sections) && figure.deepDive.sections.length >= 4, `${figure.title} deepDive needs at least 4 sections`);
+  for (const section of figure.deepDive.sections) {
+    assert.ok(section.title, `${figure.title} deepDive section needs title`);
+    assert.ok(section.body && section.body.length >= 40, `${figure.title} deepDive section needs a substantial explanation`);
+  }
   const nodeIds = new Set(figure.nodes.map((node) => node.id));
   assert.equal(nodeIds.size, figure.nodes.length, `${figure.title} node ids should be unique`);
   for (const edge of figure.edges) {
@@ -178,6 +185,8 @@ for (const fn of ["renderArchitecture", "renderPaperFigures", "renderOriginalMed
 }
 assert.ok(app.includes("paper-original-media"), "app should render original paper/project media");
 assert.ok(app.includes("figure-detail"), "app should render detailed paradigm explanations when present");
+assert.ok(app.includes("renderDeepDive"), "app should render collapsible detailed paper interpretations");
+assert.ok(app.includes("paper-deep-dive"), "app should use a dedicated deep dive details component");
 assert.ok(app.includes("diagramClass"), "app should allow figures to opt into clearer diagram layouts");
 assert.ok(app.includes("cardClass"), "app should allow complex figure cards to opt into wider layouts");
 assert.ok(app.includes("figure.stages"), "app should render stage backgrounds for pipeline figures");

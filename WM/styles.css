@@ -519,6 +519,80 @@ h3 {
   line-height: 1.65;
 }
 
+.paper-deep-dive {
+  margin-top: 1rem;
+  border: 1px solid #d0d9d3;
+  background: #f8fbf8;
+}
+
+.paper-deep-dive summary {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1rem;
+  color: #2f403b;
+  cursor: pointer;
+}
+
+.paper-deep-dive summary::-webkit-details-marker {
+  display: none;
+}
+
+.paper-deep-dive summary::after {
+  content: "+";
+  flex: 0 0 auto;
+  color: var(--accent);
+  font-size: 1.25rem;
+  font-weight: 850;
+}
+
+.paper-deep-dive[open] summary::after {
+  content: "-";
+}
+
+.deep-dive-title {
+  color: var(--accent);
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.deep-dive-title::after {
+  content: "：";
+}
+
+.deep-dive-summary {
+  flex: 1;
+  color: #5b6864;
+  font-size: 0.92rem;
+}
+
+.deep-dive-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  border-top: 1px solid #d0d9d3;
+  background: #d0d9d3;
+}
+
+.deep-dive-section {
+  min-width: 0;
+  padding: 1rem;
+  background: #fbfdfb;
+}
+
+.deep-dive-section h4 {
+  margin-bottom: 0.35rem;
+  color: #9a5139;
+  font-size: 0.95rem;
+}
+
+.deep-dive-section p {
+  color: #384743;
+  font-size: 0.94rem;
+  line-height: 1.7;
+}
+
 .reading-focus {
   margin: 0.8rem 0 0;
   padding-left: 1.2rem;
@@ -995,6 +1069,15 @@ input {
   .reference-route-head {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .paper-deep-dive summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .deep-dive-body {
+    grid-template-columns: 1fr;
   }
 }
 

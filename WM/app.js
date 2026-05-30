@@ -122,11 +122,32 @@
       if (figure.detail) {
         card.append(el("p", "figure-detail", figure.detail));
       }
+      if (figure.deepDive) {
+        card.append(renderDeepDive(figure.deepDive));
+      }
       const list = el("ul", "reading-focus");
       figure.readingFocus.forEach((item) => list.append(el("li", "", item)));
       card.append(list);
       container.append(card);
     });
+  }
+
+  function renderDeepDive(deepDive) {
+    const details = el("details", "paper-deep-dive");
+    const summary = el("summary");
+    summary.append(el("span", "deep-dive-title", "详细解读"));
+    summary.append(el("span", "deep-dive-summary", deepDive.summary));
+    details.append(summary);
+
+    const body = el("div", "deep-dive-body");
+    deepDive.sections.forEach((section) => {
+      const item = el("section", "deep-dive-section");
+      item.append(el("h4", "", section.title));
+      item.append(el("p", "", section.body));
+      body.append(item);
+    });
+    details.append(body);
+    return details;
   }
 
   function renderOriginalMedia(media, variant) {

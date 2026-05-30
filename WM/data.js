@@ -227,6 +227,27 @@ const wmMapData = {
       diagramClass: "pipeline",
       thesis: "核心不是把视频生成得好看，而是把历史压进 latent belief state，在想象轨迹里训练 actor-critic 或做规划。",
       detail: "这条线先用 encoder 把当前观测压到 stochastic + deterministic belief state，再用 RSSM 根据动作在 latent 里往前滚。decoder/reward/discount/value heads 让 world model 学到可训练信号；actor 和 critic 不直接在真环境里反复试，而是在 imagined latent trajectory 上优化策略。",
+      deepDive: {
+        summary: "从 belief state、RSSM、imagined rollout 三个词读懂 Dreamer/PlaNet。",
+        sections: [
+          {
+            title: "先看什么",
+            body: "先不要盯着 decoder 生成图像，而是看历史观测和动作如何被压进 RSSM belief。这个 belief 是模型对当前世界状态的记忆：它同时包含过去动作造成的影响、当前图像提供的新证据，以及模型对看不见状态的猜测。"
+          },
+          {
+            title: "机制怎么跑",
+            body: "训练时，encoder 把观测变成 latent，RSSM 用上一时刻 latent 和动作预测下一 latent，再用观测修正 belief。prediction heads 会预测图像、reward、discount 或 value，提供训练信号。控制时，模型在 latent 里滚出 imagined trajectory，actor/critic 用这些想象轨迹更新策略。"
+          },
+          {
+            title: "为什么重要",
+            body: "真实机器人不能无限试错，Dreamer/PlaNet 的价值是把昂贵交互换成模型里的想象。只要 belief 抓住了任务相关状态，策略就能在模型里比较许多未来，而不必每次都在真机上撞桌子、掉杯子或浪费数据。"
+          },
+          {
+            title: "容易误解",
+            body: "不要把它理解成先生成清晰视频再照着执行。像素 decoder 主要是训练 world model 的辅助信号，真正服务控制的是 latent belief 和 reward/value。PlaNet 更偏在线 planning，Dreamer 更偏在 imagination 中学 actor-critic。"
+          }
+        ]
+      },
       stages: [
         { label: "Representation", x: 24, y: 34, w: 320, h: 340 },
         { label: "Latent World Model", x: 370, y: 34, w: 350, h: 340 },
@@ -287,6 +308,27 @@ const wmMapData = {
       diagramClass: "pipeline",
       thesis: "给一批候选动作，预测每条动作会产生的视频，再按目标像素/目标图像/分类器 reward 选动作。",
       detail: "Visual Foresight 是典型 receding-horizon visual MPC：从当前图像和历史帧出发，采样多条未来动作序列，用动作条件视频模型预测每条序列的未来画面，再按目标图像、指定像素或 learned reward 打分。执行时只落地第一步动作，拿到新相机观测后重新采样和规划。",
+      deepDive: {
+        summary: "把它当成“看视频预测来做 MPC”，关键是每步重规划。",
+        sections: [
+          {
+            title: "先看什么",
+            body: "先看左侧的当前图像、历史帧和 visual goal，再看中间的 action-conditioned video predictor。它不是无条件生成视频，而是问：如果机器人执行这段动作序列，未来画面会怎样变化。"
+          },
+          {
+            title: "机制怎么跑",
+            body: "测试时会采样很多候选动作序列，每条序列都送进视频预测模型，得到未来帧或像素运动。然后用目标图像、指定像素距离、分类器或 learned reward 给每条视频打分，选出分数最好的动作序列。"
+          },
+          {
+            title: "为什么重要",
+            body: "这条路线非常直观：目标在图像里，预测也在图像里，评分也可以在图像空间完成。对推、拉、移动物体这类视觉反馈强的任务，它能用相对少的人工标注，把无标注交互视频变成规划模型。"
+          },
+          {
+            title: "容易误解",
+            body: "不要以为模型生成一整段视频后机器人就 open-loop 执行到底。Visual MPC 的关键是 receding horizon：只执行第一步动作，然后拿到新观测重新预测和重排。这样可以不断纠正视频预测误差。"
+          }
+        ]
+      },
       stages: [
         { label: "Visual Context", x: 24, y: 34, w: 275, h: 340 },
         { label: "Video Prediction", x: 324, y: 34, w: 345, h: 340 },
@@ -337,6 +379,27 @@ const wmMapData = {
       diagramClass: "pipeline",
       thesis: "不追求像素重建，学习直接服务 reward/Q/value 的 latent dynamics；规划时只做短 horizon latent rollout，用 reward 累加加 terminal value/Q 打分，最后只执行第一步动作并重规划。",
       detail: "decoder-free 的意思是模型不必还原未来图像，而是学习控制要用的量：encoder 得到任务 latent，d(z,a) 预测下一 latent，reward head 估计短期收益，Q/value head bootstrap 更远的回报。CEM/MPPI 采样多条动作序列，policy prior 提供更靠谱的候选或初始化；每条序列在 latent 里短滚动，按短期 reward + terminal value 排序，选出序列后只执行 a_t，下一帧重新观测再规划。这样把模型误差限制在短 horizon 内，长期目标交给从真实 replay 学到的 value。",
+      deepDive: {
+        summary: "读懂 decoder-free、短 rollout、terminal value 和 policy prior 的配合。",
+        sections: [
+          {
+            title: "先看什么",
+            body: "先找有没有 pixel decoder。如果没有，不是缺了一块，而是路线选择：TD-MPC 学的是任务相关 latent，不追求还原背景纹理。图里最关键的是 latent dynamics、reward head、Q/value head 和 planner。"
+          },
+          {
+            title: "机制怎么跑",
+            body: "当前观测先被编码成 latent z_t。planner 采样多条未来动作序列，policy prior 提供更靠谱的动作提案；TOLD dynamics 在 latent 中短 horizon rollout，reward head 给每一步打短期分，Q/value head 对末端状态做长期估值。"
+          },
+          {
+            title: "为什么重要",
+            body: "机器人控制关心的是哪个动作能拿高回报，而不是未来图像是否漂亮。短 rollout 降低模型误差累积，terminal value 用 TD 学到的长期回报补上远期目标，二者组合比盲目拉长模型预测更稳。"
+          },
+          {
+            title: "容易误解",
+            body: "policy prior 不是最终控制器，它只是帮助 CEM/MPPI 更快采到好候选。最终动作来自 reward rollout 和 terminal Q/value 的排序。也不要说它完全消除 compounding error，它只是把误差控制在短 horizon 内。"
+          }
+        ]
+      },
       stages: [
         { label: "Replay + Encoding", x: 24, y: 34, w: 300, h: 340 },
         { label: "Task Latent Model", x: 350, y: 34, w: 370, h: 340 },
@@ -393,6 +456,27 @@ const wmMapData = {
       diagramClass: "pipeline",
       thesis: "把生成模型变成可交互环境：给历史、prompt 或动作，生成下一帧/下一状态，让 agent 能继续闭环。",
       detail: "Interactive simulator 和普通 text-to-video 的区别在交互接口：它接收历史上下文和动作，生成下一步观测或状态，再把这个结果交回 agent 继续选择动作。机器人场景里关键不是画面多漂亮，而是 action alignment、step-by-step controllability，以及生成 rollout 是否能用于训练、评估或规划。",
+      deepDive: {
+        summary: "区分普通视频生成和可交互 world simulator。",
+        sections: [
+          {
+            title: "先看什么",
+            body: "先看模型有没有动作输入，以及输出是否能作为下一步观测继续喂回 agent。如果只是 prompt 生成一段视频，那更像 video generation；如果每一步都能接收动作并更新世界，才接近 interactive simulator。"
+          },
+          {
+            title: "机制怎么跑",
+            body: "训练时用视频、机器人轨迹、动作或 latent action 对齐模型。推理时给定 prompt/history 和当前动作，simulator 生成下一帧、状态或接触结果；agent 读取这个新观测再选下一步动作，于是形成 step-by-step 闭环。"
+          },
+          {
+            title: "为什么重要",
+            body: "机器人数据贵且危险，interactive simulator 可以生成更多长尾场景、失败案例和候选 rollout，用来做训练、评估或规划。它把 world model 从一次性视频生成推进到可被 agent 使用的环境接口。"
+          },
+          {
+            title: "容易误解",
+            body: "画质好不代表可交互。核心指标是 action controllability、闭环稳定、物理接触是否合理，以及生成数据是否真的提升下游机器人表现。IRASim 这类机器人路线尤其强调 action-aligned。"
+          }
+        ]
+      },
       stages: [
         { label: "World Data", x: 24, y: 34, w: 280, h: 340 },
         { label: "Action-Aligned Simulator", x: 330, y: 34, w: 390, h: 340 },
@@ -441,6 +525,27 @@ const wmMapData = {
       diagramClass: "pipeline",
       thesis: "现实机器人系统最可能是混合架构：VLA 给动作候选，WM 做短程想象，critic/safety/controller 决定是否执行。",
       detail: "这张图把 VLA 放在 proposal policy，而不是 world model 内部。VLA 根据视觉、语言、本体和历史提出多个 action chunk、轨迹或技能；WM 对每个候选做反事实 rollout；critic/safety 根据成功率、接触、碰撞、进度和约束重排或拒绝；最后 controller 执行可落地动作，真实日志再回流改进 VLA、WM 和 critic。",
+      deepDive: {
+        summary: "机器人系统里 VLA 负责提案，WM 负责想象和校验。",
+        sections: [
+          {
+            title: "先看什么",
+            body: "先看 VLA 的位置：它读取视觉、语言、本体和历史，不是直接替代 world model，而是提出候选 action chunk、轨迹或技能。后面的 WM、critic 和 safety 才负责比较这些候选的后果。"
+          },
+          {
+            title: "机制怎么跑",
+            body: "VLA 先生成 K 个候选动作；world model 对每个候选做短程反事实 rollout，预测成功率、接触、碰撞、进度或风险；critic/reranker 给候选排序，safety filter 拒绝危险选项，controller 执行最终动作。"
+          },
+          {
+            title: "为什么重要",
+            body: "VLA 擅长语义泛化，但它不一定知道某个动作在当前物理状态下会不会撞、滑、卡住。WM 像慢速 System 2，能在执行前做后果检查，让机器人少用真机试错。"
+          },
+          {
+            title: "容易误解",
+            body: "不要把 WM 画成 VLA 后面的万能大脑，也不要把 VLA 画成只输出单步动作。真实系统通常是混合栈：VLA 提议，WM 想象，critic/safety 重排，低层控制器负责可执行性和全身稳定。"
+          }
+        ]
+      },
       stages: [
         { label: "Multimodal Context", x: 24, y: 34, w: 270, h: 340 },
         { label: "Proposal + Rollout", x: 320, y: 34, w: 390, h: 340 },
