@@ -429,6 +429,23 @@ const vlaMapData = {
       ]
     },
     {
+      title: "Figure 厨房全身操作：Helix 02 洗碗机任务",
+      kicker: "Helix 02 Full-Body Autonomy",
+      answer: "是的，Figure 还有厨房全身操作 demo。官方 Helix 02 发布里展示了机器人在真实厨房中卸载和重新装载洗碗机，强调整间厨房移动、双手抓取、开关抽屉/柜门、放置餐具等连续家务操作。",
+      sourceTitle: "Figure AI: Helix 02",
+      sourceUrl: "https://www.figure.ai/news/helix-02",
+      flow: [
+        "System 2 负责理解自然语言目标、识别餐具/抽屉/洗碗机/台面等对象关系，并维持长程任务上下文。",
+        "System 1 把视觉语义条件转成高频上身和双手动作，处理拿取餐具、放入架子、对齐物体等接触操作。",
+        "System 0 让机器人在厨房空间里走动、站稳、转身并调整全身姿态，把 manipulation 从桌面扩展到 room-scale loco-manipulation。",
+        "官方 demo 的学习点是端到端长程执行：真实厨房、数分钟任务、无人工干预/无 reset，比单个抓放更接近家庭机器人部署问题。"
+      ],
+      notes: [
+        { label: "和铺床不同", text: "厨房任务更强调导航、开合容器、物体分类和放置约束；铺床更强调柔性物体和多机器人协作。" },
+        { label: "读 demo 的问题", text: "要看它是否覆盖多种厨房布局、餐具形状和失败恢复；官方 demo 是强信号，但仍不是公开 benchmark。" }
+      ]
+    },
+    {
       title: "Helix 到 Helix-02：怎么放进 VLA 地图",
       kicker: "System 2 / System 1 / System 0",
       answer: "Helix 原始公开重点是 S2 语义理解 + S1 高频上身控制；Helix-02 把同一思路推向全身任务，多出底层 whole-body motor layer。学习时应把模型、控制和任务证据拆开看。",
@@ -934,6 +951,13 @@ const vlaMapData = {
           value: "两个 Figure 机器人协作整理卧室/铺床/处理被子；应和早期 Helix、fold laundry 分开标注。"
         },
         {
+          title: "Figure Helix 02",
+          year: "2026",
+          type: "blog",
+          url: "https://www.figure.ai/news/helix-02",
+          value: "Figure 02 上的 full-body autonomy demo，包含真实厨房卸载/重装洗碗机等长程全身操作。"
+        },
+        {
           title: "Figure Helix Logistics",
           year: "2025",
           type: "blog",
@@ -1212,6 +1236,13 @@ const vlaMapData = {
           type: "blog",
           url: "https://www.figure.ai/news/helix-02-bedroom-tidy",
           value: "两个 Helix-02 机器人协作整理床铺和卧室，重点看无中央协调器的多机器人 VLA 协作。"
+        },
+        {
+          title: "Figure Helix 02 Kitchen / Dishwasher",
+          year: "2026",
+          type: "blog",
+          url: "https://www.figure.ai/news/helix-02",
+          value: "厨房全身操作案例：卸载/重装洗碗机，适合和 Bedroom Tidy 对比学习 room-scale long-horizon manipulation。"
         },
         {
           title: "Gemini Robotics Technical Report",

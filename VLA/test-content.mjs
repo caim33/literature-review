@@ -45,6 +45,7 @@ const requiredNames = [
   "GR00T N1.7",
   "Figure Helix",
   "Helix-02 Bedroom Tidy",
+  "Helix 02 Kitchen",
   "DreamZero",
   "StarVLA",
   "SpatialVLA",
