@@ -47,6 +47,7 @@ const requiredNames = [
   "Figure Helix",
   "Helix-02 Bedroom Tidy",
   "Helix 02 Kitchen",
+  "GENE-26.5",
   "DreamZero",
   "StarVLA",
   "SpatialVLA",

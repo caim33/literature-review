@@ -33,7 +33,7 @@ const vlaMapData = {
     { year: "2023", label: "RT-2 / PaLM-E / Open X-Embodiment / Diffusion Policy", lane: "foundation", note: "Web-scale VLM knowledge meets robot actions; large robot mixtures become credible." },
     { year: "2024", label: "OpenVLA / Octo / DROID / RoboCasa / π0", lane: "open", note: "Open generalist policies and in-the-wild datasets make VLA reproducible." },
     { year: "2025", label: "π0.5 / FAST / Gemini Robotics / Figure Helix / GR00T N1", lane: "systems", note: "Long-horizon, whole-body, and company VLA systems become the frontier." },
-    { year: "2026", label: "π0.7 / GR00T N1.7 / DreamZero", lane: "systems", note: "Steerable generalists, open humanoid checkpoints, and WAM-style policies reshape the map." }
+    { year: "2026", label: "π0.7 / GR00T N1.7 / DreamZero / GENE-26.5", lane: "systems", note: "Steerable generalists, open humanoid checkpoints, WAM-style policies, and dexterous manipulation systems reshape the map." }
   ],
   equations: [
     {
@@ -76,7 +76,7 @@ const vlaMapData = {
     },
     {
       name: "Diffusion / Flow action",
-      examples: "Diffusion Policy, π0, RDT, GR00T",
+      examples: "Diffusion Policy, π0, RDT, GR00T, GENE-26.5",
       strength: "连续、多峰、chunked 动作建模强，适合精细操作。",
       caution: "训练和推理成本高，实时部署需要 action expert、少步采样或蒸馏。"
     },
@@ -644,7 +644,7 @@ const vlaMapData = {
       branches: [
         "多机器人数据混合：把不同机器人、相机、控制频率、任务语义合到一个训练配方里。",
         "遥操与人类演示：ALOHA、DROID、BridgeData、RoboSet 代表真实世界动作数据来源。",
-        "仿真与合成数据：RoboCasa、MimicGen、ManiSkill、RoboTwin 用程序化场景和 demo 扩展覆盖。",
+        "仿真与合成数据：RoboCasa、MimicGen、ManiSkill、RoboTwin、Genesis AI 用程序化场景和 demo 扩展覆盖。",
         "动作归一化与 retarget：把不同 embodiment 的状态/action 对齐成可学习接口。",
         "数据飞轮：部署、失败收集、人工纠正、再训练，正在成为公司 VLA 的核心壁垒。"
       ],
@@ -709,6 +709,13 @@ const vlaMapData = {
           type: "project",
           url: "https://github.com/huggingface/lerobot",
           value: "开源机器人学习栈，统一数据、策略、训练和真实机器人部署入口。"
+        },
+        {
+          title: "GENE-26.5",
+          year: "2026",
+          type: "blog",
+          url: "https://www.genesis.ai/blog/gene-26-5-advancing-robotic-manipulation-to-human-level",
+          value: "Genesis AI 发布的 dexterous manipulation 系统信号，强调 human-centric hand、数据/仿真/控制全栈和复杂手部操作。"
         }
       ]
     },
@@ -1207,10 +1214,10 @@ const vlaMapData = {
       id: "dexterous-longhorizon",
       title: "精细交互与长程任务",
       question: "VLA 从桌面抓放走向叠衣服、整理厨房、开抽屉、做咖啡、协作搬运，会遇到接触、遮挡、失败恢复和长时记忆。",
-      takeaway: "精细交互要同时学手、物体状态、接触和纠错。长程任务要把语言分解、记忆、子目标、失败检测和动作 chunk 接起来，Figure Helix 叠被子/协作、π0.5 家庭清洁、Gemini Robotics origami 都是典型样本。",
+      takeaway: "精细交互要同时学手、物体状态、接触和纠错。长程任务要把语言分解、记忆、子目标、失败检测和动作 chunk 接起来，Figure Helix 叠被子/协作、GENE-26.5 灵巧操作、π0.5 家庭清洁、Gemini Robotics origami 都是典型样本。",
       priority: "重点",
       branches: [
-        "双臂与灵巧手：ALOHA/ACT、RoboSet、DexMG、GR00T、Gemini Robotics 都在强化精细双手。",
+        "双臂与灵巧手：ALOHA/ACT、RoboSet、DexMG、GENE-26.5、GR00T、Gemini Robotics 都在强化精细双手。",
         "布料/柔性物体：叠衣服、叠被子是 VLA 长程接触推理的高价值任务。",
         "长程协作：多机器人或人机协作需要共享目标、互相避让和角色分配。",
         "记忆与子任务：从 single instruction 到 multi-step household mission，必须显式或隐式维护进度。",
@@ -1263,6 +1270,13 @@ const vlaMapData = {
           type: "blog",
           url: "https://www.figure.ai/news/helix-02",
           value: "厨房全身操作案例：卸载/重装洗碗机，适合和 Bedroom Tidy 对比学习 room-scale long-horizon manipulation。"
+        },
+        {
+          title: "GENE-26.5",
+          year: "2026",
+          type: "blog",
+          url: "https://www.genesis.ai/blog/gene-26-5-advancing-robotic-manipulation-to-human-level",
+          value: "Genesis AI 面向 human-level robotic manipulation 的系统发布，适合学习灵巧手、触觉/接触、仿真数据和 policy/control 协同。"
         },
         {
           title: "Gemini Robotics Technical Report",
