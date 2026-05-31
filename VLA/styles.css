@@ -610,68 +610,172 @@ input {
   background: #edf3f2;
 }
 
-.case-study-grid {
+.figure-system-case {
   display: grid;
-  gap: 1rem;
+  gap: 1.1rem;
 }
 
-.case-card {
+.figure-intro {
   display: grid;
-  grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1fr) minmax(260px, 0.8fr);
+  grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.65fr);
   gap: 1px;
   border: 1px solid #c8d8d6;
   background: #c8d8d6;
 }
 
-.case-card > * {
+.figure-intro > * {
   min-width: 0;
+  margin: 0;
+  padding: 1.1rem;
   background: #fffdf8;
 }
 
-.case-head,
-.case-notes {
-  padding: 1.1rem;
+.figure-summary {
+  color: #24343a;
+  font-size: 1.06rem;
+  font-weight: 700;
 }
 
-.case-kicker {
-  display: block;
-  margin-bottom: 0.55rem;
+.figure-architecture {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  border: 1px solid #c8d8d6;
+  background: #c8d8d6;
+}
+
+.figure-arch-node {
+  position: relative;
+  min-width: 0;
+  min-height: 190px;
+  padding: 1rem;
+  background: #fffdf8;
+}
+
+.figure-arch-label {
+  display: inline-block;
+  margin-bottom: 0.75rem;
   color: var(--accent-2);
   font-size: 0.78rem;
   font-weight: 850;
 }
 
-.case-head h3 {
-  font-size: clamp(1.35rem, 3vw, 2rem);
+.figure-arch-node h3 {
+  color: var(--accent);
+  font-size: clamp(1.15rem, 2vw, 1.55rem);
+}
+
+.figure-arch-node p {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.figure-arch-arrow {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: #98aaa6;
+  font-size: 1.2rem;
+  font-weight: 850;
+}
+
+.figure-demo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.figure-demo-card {
+  min-width: 0;
+  border: 1px solid #c8d8d6;
+  background: #fffdf8;
+  box-shadow: var(--shadow);
+}
+
+.figure-video-wrap {
+  width: 100%;
+  background: #101820;
+}
+
+.figure-video-wrap video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #101820;
+}
+
+.figure-demo-body {
+  display: grid;
+  gap: 0.45rem;
+  padding: 1rem;
+}
+
+.figure-version {
+  color: var(--accent-2);
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.figure-demo-body h3 {
+  color: var(--ink);
+  font-size: clamp(1.25rem, 2.4vw, 1.85rem);
   line-height: 1.12;
 }
 
-.case-head p {
-  color: #344348;
-  font-weight: 650;
+.figure-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.2rem;
 }
 
-.case-flow {
-  display: grid;
-  align-content: start;
-  gap: 0.65rem;
-  margin: 0;
-  padding: 1.1rem 1.1rem 1.1rem 2.35rem;
+.figure-tag {
+  padding: 0.22rem 0.5rem;
+  border: 1px solid #c8d8d6;
+  border-radius: 999px;
+  color: var(--accent-3);
+  background: #eef5f2;
+  font-size: 0.78rem;
+  font-weight: 800;
 }
 
-.case-flow li {
-  padding-left: 0.15rem;
-}
-
-.case-link {
-  grid-column: 1 / -1;
-  display: block;
-  padding: 0.85rem 1.1rem;
+.figure-source-link {
+  margin-top: 0.35rem;
   color: var(--accent);
-  background: #f6faf9;
   font-weight: 850;
   overflow-wrap: anywhere;
   text-underline-offset: 3px;
+}
+
+.figure-study-footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.figure-questions,
+.figure-notes {
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid #c8d8d6;
+  background: #fffdf8;
+}
+
+.figure-questions h3,
+.figure-notes h3 {
+  color: var(--accent);
+  font-size: 1.2rem;
+}
+
+.figure-questions ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.figure-questions li + li {
+  margin-top: 0.5rem;
 }
 
 .paper-figures-band {
@@ -1029,7 +1133,10 @@ input {
   .detail-columns,
   .split,
   .figure-guide,
-  .case-card,
+  .figure-intro,
+  .figure-architecture,
+  .figure-demo-grid,
+  .figure-study-footer,
   .design-axis-grid,
   .principle-grid,
   .formula-grid,
@@ -1061,6 +1168,17 @@ input {
   .figure-media {
     border-right: 0;
     border-bottom: 1px solid var(--line);
+  }
+
+  .figure-arch-node {
+    min-height: 0;
+  }
+
+  .figure-arch-arrow {
+    top: auto;
+    right: 50%;
+    bottom: -0.75rem;
+    transform: rotate(90deg);
   }
 
   .filter-buttons {
@@ -1100,6 +1218,10 @@ input {
 
   .figure-media {
     min-height: 190px;
+  }
+
+  .figure-video-wrap video {
+    aspect-ratio: 4 / 3;
   }
 
   .band {

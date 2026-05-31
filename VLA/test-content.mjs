@@ -31,8 +31,9 @@ assert.ok(Array.isArray(data.architectureDiagrams), "architectureDiagrams should
 assert.ok(data.architectureDiagrams.length >= 4, "should include at least 4 architecture diagrams");
 assert.ok(Array.isArray(data.paperFigureGuides), "paperFigureGuides should be an array");
 assert.ok(data.paperFigureGuides.length >= 5, "should include at least 5 paper figure guides");
-assert.ok(Array.isArray(data.caseStudies), "caseStudies should be an array");
-assert.ok(data.caseStudies.length >= 2, "should include Figure case studies");
+assert.ok(data.figureSystem, "figureSystem should exist");
+assert.ok(Array.isArray(data.figureSystem.demos), "figureSystem demos should be an array");
+assert.ok(data.figureSystem.demos.length >= 4, "should include at least 4 Figure demos");
 
 const allRefs = data.routes.flatMap((route) => route.references ?? []);
 assert.ok(allRefs.length >= 50, "should include at least 50 references");
@@ -109,27 +110,33 @@ for (const figure of data.paperFigureGuides) {
   assert.ok(Array.isArray(figure.simplified) && figure.simplified.length >= 3, `${figure.title} needs simplified steps`);
 }
 
-for (const study of data.caseStudies) {
-  assert.ok(study.title, "case study needs title");
-  assert.ok(study.answer, `${study.title} needs answer`);
-  assert.ok(study.sourceUrl?.startsWith("http"), `${study.title} needs source URL`);
-  assert.ok(Array.isArray(study.flow) && study.flow.length >= 3, `${study.title} needs mechanism flow`);
-  assert.ok(Array.isArray(study.notes) && study.notes.length >= 1, `${study.title} needs notes`);
+assert.ok(data.figureSystem.title, "figure system needs title");
+assert.ok(data.figureSystem.summary, "figure system needs summary");
+assert.ok(Array.isArray(data.figureSystem.architecture) && data.figureSystem.architecture.length >= 4, "figure system needs architecture nodes");
+for (const demo of data.figureSystem.demos) {
+  assert.ok(demo.title, "Figure demo needs title");
+  assert.ok(demo.version, `${demo.title} needs version`);
+  assert.ok(demo.scene, `${demo.title} needs scene`);
+  assert.ok(demo.capability, `${demo.title} needs capability`);
+  assert.ok(demo.mechanism, `${demo.title} needs mechanism`);
+  assert.ok(demo.sourceUrl?.startsWith("http"), `${demo.title} needs source URL`);
+  assert.ok(demo.videoUrl?.startsWith("https://videos.ctfassets.net/"), `${demo.title} needs official video URL`);
+  assert.ok(Array.isArray(demo.tags) && demo.tags.length >= 2, `${demo.title} needs tags`);
 }
 
 const html = await readFile(indexPath, "utf8");
-for (const id of ["route-tabs", "route-detail", "reference-grid", "timeline", "search-input", "formula-grid", "paradigm-grid", "design-axis-grid", "architecture-gallery", "case-study-grid", "paper-figure-guides", "evidence-legend", "route-match-count"]) {
+for (const id of ["route-tabs", "route-detail", "reference-grid", "timeline", "search-input", "formula-grid", "paradigm-grid", "design-axis-grid", "architecture-gallery", "figure-system-case", "paper-figure-guides", "evidence-legend", "route-match-count"]) {
   assert.ok(html.includes(id), `index should expose #${id}`);
 }
 
 const app = await readFile(appPath, "utf8");
-for (const fn of ["renderRouteTabs", "renderRouteDetail", "renderReferences", "renderRouteReferenceGroup", "renderTimeline", "renderEquations", "renderParadigms", "renderDesignAxes", "renderArchitectureDiagrams", "renderCaseStudies", "renderPaperFigureGuides", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
+for (const fn of ["renderRouteTabs", "renderRouteDetail", "renderReferences", "renderRouteReferenceGroup", "renderTimeline", "renderEquations", "renderParadigms", "renderDesignAxes", "renderArchitectureDiagrams", "renderFigureSystem", "renderPaperFigureGuides", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
   assert.ok(app.includes(fn), `app should include ${fn}`);
 }
 assert.ok(!app.includes("innerHTML = `<strong>${reference.title}"), "mini refs should not interpolate titles with innerHTML");
 
 const styles = await readFile(stylePath, "utf8");
-for (const className of ["reference-groups", "reference-route-group", "route-reference-grid", "route-group-head", "design-axis-grid", "axis-card"]) {
+for (const className of ["reference-groups", "reference-route-group", "route-reference-grid", "route-group-head", "design-axis-grid", "axis-card", "figure-system-case", "figure-demo-card", "figure-architecture"]) {
   assert.ok(styles.includes(className), `styles should include ${className}`);
 }
 

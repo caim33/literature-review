@@ -259,30 +259,79 @@
     });
   }
 
-  function renderCaseStudies() {
-    const container = byId("case-study-grid");
+  function renderFigureSystem() {
+    const system = data.figureSystem;
+    byId("figure-eyebrow").textContent = system.eyebrow;
+    byId("figure-title").textContent = system.title;
+
+    const container = byId("figure-system-case");
     container.replaceChildren();
-    data.caseStudies.forEach((study) => {
-      const card = el("article", "case-card");
-      const head = el("div", "case-head");
-      head.append(el("span", "case-kicker", study.kicker));
-      head.append(el("h3", "", study.title));
-      head.append(el("p", "", study.answer));
 
-      const flow = el("ol", "case-flow");
-      study.flow.forEach((step) => flow.append(el("li", "", step)));
+    const intro = el("article", "figure-intro");
+    intro.append(el("p", "figure-summary", system.summary));
+    intro.append(labelText("证据等级", system.evidence));
 
-      const notes = el("div", "case-notes");
-      study.notes.forEach((note) => notes.append(labelText(note.label, note.text)));
-
-      const link = el("a", "case-link", study.sourceTitle);
-      link.href = study.sourceUrl;
-      link.target = "_blank";
-      link.rel = "noreferrer";
-
-      card.append(head, flow, notes, link);
-      container.append(card);
+    const arch = el("div", "figure-architecture");
+    system.architecture.forEach((node, index) => {
+      const nodeEl = el("section", "figure-arch-node");
+      nodeEl.append(el("span", "figure-arch-label", node.label));
+      nodeEl.append(el("h3", "", node.title));
+      nodeEl.append(el("p", "", node.detail));
+      if (index < system.architecture.length - 1) {
+        nodeEl.append(el("span", "figure-arch-arrow", "→"));
+      }
+      arch.append(nodeEl);
     });
+
+    const demoGrid = el("div", "figure-demo-grid");
+    system.demos.forEach((demo) => {
+      const card = el("article", "figure-demo-card");
+      const media = el("div", "figure-video-wrap");
+      const video = document.createElement("video");
+      video.src = demo.videoUrl;
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.preload = "metadata";
+      video.controls = true;
+      video.setAttribute("disableRemotePlayback", "");
+      media.append(video);
+
+      const tags = el("div", "figure-tags");
+      demo.tags.forEach((tag) => tags.append(el("span", "figure-tag", tag)));
+
+      const body = el("div", "figure-demo-body");
+      body.append(el("span", "figure-version", demo.version));
+      body.append(el("h3", "", demo.title));
+      body.append(labelText("任务场景", demo.scene));
+      body.append(labelText("体现能力", demo.capability));
+      body.append(labelText("系统机制", demo.mechanism));
+      body.append(labelText("公开视频", demo.evidence));
+      body.append(tags);
+
+      const source = el("a", "figure-source-link", demo.sourceTitle);
+      source.href = demo.sourceUrl;
+      source.target = "_blank";
+      source.rel = "noreferrer";
+      body.append(source);
+
+      card.append(media, body);
+      demoGrid.append(card);
+    });
+
+    const footer = el("div", "figure-study-footer");
+    const questions = el("article", "figure-questions");
+    questions.append(el("h3", "", "读 Figure demo 时追问"));
+    const list = el("ul");
+    system.readQuestions.forEach((question) => list.append(el("li", "", question)));
+    questions.append(list);
+
+    const notes = el("article", "figure-notes");
+    notes.append(el("h3", "", "和其他路线对比"));
+    system.notes.forEach((note) => notes.append(labelText(note.label, note.text)));
+    footer.append(questions, notes);
+
+    container.append(intro, arch, demoGrid, footer);
   }
 
   function labelText(label, text) {
@@ -436,7 +485,7 @@
     renderParadigms();
     renderDesignAxes();
     renderArchitectureDiagrams();
-    renderCaseStudies();
+    renderFigureSystem();
     renderPaperFigureGuides();
     renderReadingPath();
     renderGlossary();

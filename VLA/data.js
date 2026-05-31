@@ -393,76 +393,96 @@ const vlaMapData = {
       takeaway: "公司级 VLA 的护城河往往是数据飞轮：真实部署越多，失败越可挖，下一版模型越能覆盖长尾。"
     }
   ],
-  caseStudies: [
-    {
-      title: "Figure 叠衣服：是 Helix 吗？",
-      kicker: "Helix Learns to Fold Laundry",
-      answer: "是 Helix 家族。这个 demo 更准确地叫 Helix learns to fold laundry：单台 Figure 机器人用 Helix 的快慢系统执行毛巾/衣物折叠，重点在长程布料接触、双手协调和视觉闭环。",
-      sourceTitle: "Figure AI: Helix Learns to Fold Laundry",
-      sourceUrl: "https://www.figure.ai/news/helix-learns-to-fold-laundry",
-      flow: [
-        "System 2 用视觉和语言理解任务语义、物体状态和当前步骤。",
-        "System 1 高频 visuomotor policy 接收 S2 latent，连续输出上身、手腕、手指等动作。",
-        "动作不是一次性脚本，而是在执行中不断看布料边缘、折痕、手的位置并重规划局部动作。",
-        "学习价值：布料会遮挡、变形、滑动，要求模型同时学 contact-rich manipulation 和阶段进度判断。"
-      ],
-      notes: [
-        { label: "不要误标", text: "它不是 Helix-02 Bedroom Tidy；它是 Helix 在 laundry/folding 任务上的展示。" },
-        { label: "读 demo 的问题", text: "是否用同一模型覆盖不同衣物？是否 task-specific data？失败后能否自己恢复？这些比视频是否流畅更关键。" }
-      ]
-    },
-    {
-      title: "Figure 铺床 / 叠被子：更准确是 Helix-02 Bedroom Tidy",
-      kicker: "Helix-02 Bedroom Tidy",
-      answer: "如果你说的是两个 Figure humanoid 协作拉被子、整理床铺、reset bedroom，那它应标为 Helix-02 / Bedroom Tidy。它仍在 Helix 路线里，但比早期 Helix 多了全身移动和多机器人长程协作。",
-      sourceTitle: "Figure AI: Helix-02 Bedroom Tidy",
-      sourceUrl: "https://www.figure.ai/news/helix-02-bedroom-tidy",
-      flow: [
-        "每台机器人各自 onboard 感知房间、床、被子和对方位置，执行同一个 learned policy。",
-        "公开说法强调没有中央协调器：协作来自各自根据视觉观察对方动作并实时调整。",
-        "Helix-02 在 S1/S2 之外加入 System 0，用于全身运动、平衡和底盘/腿部 loco-manipulation。",
-        "长程任务被拆成拾取、拉平、对齐、整理、检查等隐式阶段；模型需要在布料变形和机器人互相遮挡下维持进度。"
-      ],
-      notes: [
-        { label: "核心难点", text: "布料状态不可完全观测、双机器人动作会相互影响，失败恢复比单臂抓放重要得多。" },
-        { label: "学习定位", text: "把它当作工业 humanoid VLA 系统样本，而不是可复现 benchmark；公开证据主要来自官方 blog/demo。" }
-      ]
-    },
-    {
-      title: "Figure 厨房全身操作：Helix 02 洗碗机任务",
-      kicker: "Helix 02 Full-Body Autonomy",
-      answer: "是的，Figure 还有厨房全身操作 demo。官方 Helix 02 发布里展示了机器人在真实厨房中卸载和重新装载洗碗机，强调整间厨房移动、双手抓取、开关抽屉/柜门、放置餐具等连续家务操作。",
-      sourceTitle: "Figure AI: Helix 02",
-      sourceUrl: "https://www.figure.ai/news/helix-02",
-      flow: [
-        "System 2 负责理解自然语言目标、识别餐具/抽屉/洗碗机/台面等对象关系，并维持长程任务上下文。",
-        "System 1 把视觉语义条件转成高频上身和双手动作，处理拿取餐具、放入架子、对齐物体等接触操作。",
-        "System 0 让机器人在厨房空间里走动、站稳、转身并调整全身姿态，把 manipulation 从桌面扩展到 room-scale loco-manipulation。",
-        "官方 demo 的学习点是端到端长程执行：真实厨房、数分钟任务、无人工干预/无 reset，比单个抓放更接近家庭机器人部署问题。"
-      ],
-      notes: [
-        { label: "和铺床不同", text: "厨房任务更强调导航、开合容器、物体分类和放置约束；铺床更强调柔性物体和多机器人协作。" },
-        { label: "读 demo 的问题", text: "要看它是否覆盖多种厨房布局、餐具形状和失败恢复；官方 demo 是强信号，但仍不是公开 benchmark。" }
-      ]
-    },
-    {
-      title: "Helix 到 Helix-02：怎么放进 VLA 地图",
-      kicker: "System 2 / System 1 / System 0",
-      answer: "Helix 原始公开重点是 S2 语义理解 + S1 高频上身控制；Helix-02 把同一思路推向全身任务，多出底层 whole-body motor layer。学习时应把模型、控制和任务证据拆开看。",
-      sourceTitle: "Figure AI: Helix",
-      sourceUrl: "https://www.figure.ai/news/helix",
-      flow: [
-        "S2：较低频率的 VLM/semantic model，处理语言、场景和任务语义。",
-        "S1：快速 visuomotor transformer，生成连续上身/手/头/躯干动作。",
-        "S0：Helix-02 公开描述中的全身运动层，处理移动、平衡和底层控制。",
-        "Bedroom Tidy 的价值在于三层同时工作：高层知道要整理床，低层能走到位置，中层能用双手处理柔性物体。"
-      ],
-      notes: [
-        { label: "和 GR00T 对比", text: "二者都像快慢系统，但 GR00T 有更明确的开放模型/模型卡路线，Figure 更多是官方工程披露。" },
-        { label: "和 PI 对比", text: "π0/π0.5 更强调跨 embodiment VLA 和 flow action expert；Figure 更强调 humanoid onboard、实时和协作任务。" }
-      ]
-    }
-  ],
+  figureSystem: {
+    eyebrow: "Company System Case",
+    title: "Figure Helix 系统案例：从上身 VLA 到全身家务操作",
+    summary: "Figure 的公开材料适合当作工业 humanoid VLA 样本来读：Helix 先展示 System 2 + System 1 的上身像素到动作控制，Helix 02 再加入 System 0，把任务扩展到整间厨房、卧室整理和精细手部操作。",
+    evidence: "官方 blog / 官方视频；不是可复现 benchmark。读 demo 时要区分模型版本、任务数据、是否全自主、是否无 reset、是否同一策略覆盖多场景。",
+    architecture: [
+      {
+        label: "System 2",
+        title: "Semantic VLM",
+        detail: "低频处理语言、场景、对象关系和任务阶段，输出语义 latent / goal conditioning。"
+      },
+      {
+        label: "System 1",
+        title: "Visuomotor Policy",
+        detail: "高频接收视觉、proprioception、触觉/手掌相机等传感器，生成上身/手/全身动作目标。"
+      },
+      {
+        label: "System 0",
+        title: "Whole-Body Controller",
+        detail: "Helix 02 中的 learned whole-body controller，处理平衡、步态、姿态和 kHz 级关节控制。"
+      },
+      {
+        label: "Robot Loop",
+        title: "Pixels to Whole Body",
+        detail: "执行后把视觉、触觉和本体状态回流，用于长程进度、接触变化和失败恢复。"
+      }
+    ],
+    demos: [
+      {
+        title: "Helix 原始系统",
+        version: "Helix · 2025",
+        scene: "上身/双手 VLA、多机器人协作、桌面物品操作",
+        capability: "证明单一神经网络可以从像素和语言控制 humanoid 上身、手腕、手指、头部和躯干。",
+        mechanism: "System 2 低频理解语义，System 1 高频执行 visuomotor control；部署时两层异步运行。",
+        evidence: "官方页面含多段视频：grocery、apple、ketchup、cookie、multi-robot collaboration 等。",
+        sourceTitle: "Figure AI: Helix",
+        sourceUrl: "https://www.figure.ai/news/helix",
+        videoUrl: "https://videos.ctfassets.net/qx5k8y1u9drj/2a4YQTPs9dnzYKWZQ6c2ni/78812ae00c3232d684e6e5e7ef748a36/VLA_Full_Quality_MASTER_21925A.mp4",
+        tags: ["S1/S2", "upper-body", "collaboration"]
+      },
+      {
+        title: "Laundry Folding",
+        version: "Helix · 2025",
+        scene: "单机器人折叠毛巾/衣物",
+        capability: "布料遮挡、形变、滑动和长程阶段判断要求模型持续观察边缘、折痕、手的位置和任务进度。",
+        mechanism: "仍属于 Helix 家族：S2 提供任务语义与阶段 latent，S1 高频执行双手布料 manipulation。",
+        evidence: "官方 folding 视频；适合作为柔性物体和 contact-rich manipulation 案例。",
+        sourceTitle: "Figure AI: Helix Learns to Fold Laundry",
+        sourceUrl: "https://www.figure.ai/news/helix-learns-to-fold-laundry",
+        videoUrl: "https://videos.ctfassets.net/qx5k8y1u9drj/1n817WFIWK0HpX3onZ2QbR/3aef0a71aa8fdf6c2e748642beee90bf/Folding_MP4_copy.mp4",
+        tags: ["cloth", "bimanual", "long-horizon"]
+      },
+      {
+        title: "Kitchen Dishwasher",
+        version: "Helix 02 · 2026",
+        scene: "整间厨房中卸载/重装洗碗机、搬运餐具、开关抽屉和柜门",
+        capability: "官方称连续 4 分钟、61 个 loco-manipulation actions、全自主、无人工干预/无 reset。",
+        mechanism: "S2 维持长程语义进度，S1 连接所有传感器到所有关节，S0 负责全身移动、平衡和稳定执行。",
+        evidence: "Helix 02 官方发布中的 Video 1，是 Figure 当前最重要的 full-body autonomy demo。",
+        sourceTitle: "Figure AI: Helix 02",
+        sourceUrl: "https://www.figure.ai/news/helix-02",
+        videoUrl: "https://videos.ctfassets.net/qx5k8y1u9drj/1cKhxhvotDvkyJx2rfq2IN/94f100629ab7a0bdb37d5b248f8f5760/Kitchen_Tidy_MP4_Compressed.mp4",
+        tags: ["S0/S1/S2", "room-scale", "dishwasher"]
+      },
+      {
+        title: "Bedroom Tidy",
+        version: "Helix-02 · 2026",
+        scene: "两个 humanoid 协作整理卧室、拉被子、铺床、reset bedroom",
+        capability: "柔性物体、多机器人互相遮挡、角色隐式分配和长程协作，比单臂抓放更接近家庭任务。",
+        mechanism: "每台机器人 onboard 感知自己和对方；公开说法强调无中央协调器，协作来自视觉观察和同一 learned policy 的闭环调整。",
+        evidence: "官方 Bedroom Tidy 页面含多段视频，应和 laundry folding、Helix 原始系统分开标注。",
+        sourceTitle: "Figure AI: Helix-02 Bedroom Tidy",
+        sourceUrl: "https://www.figure.ai/news/helix-02-bedroom-tidy",
+        videoUrl: "https://videos.ctfassets.net/qx5k8y1u9drj/6ejXSHWNFd9qTBVxopCWF8/398d4ebfdde91a77a3c6cf41754fd82d/Tidy_Bedroom_MP4_Longer_Ending__1_.mp4",
+        tags: ["multi-robot", "cloth", "home"]
+      }
+    ],
+    readQuestions: [
+      "是否同一模型/同一权重，还是 task-specific tuning？",
+      "是否全自主、onboard、无 teleop、无 reset？",
+      "遇到物体偏移、布料失败、抓取失误时有没有闭环恢复？",
+      "任务成功是否依赖固定场景布局、固定物体集合或人工摆放？",
+      "System 0 / whole-body controller 和 VLA policy 的接口是什么？"
+    ],
+    notes: [
+      { label: "和 GR00T 对比", text: "二者都采用快慢系统思路；GR00T 公开模型卡和开放权重路径更清晰，Figure 更像工业 demo + 官方架构披露。" },
+      { label: "和 π0 对比", text: "PI 系列更强调跨 embodiment VLA、flow action expert 和数据配方；Figure 更强调 humanoid onboard、全身控制、家庭任务和协作。" },
+      { label: "证据等级", text: "这些 demo 很值得学习，但应按官方工程信号阅读，不等同于可复现论文 benchmark。" }
+    ]
+  },
   paperFigureGuides: [
     {
       title: "RT-2：把动作当作另一种语言",
