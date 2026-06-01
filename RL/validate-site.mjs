@@ -42,6 +42,8 @@ const checks = [
   ["RLVR verifier rewards", /RLVR|verifiable|验证器奖励|规则验证/i],
   ["DAPO and GSPO coverage", /DAPO[\s\S]*GSPO|GSPO[\s\S]*DAPO/i],
   ["robot VLA post-training algorithms", /DPPO|Residual RL|RLPD|AWAC/i],
+  ["Teacher PPO coverage", /TPPO[\s\S]*Teacher PPO|Teacher PPO[\s\S]*TPPO/i],
+  ["Termination glossary", /Termination[\s\S]*episode|terminal state|done/i],
   ["traditional algorithm map", /DQN|Q-learning|Dreamer|TD-MPC/i],
   ["SAC entropy objective", /SAC|entropy|alpha/i],
   ["VLA real robot workflow", /VLA|真机|安全/i],
@@ -78,8 +80,8 @@ if (!html.includes('id="toggleGlossary"') || !html.includes("glossary-collapsed"
 }
 
 const termCount = (html.match(/class="[^"]*\bterm\b[^"]*"/g) || []).length;
-if (termCount < 72) {
-  failures.push(`Expected at least 72 glossary terms, found ${termCount}`);
+if (termCount < 79) {
+  failures.push(`Expected at least 79 glossary terms, found ${termCount}`);
 }
 
 const cssPath = path.join(root, "styles.css");

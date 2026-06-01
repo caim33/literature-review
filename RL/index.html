@@ -138,6 +138,7 @@
           <div class="term" data-tags="sparse reward"><b>Sparse Reward</b><span>只在成功或失败时给奖励，信号稀少但不容易被奖励黑客利用。</span></div>
           <div class="term" data-tags="reward shaping"><b>Reward Shaping</b><span>加入距离、姿态、接触等中间奖励，让学习更快，但设计不好会诱导错误行为。</span></div>
           <div class="term" data-tags="reset"><b>Reset</b><span>把环境恢复到下一次训练可开始的状态，真机 reset 成本常常决定算法能不能落地。</span></div>
+          <div class="term" data-tags="termination done terminal state timeout success failure"><b>Termination</b><span>一个 episode 结束的判定条件，可以来自成功、失败、超时、安全停止或环境 reset。</span></div>
           <div class="term" data-tags="domain randomization"><b>Domain Randomization</b><span>在仿真中随机化纹理、质量、摩擦、光照等因素，提高策略迁移到真机的鲁棒性。</span></div>
           <div class="term" data-tags="system identification"><b>System Identification</b><span>根据真实机器人数据估计动力学、摩擦、延迟等参数，让仿真更接近现实。</span></div>
           <div class="term" data-tags="sim to real"><b>Sim-to-Real</b><span>把仿真中训练的策略迁移到真实机器人。</span></div>
@@ -149,6 +150,7 @@
           <div class="term" data-tags="DPPO diffusion policy policy optimization"><b>DPPO</b><span>Diffusion Policy Policy Optimization，用 RL 微调扩散动作策略，保留动作分布先验。</span></div>
           <div class="term" data-tags="RLPD prior data offline online"><b>RLPD</b><span>Reinforcement Learning with Prior Data，把离线示教和在线 rollout 混合用于样本高效训练。</span></div>
           <div class="term" data-tags="residual RL correction"><b>Residual RL</b><span>在已有控制器、BC 或 VLA 动作上学习小残差，降低真机探索破坏性。</span></div>
+          <div class="term" data-tags="TPPO teacher PPO teacher student humanoid robot"><b>TPPO</b><span>Teacher PPO：先训练更强 teacher policy 或 privileged policy，再蒸馏/迁移给 student policy 的 PPO 训练路线。</span></div>
           <div class="term" data-tags="Q-learning DQN value based"><b>DQN / Q-learning</b><span>价值学习代表路线，用 Q 函数选择动作，是理解 target、bootstrap 和 off-policy 的背景。</span></div>
           <div class="term" data-tags="model based world model Dreamer TD-MPC"><b>Model-based RL</b><span>先学习世界模型或 latent dynamics，再在想象中规划或更新策略，例如 Dreamer、TD-MPC。</span></div>
           <div class="term" data-tags="safe RL CPO Lagrangian"><b>Safe RL</b><span>把碰撞、越界、力矩、速度等安全成本显式放进优化或约束中的 RL 方向。</span></div>
@@ -710,10 +712,10 @@ Loss_{GRPO} =
             <h3>GSPO</h3>
             <p>把 ratio/clipping 从 token 级提升到 sequence 级，缓解长序列或 MoE 训练中的局部不稳定。</p>
           </article>
-          <article class="algo-card" data-tags="TPPO token level turn level">
-            <div class="meta"><span>缩写不统一</span><span>看论文定义</span></div>
+          <article class="algo-card" data-tags="TPPO teacher PPO teacher student privileged policy distillation">
+            <div class="meta"><span>Teacher PPO</span><span>robotics</span></div>
             <h3>TPPO</h3>
-            <p>常见语境可能是 Token-level PPO，也可能是 Turn-level PPO。前者做更细 token 信用分配，后者面向多轮 agent。</p>
+            <p>这里指 Teacher PPO：用 PPO 训练 teacher / privileged policy，再把能力蒸馏到 student 或部署策略。注意别和 LLM 里偶尔说的 token-level / turn-level PPO 混淆。</p>
           </article>
           <article class="algo-card" data-tags="KTO IPO ORPO SimPO preference optimization">
             <div class="meta"><span>偏好优化</span><span>DPO 家族</span></div>
