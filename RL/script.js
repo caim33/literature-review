@@ -5,6 +5,10 @@ const searchInput = document.querySelector("#searchInput");
 const clearSearch = document.querySelector("#clearSearch");
 let searchable = [...document.querySelectorAll("[data-tags]")];
 const noResults = document.querySelector("#noResults");
+const glossary = document.querySelector("#glossary");
+const toggleGlossary = document.querySelector("#toggleGlossary");
+const glossaryTerms = [...document.querySelectorAll("#glossary .term")];
+let glossaryExpanded = false;
 
 function updateProgress() {
   const scrollTop = window.scrollY;
@@ -30,6 +34,8 @@ function normalize(text) {
 function runSearch() {
   const query = normalize(searchInput.value);
   let visible = 0;
+  if (query) glossaryExpanded = true;
+  syncGlossaryVisibility(query);
   searchable.forEach((item) => {
     const haystack = normalize(`${item.textContent} ${item.dataset.tags || ""}`);
     const match = !query || haystack.includes(query);
@@ -37,6 +43,14 @@ function runSearch() {
     if (match) visible += 1;
   });
   noResults.classList.toggle("show", Boolean(query) && visible === 0);
+}
+
+function syncGlossaryVisibility(query = normalize(searchInput.value)) {
+  if (!glossary || !toggleGlossary) return;
+  const expanded = glossaryExpanded || Boolean(query);
+  glossary.classList.toggle("glossary-collapsed", !expanded);
+  toggleGlossary.setAttribute("aria-expanded", String(expanded));
+  toggleGlossary.textContent = expanded ? "收起术语表" : `展开全部 ${glossaryTerms.length} 个术语`;
 }
 
 function escapeHtml(text) {
@@ -201,10 +215,16 @@ window.addEventListener("scroll", () => {
 searchInput.addEventListener("input", runSearch);
 clearSearch.addEventListener("click", () => {
   searchInput.value = "";
+  glossaryExpanded = false;
   runSearch();
   searchInput.focus();
 });
 
 renderFormulaViews();
+toggleGlossary?.addEventListener("click", () => {
+  glossaryExpanded = !glossaryExpanded;
+  syncGlossaryVisibility();
+});
+syncGlossaryVisibility();
 updateProgress();
 updateActiveNav();

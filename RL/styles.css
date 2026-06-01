@@ -231,6 +231,39 @@ a {
   line-height: 1.18;
 }
 
+.section-title-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: start;
+}
+
+.section-title-row h2 {
+  margin: 0 0 12px;
+  font-size: 31px;
+  line-height: 1.18;
+}
+
+.section-title-row .lead {
+  margin: 0;
+}
+
+.section-toggle {
+  flex: 0 0 auto;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--panel-2);
+  color: var(--ink);
+  padding: 9px 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.section-toggle:hover {
+  border-color: var(--accent);
+}
+
 .section > p,
 .lead {
   color: var(--muted);
@@ -271,7 +304,10 @@ a {
 .note,
 .path-card,
 .term,
-.diagram-card {
+.diagram-card,
+.phase-card,
+.algo-family,
+.lane {
   border: 1px solid var(--line);
   background: rgba(23, 29, 36, 0.92);
   border-radius: 8px;
@@ -287,7 +323,10 @@ a {
 .algo-card h3,
 .note h3,
 .path-card h3,
-.diagram-card h3 {
+.diagram-card h3,
+.phase-card h3,
+.algo-family h3,
+.lane h3 {
   margin: 0;
   font-size: 18px;
 }
@@ -295,10 +334,128 @@ a {
 .algo-card p,
 .note p,
 .path-card p,
-.diagram-card p {
+.diagram-card p,
+.phase-card p,
+.algo-family p,
+.lane p {
   margin: 0;
   color: var(--muted);
   line-height: 1.68;
+}
+
+.phase-list {
+  display: grid;
+  gap: 14px;
+  margin: 24px 0;
+}
+
+.phase-card {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 8px 18px;
+  align-items: start;
+  background:
+    linear-gradient(90deg, rgba(79, 179, 163, 0.1), transparent 42%),
+    rgba(23, 29, 36, 0.92);
+}
+
+.phase-card > span {
+  grid-row: 1 / 4;
+  color: var(--accent-2);
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.phase-card ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.phase-card li + li {
+  margin-top: 5px;
+}
+
+.priority-lane {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr 1fr;
+  gap: 14px;
+  margin: 24px 0;
+}
+
+.lane {
+  min-height: 142px;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.lane.mainline {
+  border-color: rgba(79, 179, 163, 0.7);
+  background: rgba(24, 52, 47, 0.76);
+}
+
+.lane.support {
+  border-color: rgba(225, 184, 79, 0.72);
+  background: rgba(52, 43, 24, 0.62);
+}
+
+.lane.background {
+  border-color: rgba(159, 176, 195, 0.35);
+}
+
+.algorithm-map {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 24px 0;
+}
+
+.algo-family {
+  min-height: 118px;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 6px 10px;
+  align-content: start;
+  padding: 14px;
+}
+
+.algo-family span {
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  color: var(--ink);
+  background: #25313d;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.algo-family h3 {
+  align-self: center;
+  font-size: 17px;
+}
+
+.algo-family p {
+  grid-column: 1 / -1;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.algo-family.highlight {
+  border-color: rgba(79, 179, 163, 0.68);
+  background:
+    linear-gradient(145deg, rgba(79, 179, 163, 0.14), transparent 68%),
+    rgba(23, 29, 36, 0.92);
+}
+
+.algo-family.muted-family {
+  opacity: 0.92;
 }
 
 .meta {
@@ -620,6 +777,10 @@ tr:last-child td {
   gap: 10px;
 }
 
+.glossary-collapsed .term:not(.core-term) {
+  display: none;
+}
+
 .term b {
   display: block;
   color: var(--accent-2);
@@ -664,15 +825,41 @@ tr:last-child td {
   }
 
   .hero,
+  .section-title-row,
   .two-col,
   .grid,
   .term-grid,
-  .checklist {
+  .checklist,
+  .priority-lane {
     grid-template-columns: 1fr;
+  }
+
+  .phase-card {
+    grid-template-columns: 1fr;
+  }
+
+  .phase-card > span {
+    grid-row: auto;
   }
 
   .hero h2 {
     font-size: 34px;
+  }
+}
+
+@media (max-width: 980px) and (min-width: 641px) {
+  .algorithm-map {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .algorithm-map {
+    grid-template-columns: 1fr;
+  }
+
+  .section-title-row {
+    grid-template-columns: 1fr;
   }
 }
 
