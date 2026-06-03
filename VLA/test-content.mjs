@@ -52,7 +52,7 @@ const requiredNames = [
   "GENE-26.5",
   "Qwen-VLA",
   "Galaxea G0.5",
-  "XPENG VLA 2.0",
+  "XPENG Robotics Fe0",
   "DreamZero",
   "StarVLA",
   "SpatialVLA",
@@ -135,6 +135,16 @@ for (const recipe of data.trainingRecipes) {
   for (const item of recipe.dataMix) {
     assert.ok(item.label, `${recipe.title} data mix item needs label`);
     assert.ok(item.role, `${recipe.title} data mix item needs role`);
+    if (item.share !== undefined) {
+      assert.equal(typeof item.share, "number", `${recipe.title} data mix share should be numeric`);
+      assert.ok(item.share > 0, `${recipe.title} data mix share should be positive`);
+    }
+  }
+  const shares = recipe.dataMix.map((item) => item.share).filter((share) => share !== undefined);
+  if (shares.length) {
+    assert.equal(shares.length, recipe.dataMix.length, `${recipe.title} should either share all data mix items or none`);
+    const shareTotal = shares.reduce((sum, share) => sum + share, 0);
+    assert.ok(shareTotal > 99 && shareTotal <= 101, `${recipe.title} shared data mix should add up to roughly 100%`);
   }
   for (const stage of recipe.training) {
     assert.ok(stage.stage, `${recipe.title} training item needs stage`);
@@ -163,13 +173,13 @@ for (const id of ["route-tabs", "route-detail", "reference-grid", "timeline", "s
 }
 
 const app = await readFile(appPath, "utf8");
-for (const fn of ["renderRouteTabs", "renderRouteDetail", "renderReferences", "renderRouteReferenceGroup", "renderTimeline", "renderEquations", "renderParadigms", "renderDesignAxes", "renderArchitectureDiagrams", "renderTrainingRecipes", "renderRecipeBlock", "renderFigureSystem", "renderPaperFigureGuides", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
+for (const fn of ["renderRouteTabs", "renderRouteDetail", "renderReferences", "renderRouteReferenceGroup", "renderTimeline", "renderEquations", "renderParadigms", "renderDesignAxes", "renderArchitectureDiagrams", "renderTrainingRecipes", "renderRecipeDataMix", "renderRecipeDonut", "renderRecipePyramid", "renderRecipeBlock", "renderFigureSystem", "renderPaperFigureGuides", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
   assert.ok(app.includes(fn), `app should include ${fn}`);
 }
 assert.ok(!app.includes("innerHTML = `<strong>${reference.title}"), "mini refs should not interpolate titles with innerHTML");
 
 const styles = await readFile(stylePath, "utf8");
-for (const className of ["reference-groups", "reference-route-group", "route-reference-grid", "route-group-head", "design-axis-grid", "axis-card", "recipe-band", "training-recipe-list", "recipe-card", "recipe-item-grid", "figure-system-case", "figure-demo-card", "figure-architecture"]) {
+for (const className of ["reference-groups", "reference-route-group", "route-reference-grid", "route-group-head", "design-axis-grid", "axis-card", "recipe-band", "training-recipe-list", "recipe-card", "recipe-donut", "recipe-mix-legend", "recipe-pyramid", "recipe-item-grid", "figure-system-case", "figure-demo-card", "figure-architecture"]) {
   assert.ok(styles.includes(className), `styles should include ${className}`);
 }
 

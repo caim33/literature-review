@@ -407,11 +407,11 @@ const vlaMapData = {
       action: "统一的是 action/trajectory tensor interface、masking scheme 和 embodiment-aware prompt，不是把所有机器人强行映射到同一物理语义 action space；target tensor 以 horizon H 和共享 channel K 表示，padding channel 用 mask 排除梯度。",
       readAs: "这是 2026 年最值得单独精读的统一 VLA 样本：差异不只是换 action head，而是把任务、轨迹和 embodiment prompt 一起统一。",
       dataMix: [
-        { label: "Robot manipulation · 74.2%", role: "公开混合的主体，含 RobotSet、Galaxea、AgiBot、RoboMIND、RDT-1B、DROID、BridgeData、RT-1 等，以及 1000+ 小时 in-house real-robot trajectories。" },
-        { label: "Navigation · 7.5%", role: "把 VLN / object searching / target tracking 的 waypoint 监督并入统一轨迹预测，常用每步相对 Δx, Δy, Δθ。" },
-        { label: "Egocentric human · 6.0%", role: "来自 Ego4D/EPIC-KITCHENS 等处理子集，预测手腕 SE(3) 和手部 articulation，贡献人类 manipulation prior。" },
-        { label: "Synthetic simulation · 3.7%", role: "包括自研仿真管线 8M+ synthetic trajectories，以及 tabletop scenes/tasks 的成功轨迹，补任务和场景长尾。" },
-        { label: "Auxiliary V-L · 8.5%", role: "由 general VL、2D spatial grounding、autonomous driving VQA、embodied action caption 组成，维持 OCR、grounding、spatial reasoning 和指令能力。" }
+        { label: "Robot manipulation", share: 74.2, role: "公开混合的主体，含 RobotSet、Galaxea、AgiBot、RoboMIND、RDT-1B、DROID、BridgeData、RT-1 等，以及 1000+ 小时 in-house real-robot trajectories。" },
+        { label: "Navigation", share: 7.5, role: "把 VLN / object searching / target tracking 的 waypoint 监督并入统一轨迹预测，常用每步相对 Δx, Δy, Δθ。" },
+        { label: "Egocentric human", share: 6.0, role: "来自 Ego4D/EPIC-KITCHENS 等处理子集，预测手腕 SE(3) 和手部 articulation，贡献人类 manipulation prior。" },
+        { label: "Synthetic simulation", share: 3.7, role: "包括自研仿真管线 8M+ synthetic trajectories，以及 tabletop scenes/tasks 的成功轨迹，补任务和场景长尾。" },
+        { label: "Auxiliary V-L", share: 8.5, role: "由 general VL、2D spatial grounding、autonomous driving VQA、embodied action caption 组成，维持 OCR、grounding、spatial reasoning 和指令能力。" }
       ],
       training: [
         { stage: "I", title: "T2A warm start", detail: "冻结 VLM，只训练 DiT decoder；输入 language instruction + embodiment prompt，不给图像，让 decoder 先形成 language-conditioned action prior。" },
@@ -458,34 +458,33 @@ const vlaMapData = {
       ]
     },
     {
-      title: "XPENG VLA 2.0 / Physical AI（Fe0 命名待核）",
-      year: "2025-2026",
-      family: "Vehicle/Physical-AI VLA + world model",
-      evidence: "官方发布 + 技术报告",
+      title: "XPENG Robotics Fe0",
+      year: "2026",
+      family: "Cross-embodiment robot data study",
+      evidence: "官方项目页",
       sources: [
-        { title: "XPENG AI Day 2025: VLA 2.0", url: "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7" },
-        { title: "X-World technical report release", url: "https://www.xpeng.com/news/019dd72da86c9dd703de8a0282290002" }
+        { title: "Fe0 project page", url: "https://xpeng-robotics.github.io/fe0/" }
       ],
-      paradigm: "官方称 VLA 2.0 采用 Vision-Implicit Token-Action，去掉语言翻译中间步，从视觉信号端到端生成 action command。",
-      action: "更接近自动驾驶/Physical AI 的 action generative model，不是标准机械臂 manipulation VLA。X-World 是 action-conditioned 多摄世界模型，用于闭环仿真、评估和长尾数据生成。",
-      readAs: "把它当作“VLA 概念进入车辆/Physical AI”的案例读，而不是直接和 OpenVLA/π0 的机械臂成功率横向比较。",
+      paradigm: "Fe0 用一个基础模型研究 cross-embodiment data 是否能帮助 IRON 人形机器人：backbone 基于 UniT 和小鹏内部 multimodal model，评估目标是 IRON-R01-1.11 pick-and-place。",
+      action: "动作空间聚焦 IRON 的桌面 pick-and-place teleoperation/evaluation，不是车端 VLA 2.0。核心问题是：在只有约 3 小时 IRON anchor 数据时，大规模跨 embodiment pool 能否迁移出泛化。",
+      readAs: "把它当作数据层诊断实验来读：不是炫一个新 backbone，而是在测 cross-embodiment pool、极小目标机器人数据和真实闭环成功率之间的关系。",
       dataMix: [
-        { label: "Real driving videos", role: "官方称接近 1 亿 driving clips，且训练无需 Data Annotation；主要贡献真实道路分布和长尾驾驶场景。" },
-        { label: "Cloud base model", role: "官方披露云端 72B base model、3 万卡集群、约 5 天一次 full-cycle iteration；细节偏系统工程信号。" },
-        { label: "Vehicle deployment data", role: "量产车端十亿级模型和 Turing chip/software stack，贡献真实部署闭环与边缘约束。" },
-        { label: "X-World simulation", role: "通过多摄未来视频生成支持 closed-loop evaluation、场景扩展和 long-tail data synthesis。" },
-        { label: "Manual annotation", role: "官方口径强调无需人工标注训练；是否有数据治理、筛选、审核、场景标签未披露。" }
+        { label: "Cross-Embodiment Pool", role: "Fe0 的最大底座：项目页称相对 IRON anchor 数据，episode 数约 345x、frame 数约 909x、hour 数约 1587x，用于提供跨机器人操作先验。" },
+        { label: "IRON anchor data", role: "约 3 小时 IRON 人形遥操数据，任务限定为 pick-and-place；约 95% 是一个物体放进一个容器，约 5% 是两个物体放到同一层板。" },
+        { label: "Open-loop trajectories", role: "用相同任务分布的轨迹做 frame-level MSE 和 L1-L5 难度分层，检查模型是否真的学到 IRON action geometry。" },
+        { label: "Closed-loop real trials", role: "在 IRON-R01-1.11 真机上评估成功率，重点看训练配方是否能从离线误差转成真实执行提升。" },
+        { label: "L1-L5 curriculum", role: "任务难度从简单单物体搬运扩展到位置、容器、物体组合和更复杂泛化，用来观察数据池对不同泛化轴的贡献。" }
       ],
       training: [
-        { stage: "VLA", title: "Large-scale video-to-action training", detail: "公开材料只给出高层口径：真实驾驶视频、无标注、云端大模型快速迭代；具体 loss/action space 未披露。" },
-        { stage: "Deploy", title: "Cloud-to-vehicle optimization", detail: "通过 chip-operator-model 全周期优化，把十亿级模型部署到车端。" },
-        { stage: "WM-1", title: "X-World controllable world model", detail: "先把预训练视频生成模型转成可控多摄世界模型，输入历史视频和 future action/action sequence。" },
-        { stage: "WM-2", title: "Streaming autoregressive simulator", detail: "再用 block-causal architecture、few-step self-forcing learning 和 rolling KV cache 支持闭环仿真。" }
+        { stage: "1", title: "Minimal target anchor", detail: "先固定约 3 小时 IRON 数据，避免靠大量目标机器人数据掩盖 cross-embodiment transfer 的贡献。" },
+        { stage: "2", title: "Pool ratio sweep", detail: "逐步加入不同规模的 Cross-Embodiment Pool，观察 open-loop MSE 和 closed-loop success rate 如何变化。" },
+        { stage: "3", title: "Difficulty-stratified evaluation", detail: "按 L1-L5 任务难度评估，区分简单复现、物体泛化、容器/位置泛化和组合泛化。" },
+        { stage: "4", title: "Real-robot validation", detail: "用 IRON-R01-1.11 真机闭环验证，而不是只看离线 imitation loss。" }
       ],
       unknowns: [
-        "公开资料没有确认 Fe0 是正式模型名；页面只保留用户关心的别名备注。",
-        "VLA 2.0 的 action token/action command 定义、控制频率、loss、RL 细节和数据采样比例未公开。",
-        "车辆 VLA、Robotaxi、IRON 人形和飞行器是否共享同权重或仅共享平台化技术，没有足够公开细节。"
+        "Fe0 是公开项目页/实验报告，不是完整开源训练代码和权重发布。",
+        "Cross-Embodiment Pool 的完整机器人来源、采样配比、清洗规则和 loss 细节没有在页面上全部展开。",
+        "该实验聚焦 IRON pick-and-place 迁移，不应直接外推为小鹏所有机器人/车辆 Physical AI 的统一训练配方。"
       ]
     },
     {
@@ -962,6 +961,13 @@ const vlaMapData = {
           type: "blog",
           url: "https://www.genesis.ai/blog/gene-26-5-advancing-robotic-manipulation-to-human-level",
           value: "Genesis AI 发布的 dexterous manipulation 系统信号，强调 human-centric hand、数据/仿真/控制全栈和复杂手部操作。"
+        },
+        {
+          title: "XPENG Robotics Fe0",
+          year: "2026",
+          type: "project",
+          url: "https://xpeng-robotics.github.io/fe0/",
+          value: "小鹏机器人 cross-embodiment 数据实验：用约 3 小时 IRON anchor 数据测试大规模跨机器人数据池对人形 pick-and-place 的迁移。"
         }
       ]
     },
@@ -1376,20 +1382,6 @@ const vlaMapData = {
           type: "blog",
           url: "https://deepmind.google/discover/blog/genie-2-a-large-scale-foundation-world-model/",
           value: "DeepMind 的大规模 foundation world model，推动可交互生成环境方向。"
-        },
-        {
-          title: "XPENG VLA 2.0 / Physical AI",
-          year: "2025",
-          type: "blog",
-          url: "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
-          value: "小鹏官方发布的 Vision-Implicit Token-Action 车辆/Physical AI VLA，公开称接近 1 亿 driving clips 且无需人工标注训练。"
-        },
-        {
-          title: "X-World",
-          year: "2026",
-          type: "report",
-          url: "https://www.xpeng.com/news/019dd72da86c9dd703de8a0282290002",
-          value: "小鹏动作条件多摄世界模型，用于 VLA 2.0 的闭环仿真、数据合成和长尾验证。"
         },
         {
           title: "RoboDreamer",

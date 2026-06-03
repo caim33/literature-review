@@ -12,6 +12,7 @@
   const allReferences = () => data.routes.flatMap((route) =>
     route.references.map((reference) => ({ ...reference, route: route.title, routeId: route.id }))
   );
+  const recipeColors = ["#256f73", "#a54735", "#596b2f", "#b07a2f", "#516a93", "#7a5f95", "#8b6f4d", "#4f6f5d"];
   const findNodeLabel = (diagram, id) => diagram.nodes.find((node) => node.id === id)?.label || id;
   const scoreRoute = (route, term) => {
     if (!term) return 0;
@@ -240,10 +241,7 @@
       quick.append(labelText("Action / trajectory", recipe.action));
       quick.append(renderRecipeSources(recipe.sources));
 
-      const dataBlock = renderRecipeBlock("数据组成与贡献", recipe.dataMix.map((item) => ({
-        title: item.label,
-        text: item.role
-      })));
+      const dataBlock = renderRecipeDataMix(recipe);
       const trainBlock = renderRecipeBlock("训练阶段 / recipe", recipe.training.map((item) => ({
         title: `${item.stage}. ${item.title}`,
         text: item.detail
@@ -267,6 +265,65 @@
       block.append(link);
     });
     return block;
+  }
+
+  function renderRecipeDataMix(recipe) {
+    const hasShares = recipe.dataMix.every((item) => Number.isFinite(item.share));
+    return hasShares ? renderRecipeDonut(recipe.dataMix) : renderRecipePyramid(recipe.dataMix);
+  }
+
+  function renderRecipeDonut(items) {
+    const section = el("section", "recipe-block recipe-mix-visual");
+    section.append(el("h4", "", "数据组成与贡献"));
+    const total = items.reduce((sum, item) => sum + item.share, 0) || 1;
+    let cursor = 0;
+    const segments = items.map((item, index) => {
+      const start = cursor;
+      const end = cursor + (item.share / total) * 100;
+      cursor = end;
+      return `${recipeColors[index % recipeColors.length]} ${start.toFixed(3)}% ${end.toFixed(3)}%`;
+    });
+
+    const visual = el("div", "recipe-donut-layout");
+    const donutWrap = el("div", "recipe-donut-wrap");
+    const donut = el("div", "recipe-donut");
+    donut.style.background = `conic-gradient(${segments.join(", ")})`;
+    const center = el("div", "recipe-donut-center");
+    center.append(el("strong", "", `${Math.round(total)}%`));
+    center.append(el("span", "", "公开配比"));
+    donut.append(center);
+    donutWrap.append(donut);
+
+    const legend = el("div", "recipe-mix-legend");
+    items.forEach((item, index) => {
+      const row = el("article", "recipe-mix-row");
+      const head = el("div", "recipe-mix-head");
+      const swatch = el("span", "recipe-swatch");
+      swatch.style.backgroundColor = recipeColors[index % recipeColors.length];
+      head.append(swatch, el("strong", "", item.label), el("span", "recipe-percent", `${item.share}%`));
+      row.append(head, el("p", "", item.role));
+      legend.append(row);
+    });
+
+    visual.append(donutWrap, legend);
+    section.append(visual);
+    return section;
+  }
+
+  function renderRecipePyramid(items) {
+    const section = el("section", "recipe-block recipe-pyramid-block");
+    section.append(el("h4", "", "数据组成与贡献"));
+    const pyramid = el("div", "recipe-pyramid");
+    items.forEach((item, index) => {
+      const level = el("article", "recipe-pyramid-level");
+      const width = Math.max(58, 100 - index * 8);
+      level.style.width = `${width}%`;
+      level.append(el("strong", "", item.label));
+      level.append(el("p", "", item.role));
+      pyramid.append(level);
+    });
+    section.append(pyramid);
+    return section;
   }
 
   function renderRecipeBlock(title, items) {
