@@ -31,6 +31,8 @@ assert.ok(Array.isArray(data.architectureDiagrams), "architectureDiagrams should
 assert.ok(data.architectureDiagrams.length >= 4, "should include at least 4 architecture diagrams");
 assert.ok(Array.isArray(data.paperFigureGuides), "paperFigureGuides should be an array");
 assert.ok(data.paperFigureGuides.length >= 5, "should include at least 5 paper figure guides");
+assert.ok(Array.isArray(data.trainingRecipes), "trainingRecipes should be an array");
+assert.ok(data.trainingRecipes.length >= 8, "should include at least 8 data/training recipe entries");
 assert.ok(data.figureSystem, "figureSystem should exist");
 assert.ok(Array.isArray(data.figureSystem.demos), "figureSystem demos should be an array");
 assert.ok(data.figureSystem.demos.length >= 4, "should include at least 4 Figure demos");
@@ -48,6 +50,9 @@ const requiredNames = [
   "Helix-02 Bedroom Tidy",
   "Helix 02 Kitchen",
   "GENE-26.5",
+  "Qwen-VLA",
+  "Galaxea G0.5",
+  "XPENG VLA 2.0",
   "DreamZero",
   "StarVLA",
   "SpatialVLA",
@@ -111,6 +116,33 @@ for (const figure of data.paperFigureGuides) {
   assert.ok(Array.isArray(figure.simplified) && figure.simplified.length >= 3, `${figure.title} needs simplified steps`);
 }
 
+for (const recipe of data.trainingRecipes) {
+  assert.ok(recipe.title, "training recipe needs title");
+  assert.ok(recipe.year, `${recipe.title} needs year`);
+  assert.ok(recipe.family, `${recipe.title} needs family`);
+  assert.ok(recipe.evidence, `${recipe.title} needs evidence`);
+  assert.ok(recipe.paradigm, `${recipe.title} needs paradigm`);
+  assert.ok(recipe.action, `${recipe.title} needs action/trajectory notes`);
+  assert.ok(recipe.readAs, `${recipe.title} needs reading note`);
+  assert.ok(Array.isArray(recipe.sources) && recipe.sources.length >= 1, `${recipe.title} needs sources`);
+  assert.ok(Array.isArray(recipe.dataMix) && recipe.dataMix.length >= 4, `${recipe.title} needs data mix entries`);
+  assert.ok(Array.isArray(recipe.training) && recipe.training.length >= 3, `${recipe.title} needs training stages`);
+  assert.ok(Array.isArray(recipe.unknowns) && recipe.unknowns.length >= 2, `${recipe.title} needs unknowns/caveats`);
+  for (const source of recipe.sources) {
+    assert.ok(source.title, `${recipe.title} source needs title`);
+    assert.ok(source.url?.startsWith("http"), `${recipe.title} source needs web URL`);
+  }
+  for (const item of recipe.dataMix) {
+    assert.ok(item.label, `${recipe.title} data mix item needs label`);
+    assert.ok(item.role, `${recipe.title} data mix item needs role`);
+  }
+  for (const stage of recipe.training) {
+    assert.ok(stage.stage, `${recipe.title} training item needs stage`);
+    assert.ok(stage.title, `${recipe.title} training item needs title`);
+    assert.ok(stage.detail, `${recipe.title} training item needs detail`);
+  }
+}
+
 assert.ok(data.figureSystem.title, "figure system needs title");
 assert.ok(data.figureSystem.summary, "figure system needs summary");
 assert.ok(Array.isArray(data.figureSystem.architecture) && data.figureSystem.architecture.length >= 4, "figure system needs architecture nodes");
@@ -126,18 +158,18 @@ for (const demo of data.figureSystem.demos) {
 }
 
 const html = await readFile(indexPath, "utf8");
-for (const id of ["route-tabs", "route-detail", "reference-grid", "timeline", "search-input", "formula-grid", "paradigm-grid", "design-axis-grid", "architecture-gallery", "figure-system-case", "paper-figure-guides", "evidence-legend", "route-match-count"]) {
+for (const id of ["route-tabs", "route-detail", "reference-grid", "timeline", "search-input", "formula-grid", "paradigm-grid", "design-axis-grid", "architecture-gallery", "training-recipes", "training-recipe-list", "figure-system-case", "paper-figure-guides", "evidence-legend", "route-match-count"]) {
   assert.ok(html.includes(id), `index should expose #${id}`);
 }
 
 const app = await readFile(appPath, "utf8");
-for (const fn of ["renderRouteTabs", "renderRouteDetail", "renderReferences", "renderRouteReferenceGroup", "renderTimeline", "renderEquations", "renderParadigms", "renderDesignAxes", "renderArchitectureDiagrams", "renderFigureSystem", "renderPaperFigureGuides", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
+for (const fn of ["renderRouteTabs", "renderRouteDetail", "renderReferences", "renderRouteReferenceGroup", "renderTimeline", "renderEquations", "renderParadigms", "renderDesignAxes", "renderArchitectureDiagrams", "renderTrainingRecipes", "renderRecipeBlock", "renderFigureSystem", "renderPaperFigureGuides", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
   assert.ok(app.includes(fn), `app should include ${fn}`);
 }
 assert.ok(!app.includes("innerHTML = `<strong>${reference.title}"), "mini refs should not interpolate titles with innerHTML");
 
 const styles = await readFile(stylePath, "utf8");
-for (const className of ["reference-groups", "reference-route-group", "route-reference-grid", "route-group-head", "design-axis-grid", "axis-card", "figure-system-case", "figure-demo-card", "figure-architecture"]) {
+for (const className of ["reference-groups", "reference-route-group", "route-reference-grid", "route-group-head", "design-axis-grid", "axis-card", "recipe-band", "training-recipe-list", "recipe-card", "recipe-item-grid", "figure-system-case", "figure-demo-card", "figure-architecture"]) {
   assert.ok(styles.includes(className), `styles should include ${className}`);
 }
 

@@ -12,6 +12,7 @@
         <a href="#routes">路线</a>
         <a href="#design-axes">六轴</a>
         <a href="#architecture">架构图</a>
+        <a href="#training-recipes">训练表</a>
         <a href="#case-studies">案例</a>
         <a href="#paper-figures">论文图</a>
         <a href="#systems">范式</a>
@@ -94,6 +95,22 @@
           <h2>把 VLA 先画成几类系统图</h2>
         </div>
         <div id="architecture-gallery" class="architecture-gallery"></div>
+      </section>
+
+      <section class="band recipe-band" id="training-recipes">
+        <div class="section-head">
+          <p class="eyebrow">Data & Training Recipes</p>
+          <h2>系统报告别只看模型名，要拆数据和训练阶段</h2>
+        </div>
+        <p class="section-intro">
+          很多 VLA 的真实差异藏在数据组成、progressive training、action decoder 和部署闭环里。下面把论文、model card 和官方 blog 统一拆成可展开的训练配方，公开说法和未知项分开读。
+        </p>
+        <div class="recipe-legend" aria-label="Recipe reading legend">
+          <span>先看公开来源</span>
+          <span>再看数据贡献</span>
+          <span>最后看未知项</span>
+        </div>
+        <div id="training-recipe-list" class="training-recipe-list"></div>
       </section>
 
       <section class="band case-band" id="case-studies">
@@ -183,7 +200,7 @@
     </main>
 
     <footer class="footer">
-      <p>Updated 2026-05-28. 公开论文、项目页和官方 blog 混合整理；公司 demo 请按证据等级阅读。</p>
+      <p>Updated 2026-06-03. 公开论文、项目页和官方 blog 混合整理；公司 demo 请按证据等级阅读。</p>
     </footer>
 
     <script src="./data.js"></script>

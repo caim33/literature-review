@@ -212,6 +212,86 @@
     });
   }
 
+  function renderTrainingRecipes() {
+    const container = byId("training-recipe-list");
+    container.replaceChildren();
+    data.trainingRecipes.forEach((recipe, index) => {
+      const card = el("details", "recipe-card");
+      if (index === 0) card.open = true;
+
+      const summary = el("summary", "recipe-summary");
+      const toggle = el("span", "recipe-toggle", card.open ? "-" : "+");
+      const titleWrap = el("div", "recipe-title-wrap");
+      titleWrap.append(el("p", "eyebrow", `${recipe.year} · ${recipe.family}`));
+      titleWrap.append(el("h3", "", recipe.title));
+      titleWrap.append(el("p", "recipe-read-as", recipe.readAs));
+
+      const meta = el("div", "recipe-meta");
+      meta.append(el("span", "recipe-badge", recipe.evidence));
+      meta.append(el("span", "recipe-badge muted", recipe.sources.length > 1 ? `${recipe.sources.length} 个来源` : "1 个来源"));
+      summary.append(toggle, titleWrap, meta);
+      card.addEventListener("toggle", () => {
+        toggle.textContent = card.open ? "-" : "+";
+      });
+
+      const body = el("div", "recipe-body");
+      const quick = el("div", "recipe-quick-grid");
+      quick.append(labelText("范式", recipe.paradigm));
+      quick.append(labelText("Action / trajectory", recipe.action));
+      quick.append(renderRecipeSources(recipe.sources));
+
+      const dataBlock = renderRecipeBlock("数据组成与贡献", recipe.dataMix.map((item) => ({
+        title: item.label,
+        text: item.role
+      })));
+      const trainBlock = renderRecipeBlock("训练阶段 / recipe", recipe.training.map((item) => ({
+        title: `${item.stage}. ${item.title}`,
+        text: item.detail
+      })));
+      const unknownBlock = renderRecipeUnknowns(recipe.unknowns);
+
+      body.append(quick, dataBlock, trainBlock, unknownBlock);
+      card.append(summary, body);
+      container.append(card);
+    });
+  }
+
+  function renderRecipeSources(sources) {
+    const block = el("div", "recipe-sources");
+    block.append(el("strong", "", "来源"));
+    sources.forEach((source) => {
+      const link = el("a", "", source.title);
+      link.href = source.url;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      block.append(link);
+    });
+    return block;
+  }
+
+  function renderRecipeBlock(title, items) {
+    const section = el("section", "recipe-block");
+    section.append(el("h4", "", title));
+    const grid = el("div", "recipe-item-grid");
+    items.forEach((item) => {
+      const row = el("article", "recipe-item");
+      row.append(el("strong", "", item.title));
+      row.append(el("p", "", item.text));
+      grid.append(row);
+    });
+    section.append(grid);
+    return section;
+  }
+
+  function renderRecipeUnknowns(items) {
+    const section = el("section", "recipe-block recipe-unknowns");
+    section.append(el("h4", "", "未知项 / 阅读注意"));
+    const list = el("ul");
+    items.forEach((item) => list.append(el("li", "", item)));
+    section.append(list);
+    return section;
+  }
+
   function renderPaperFigureGuides() {
     const container = byId("paper-figure-guides");
     container.replaceChildren();
@@ -485,6 +565,7 @@
     renderParadigms();
     renderDesignAxes();
     renderArchitectureDiagrams();
+    renderTrainingRecipes();
     renderFigureSystem();
     renderPaperFigureGuides();
     renderReadingPath();

@@ -2,7 +2,7 @@ const vlaMapData = {
   meta: {
     title: "VLA Learning Map",
     subtitle: "Vision-Language-Action, World Models, WAM, and Whole-Body Robot Foundation Models",
-    updated: "2026-05-28",
+    updated: "2026-06-03",
     note: "Public papers, official project pages, and official company blogs are mixed here. Items marked as blog/model-card should be treated as engineering signals, not peer-reviewed claims."
   },
   glossary: [
@@ -391,6 +391,252 @@ const vlaMapData = {
         { from: "mine", to: "sources", label: "collect again" }
       ],
       takeaway: "公司级 VLA 的护城河往往是数据飞轮：真实部署越多，失败越可挖，下一版模型越能覆盖长尾。"
+    }
+  ],
+  trainingRecipes: [
+    {
+      title: "Qwen-VLA",
+      year: "2026",
+      family: "Unified generalist VLA",
+      evidence: "论文/代码",
+      sources: [
+        { title: "Qwen-VLA official repository", url: "https://github.com/QwenLM/Qwen-VLA" },
+        { title: "arXiv:2605.30280", url: "https://arxiv.org/abs/2605.30280" }
+      ],
+      paradigm: "Qwen3.5-4B VLM backbone + 1.15B DiT flow-matching action decoder。",
+      action: "统一的是 action/trajectory tensor interface、masking scheme 和 embodiment-aware prompt，不是把所有机器人强行映射到同一物理语义 action space；target tensor 以 horizon H 和共享 channel K 表示，padding channel 用 mask 排除梯度。",
+      readAs: "这是 2026 年最值得单独精读的统一 VLA 样本：差异不只是换 action head，而是把任务、轨迹和 embodiment prompt 一起统一。",
+      dataMix: [
+        { label: "Robot manipulation · 74.2%", role: "公开混合的主体，含 RobotSet、Galaxea、AgiBot、RoboMIND、RDT-1B、DROID、BridgeData、RT-1 等，以及 1000+ 小时 in-house real-robot trajectories。" },
+        { label: "Navigation · 7.5%", role: "把 VLN / object searching / target tracking 的 waypoint 监督并入统一轨迹预测，常用每步相对 Δx, Δy, Δθ。" },
+        { label: "Egocentric human · 6.0%", role: "来自 Ego4D/EPIC-KITCHENS 等处理子集，预测手腕 SE(3) 和手部 articulation，贡献人类 manipulation prior。" },
+        { label: "Synthetic simulation · 3.7%", role: "包括自研仿真管线 8M+ synthetic trajectories，以及 tabletop scenes/tasks 的成功轨迹，补任务和场景长尾。" },
+        { label: "Auxiliary V-L · 8.5%", role: "由 general VL、2D spatial grounding、autonomous driving VQA、embodied action caption 组成，维持 OCR、grounding、spatial reasoning 和指令能力。" }
+      ],
+      training: [
+        { stage: "I", title: "T2A warm start", detail: "冻结 VLM，只训练 DiT decoder；输入 language instruction + embodiment prompt，不给图像，让 decoder 先形成 language-conditioned action prior。" },
+        { stage: "II", title: "CPT continued pretraining", detail: "从 T2A warm start 解冻两部分，在 heterogeneous mixture 上把 action prior grounding 到视觉观测和多 embodiment 轨迹。" },
+        { stage: "III", title: "SFT", detail: "公开 post-training 包含 general VL、VLN、robot manipulation；示例 loss 权重为 VL next-token 0.1、action prediction 1.0。" },
+        { stage: "IV", title: "RL in SimplerEnv", detail: "从 SFT checkpoint 用 PPO + GAE 和 binary success reward 得到 Qwen-VLA-Instruct；公开口径是 SimplerEnv，不应写成真实机器人 RL。" }
+      ],
+      unknowns: [
+        "GitHub 当前主要是 README/素材，没有公开完整训练代码、权重、dataloader、总 tokens、硬件规模或全部私有数据组成。",
+        "In-house robot trajectories 的具体平台、任务和清洗规则没有完全公开。",
+        "T2A 中 20% synthetic + 80% real 是 ablation 最优设置，不应误写成全局所有阶段比例。"
+      ]
+    },
+    {
+      title: "Galaxea G0.5 / GalaxeaVLA",
+      year: "2026",
+      family: "Open-world robot manipulation VLA",
+      evidence: "项目/代码 + 技术 blog",
+      sources: [
+        { title: "G0.5 project page", url: "https://opengalaxea.github.io/G05/" },
+        { title: "G0.5 paper PDF", url: "https://opengalaxea.github.io/G05/Galaxea_G0_5.pdf" },
+        { title: "GalaxeaVLA repository", url: "https://github.com/OpenGalaxea/GalaxeaVLA" }
+      ],
+      paradigm: "G0.5 是单一 autoregressive VLA：初始化自 Qwen3.5 2B VLM，在同一 token stream 中生成 reasoning/CoT tokens 和 action tokens，单模型、单 objective、next-token CE。",
+      action: "G0.5 公开为统一 27D action space：left_control(9) + left_gripper(1) + right_control(9) + right_gripper(1) + lower_body(7)，并用 learnable cross-embodiment ActionCodec/RVQ 序列化 active DoF groups。",
+      readAs: "它适合和 Qwen-VLA 对读：Qwen-VLA 是多阶段 DiT flow decoder，G0.5 则刻意把 reasoning 和 action 都放进自回归 token 流里。",
+      dataMix: [
+        { label: "Robot demos · 14 embodiments", role: "G0.5 pretraining robot mixture 覆盖 14 个真实/仿真 embodiment，并映射到统一 27D action space；总小时数和各 embodiment 比例未完整公开。" },
+        { label: "Web/VQA · roughly 100M", role: "约 100M 级 vision-language samples，覆盖 generic web VQA、embodied VQA 和 in-house VQA annotations，增强 OCR、开放词表、空间与任务理解。" },
+        { label: "VQA : action = 1 : 4", role: "公开 pretraining 混合比例强调 action samples 占主体，同时保留足够视觉语言监督。" },
+        { label: "CoT/action annotations", role: "论文/技术报告提到用多模态模型和 tracking 管线生成 action hints、atomic task、episode instructions、bbox/segmentation；具体标注模型名需回原文确认。" },
+        { label: "G0 dataset baseline", role: "Galaxea Open-World Dataset 为 100K trajectories、500h、150 tasks、50 scenes、1600+ objects、58 skills，但这是 G0/GalaxeaVLA 线，不等同于 G0.5 全量 mixture。" }
+      ],
+      training: [
+        { stage: "G0.5", title: "Single-stage AR pretraining", detail: "robot demos + web/VQA 混合，用统一 next-token CE 监督 language answers、CoT traces 和 action codes；无 auxiliary regression objective 或 expert distillation。" },
+        { stage: "Memory", title: "6-frame visual history", detail: "observation 为 6 frames，间隔 1 秒，覆盖含当前帧的 5 秒窗口；训练时 30% history frame dropout。" },
+        { stage: "CoT", title: "Reasoning/action format mixture", detail: "每个 robot sample 分配一种 CoT format：no-CoT、subtask text、action hint、2D trace、bbox/localization 等，subtask-text 权重更高。" },
+        { stage: "G0", title: "Separate GalaxeaVLA curriculum", detail: "G0/GalaxeaVLA 是 dual-system 三阶段：FAST token CE cross-embodiment pretrain、flow-matching action expert single-embodiment pretrain、少量高质量 demos post-train。" }
+      ],
+      unknowns: [
+        "G0.5 的 robot demonstration 总小时数、各 embodiment 精确比例、batch size、GPU 数、RVQ codebook size/R 值没有完整明示。",
+        "GalaxeaVLA GitHub 当前更可复现的是 G0/G0Plus/G0Tiny，README 中 G0.5 weights/code 仍是 coming soon。",
+        "G0.5 论文提到 deployment 可用 flow-matching head refine action，但核心 pretraining 配方应写成 AR tokens + CE。"
+      ]
+    },
+    {
+      title: "XPENG VLA 2.0 / Physical AI（Fe0 命名待核）",
+      year: "2025-2026",
+      family: "Vehicle/Physical-AI VLA + world model",
+      evidence: "官方发布 + 技术报告",
+      sources: [
+        { title: "XPENG AI Day 2025: VLA 2.0", url: "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7" },
+        { title: "X-World technical report release", url: "https://www.xpeng.com/news/019dd72da86c9dd703de8a0282290002" }
+      ],
+      paradigm: "官方称 VLA 2.0 采用 Vision-Implicit Token-Action，去掉语言翻译中间步，从视觉信号端到端生成 action command。",
+      action: "更接近自动驾驶/Physical AI 的 action generative model，不是标准机械臂 manipulation VLA。X-World 是 action-conditioned 多摄世界模型，用于闭环仿真、评估和长尾数据生成。",
+      readAs: "把它当作“VLA 概念进入车辆/Physical AI”的案例读，而不是直接和 OpenVLA/π0 的机械臂成功率横向比较。",
+      dataMix: [
+        { label: "Real driving videos", role: "官方称接近 1 亿 driving clips，且训练无需 Data Annotation；主要贡献真实道路分布和长尾驾驶场景。" },
+        { label: "Cloud base model", role: "官方披露云端 72B base model、3 万卡集群、约 5 天一次 full-cycle iteration；细节偏系统工程信号。" },
+        { label: "Vehicle deployment data", role: "量产车端十亿级模型和 Turing chip/software stack，贡献真实部署闭环与边缘约束。" },
+        { label: "X-World simulation", role: "通过多摄未来视频生成支持 closed-loop evaluation、场景扩展和 long-tail data synthesis。" },
+        { label: "Manual annotation", role: "官方口径强调无需人工标注训练；是否有数据治理、筛选、审核、场景标签未披露。" }
+      ],
+      training: [
+        { stage: "VLA", title: "Large-scale video-to-action training", detail: "公开材料只给出高层口径：真实驾驶视频、无标注、云端大模型快速迭代；具体 loss/action space 未披露。" },
+        { stage: "Deploy", title: "Cloud-to-vehicle optimization", detail: "通过 chip-operator-model 全周期优化，把十亿级模型部署到车端。" },
+        { stage: "WM-1", title: "X-World controllable world model", detail: "先把预训练视频生成模型转成可控多摄世界模型，输入历史视频和 future action/action sequence。" },
+        { stage: "WM-2", title: "Streaming autoregressive simulator", detail: "再用 block-causal architecture、few-step self-forcing learning 和 rolling KV cache 支持闭环仿真。" }
+      ],
+      unknowns: [
+        "公开资料没有确认 Fe0 是正式模型名；页面只保留用户关心的别名备注。",
+        "VLA 2.0 的 action token/action command 定义、控制频率、loss、RL 细节和数据采样比例未公开。",
+        "车辆 VLA、Robotaxi、IRON 人形和飞行器是否共享同权重或仅共享平台化技术，没有足够公开细节。"
+      ]
+    },
+    {
+      title: "Physical Intelligence π0 → π0.7",
+      year: "2024-2026",
+      family: "VLM + flow action expert + post-training stack",
+      evidence: "论文/官方 blog/model card",
+      sources: [
+        { title: "π0 Technical Report", url: "https://www.pi.website/download/pi0.pdf" },
+        { title: "π0.5 Open-World Generalization", url: "https://arxiv.org/abs/2504.16054" },
+        { title: "π0.7 blog", url: "https://www.pi.website/blog/pi07" }
+      ],
+      paradigm: "语义 backbone 和连续 action expert 分工：VLM 负责视觉语言 grounding，flow matching action expert 生成高频连续动作 chunk。",
+      action: "连续 action chunk / action expert；FAST 版本把连续动作压缩成 token 以吃到自回归训练效率。",
+      readAs: "这是最像 LLM 产品线的 VLA 路线：base policy、FAST、open-world co-training、knowledge insulation、RL post-training、memory 和 steerability 一路叠上去。",
+      dataMix: [
+        { label: "Robot demos", role: "多机器人、多任务真实数据教可执行动作和接触控制。" },
+        { label: "High-level subtask data", role: "π0.5 类工作把长程任务拆成可学习阶段，提升家庭/开放世界任务泛化。" },
+        { label: "Web / object / V-L data", role: "补语义、对象知识和开放词表 grounding，避免策略只会训练集物体。" },
+        { label: "Rollout + intervention", role: "π*0.6 / RECAP 用自主 rollout、人工纠正和 advantage-conditioned policy 做后训练闭环。" },
+        { label: "Memory / metadata", role: "π0.7 和 memory blog 强调用短期视频记忆、长期文本记忆、quality/speed/control modality metadata 调控行为。" }
+      ],
+      training: [
+        { stage: "1", title: "Generalist policy pretraining", detail: "在跨 embodiment robot data 上训练 VLM-conditioned action expert。" },
+        { stage: "2", title: "Knowledge insulation / FAST", detail: "用架构和训练技巧减少动作梯度污染语义 backbone，或把动作压缩成高效 token。" },
+        { stage: "3", title: "Open-world co-training", detail: "混合 robot、web、object、subtask 数据，让长程家庭任务有语义和阶段结构。" },
+        { stage: "4", title: "Post-training and steering", detail: "用 rollout/intervention/RL、memory 和 metadata conditioning 改善可控性、质量、速度和恢复。" }
+      ],
+      unknowns: [
+        "最新 π0.7 的完整训练比例和闭源部署细节没有完全公开。",
+        "不同版本之间哪些能力来自架构、哪些来自数据飞轮，需要读 technical report/model card 分开判断。"
+      ]
+    },
+    {
+      title: "NVIDIA GR00T N1 → N1.7",
+      year: "2025-2026",
+      family: "Humanoid fast-slow VLA",
+      evidence: "论文/官方 blog/model card",
+      sources: [
+        { title: "GR00T N1 paper", url: "https://arxiv.org/abs/2503.14734" },
+        { title: "GR00T N1.7 model card", url: "https://huggingface.co/nvidia/GR00T-N1.7-3B" }
+      ],
+      paradigm: "System 2 VLM 语义理解 + System 1 diffusion/flow action generator，面向 humanoid action chunk。",
+      action: "连续 humanoid action，通常需要和仿真、whole-body controller、机器人本体状态和部署工作流结合。",
+      readAs: "它是开放人形 VLA 的主线之一：比 Figure 更可复现，比单臂 OpenVLA 更接近 humanoid 系统工程。",
+      dataMix: [
+        { label: "Robot/humanoid data", role: "训练可执行的双手、上身和移动操作动作。" },
+        { label: "Human video / FLARE", role: "N1.5 方向强调从人类视频学习动作先验和扩展任务覆盖。" },
+        { label: "Simulation / Isaac workflow", role: "N1.6/N1.7 公开材料强调 sim-to-real、数据生成、world model 和 Isaac 生态。" },
+        { label: "VLM pretraining", role: "System 2 提供语言、对象和场景语义，服务 System 1 动作生成。" },
+        { label: "Model-card post-training", role: "N1.7 开放模型卡给出权重、限制和 post-training 入口，便于实际复现。"}
+      ],
+      training: [
+        { stage: "1", title: "Generalist humanoid pretraining", detail: "用多源 humanoid/robot 数据训练基础策略。" },
+        { stage: "2", title: "Synthetic and human-video expansion", detail: "通过仿真、人类视频和数据生成扩展任务/场景覆盖。" },
+        { stage: "3", title: "Sim-to-real workflow", detail: "用 Isaac/GR00T 工具链做仿真训练、评估和真实机器人适配。" },
+        { stage: "4", title: "Model-specific fine-tuning", detail: "按目标机器人、动作接口和任务集合做 post-training 或 fine-tuning。" }
+      ],
+      unknowns: [
+        "公开模型卡不能完全替代论文和训练配方；真实部署数据比例、失败回流和安全策略仍有限。",
+        "不同 humanoid 的 action schema 和低层控制接口差异很大，不能只看 backbone。"
+      ]
+    },
+    {
+      title: "Figure Helix / Helix 02",
+      year: "2025-2026",
+      family: "Closed humanoid VLA system",
+      evidence: "官方 blog/video",
+      sources: [
+        { title: "Figure Helix", url: "https://www.figure.ai/news/helix" },
+        { title: "Helix 02", url: "https://www.figure.ai/news/helix-02" },
+        { title: "Helix-02 Bedroom Tidy", url: "https://www.figure.ai/news/helix-02-bedroom-tidy" }
+      ],
+      paradigm: "System 2 低频 semantic VLM + System 1 高频 visuomotor policy；Helix 02 公开材料再加入 System 0 whole-body controller。",
+      action: "从上身/手/头/躯干扩到 loco-manipulation，全身移动、厨房操作、铺床、布料和多机器人协作。",
+      readAs: "这是学习工业 humanoid VLA 任务设计的好样本，但证据等级是官方系统 demo，不是可复现 benchmark。",
+      dataMix: [
+        { label: "Teleoperation / robot demos", role: "公开细节有限，但可推断核心能力来自真实机器人任务演示和部署数据。" },
+        { label: "Onboard vision", role: "机器人用自身视觉观察物体、手、对方机器人和房间状态，支撑闭环协作。" },
+        { label: "Task-specific long-horizon demos", role: "fold laundry、dishwasher、bedroom tidy 提供布料、厨房和房间级任务分布。" },
+        { label: "Whole-body control data", role: "Helix 02 的 System 0 需要步态、平衡、姿态和全身稳定控制数据。" }
+      ],
+      training: [
+        { stage: "1", title: "S2/S1 co-design", detail: "S2 输出语义 latent，S1 高频执行动作；公开材料强调异步快慢系统。" },
+        { stage: "2", title: "Skill/task expansion", detail: "从桌面双手到 laundry、logistics、kitchen、bedroom，逐步扩任务时间尺度。" },
+        { stage: "3", title: "Whole-body extension", detail: "Helix 02 引入 System 0，把上身 VLA 接到全身移动和稳定控制。" },
+        { stage: "4", title: "Deployment iteration", detail: "具体训练阶段、数据量、loss 和是否共享权重未公开，应按 demo 证据谨慎阅读。" }
+      ],
+      unknowns: [
+        "没有公开完整论文、训练数据比例、benchmark 和权重。",
+        "每个 demo 是否同一模型、是否 task-specific tuning、是否含人工 reset，需要逐条看官方说明。",
+        "多机器人协作是否来自单策略涌现还是额外任务训练，公开细节有限。"
+      ]
+    },
+    {
+      title: "Gemini Robotics 1.5",
+      year: "2025",
+      family: "Embodied reasoning + VLA execution",
+      evidence: "技术报告/官方 blog",
+      sources: [
+        { title: "Gemini Robotics Technical Report", url: "https://arxiv.org/abs/2503.20020" },
+        { title: "Gemini Robotics 1.5 blog", url: "https://deepmind.google/blog/gemini-robotics-15-brings-ai-agents-into-the-physical-world/" }
+      ],
+      paradigm: "把 embodied reasoning 模型和 VLA execution model 分层：ER 负责高层任务理解、空间推理和计划，VLA 负责真实动作。",
+      action: "Gemini 2.0/1.5 系列将 physical action 作为输出模态；具体机器人 action interface 依任务和平台而变。",
+      readAs: "适合放在 agentic VLA 章节里读：它强调长程任务不能只靠单步 policy，需要 reasoning、工具、空间记忆和执行模型分工。",
+      dataMix: [
+        { label: "Robot task data", role: "支撑真实 manipulation、origami、打包等灵巧操作执行。" },
+        { label: "VLM/general web data", role: "提供开放词表、物体属性、场景理解和多模态推理。" },
+        { label: "Embodied reasoning data", role: "训练 ER 模型处理任务分解、环境理解、空间关系和失败恢复。" },
+        { label: "Safety / trusted testing", role: "官方发布强调 embodied safety 与测试机制，是部署层训练/评估的重要部分。" }
+      ],
+      training: [
+        { stage: "1", title: "VLM foundation", detail: "从 Gemini 多模态基础能力出发，保留语义、常识和视觉推理。" },
+        { stage: "2", title: "Robot-action adaptation", detail: "把 physical action 加为输出模态，用机器人数据对齐到真实执行。" },
+        { stage: "3", title: "ER + VLA split", detail: "1.5 路线把高层 embodied reasoning 与低层 VLA execution 拆开组合。" },
+        { stage: "4", title: "Safety and deployment evaluation", detail: "公开材料更强调安全报告和 trusted tester；训练细节仍需以 technical report 为准。" }
+      ],
+      unknowns: [
+        "数据配比、action head 细节、是否统一多 embodiment action space 没有完整公开。",
+        "ER 与 VLA 的接口粒度、调用频率和失败恢复闭环需要从 demo/报告细读。"
+      ]
+    },
+    {
+      title: "GENE-26.5",
+      year: "2026",
+      family: "Dexterous manipulation system",
+      evidence: "官方 blog",
+      sources: [
+        { title: "GENE-26.5 blog", url: "https://www.genesis.ai/blog/gene-26-5-advancing-robotic-manipulation-to-human-level" }
+      ],
+      paradigm: "面向 human-level robotic manipulation 的系统发布，学习重点在灵巧手、接触、仿真/数据/控制全栈，而不只是一个 VLM backbone。",
+      action: "更接近 dexterous whole-hand manipulation policy/control stack；具体 VLA action head、loss 和可复现权重未公开。",
+      readAs: "把它放在精细交互路线里：叠衣、开抽屉、灵巧手和复杂接触任务需要 tactile/contact、手部状态和失败恢复数据。",
+      dataMix: [
+        { label: "Dexterous hand/task data", role: "教多指接触、手内操作、物体状态变化和复杂抓握策略。" },
+        { label: "Simulation / synthetic", role: "扩展高风险、高成本、长尾接触场景，支撑训练和评估。" },
+        { label: "Human-centric task prior", role: "帮助系统对齐人类日常操作习惯和物体使用方式。" },
+        { label: "Control feedback", role: "灵巧手任务需要把视觉、接触、关节和低层控制耦合起来。" }
+      ],
+      training: [
+        { stage: "1", title: "Skill/data foundation", detail: "先覆盖灵巧手基础动作、物体接触和任务执行数据。" },
+        { stage: "2", title: "Simulation expansion", detail: "用仿真和合成场景补长尾操作与安全评估。" },
+        { stage: "3", title: "Policy/control co-training", detail: "把高层任务条件、视觉状态和低层灵巧控制协同训练。" },
+        { stage: "4", title: "Real-world validation", detail: "公开材料主要是系统信号；具体 multi-stage recipe 未完整披露。" }
+      ],
+      unknowns: [
+        "缺少可复现论文/代码和完整数据配方。",
+        "是否采用 VLM+flow、diffusion、action token 或其他控制头，公开材料不足以定论。",
+        "真实任务 benchmark、失败回流和触觉/力数据使用方式仍需后续资料。"
+      ]
     }
   ],
   figureSystem: {
@@ -830,6 +1076,20 @@ const vlaMapData = {
           value: "面向 LeRobot 社区数据和高效部署的小型 VLA 路线。"
         },
         {
+          title: "Qwen-VLA",
+          year: "2026",
+          type: "paper",
+          url: "https://arxiv.org/abs/2605.30280",
+          value: "Qwen3.5-4B VLM + 1.15B DiT flow action decoder，公开了 T2A/CPT/SFT/RL 四阶段和数据混合比例。"
+        },
+        {
+          title: "Galaxea G0.5",
+          year: "2026",
+          type: "paper",
+          url: "https://opengalaxea.github.io/G05/",
+          value: "单一自回归 VLA，统一 27D action space 和 reasoning/action token 流，适合与 Qwen-VLA、OpenVLA 对比。"
+        },
+        {
           title: "RDT-1B: Robotics Diffusion Transformer",
           year: "2024",
           type: "paper",
@@ -1116,6 +1376,20 @@ const vlaMapData = {
           type: "blog",
           url: "https://deepmind.google/discover/blog/genie-2-a-large-scale-foundation-world-model/",
           value: "DeepMind 的大规模 foundation world model，推动可交互生成环境方向。"
+        },
+        {
+          title: "XPENG VLA 2.0 / Physical AI",
+          year: "2025",
+          type: "blog",
+          url: "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+          value: "小鹏官方发布的 Vision-Implicit Token-Action 车辆/Physical AI VLA，公开称接近 1 亿 driving clips 且无需人工标注训练。"
+        },
+        {
+          title: "X-World",
+          year: "2026",
+          type: "report",
+          url: "https://www.xpeng.com/news/019dd72da86c9dd703de8a0282290002",
+          value: "小鹏动作条件多摄世界模型，用于 VLA 2.0 的闭环仿真、数据合成和长尾验证。"
         },
         {
           title: "RoboDreamer",
