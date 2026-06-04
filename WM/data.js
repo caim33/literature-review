@@ -680,13 +680,13 @@ const wmMapData = {
       {
         label: "交互接口",
         question: "模型能不能像环境一样 step-by-step 接收动作、返回下一观测、继续闭环？",
-        examples: "UniSim / Genie / IRASim / Cosmos",
+        examples: "UniSim / Genie / IRASim / Cosmos Predict",
         robotUse: "决定它能不能成为训练/评估环境，而不只是一次性生成未来片段。"
       },
       {
         label: "系统位置",
         question: "它接在 VLA 前面做表征、后面做慢速校验，还是作为训练/评估环境？",
-        examples: "VLA proposal + WM rollout + critic/safety + controller",
+        examples: "VLA proposal + WM rollout + Cosmos synthetic data + critic/safety + controller",
         robotUse: "决定它是表征底座、慢速想象层、critic/reranker，还是仿真数据源。"
       }
     ],
@@ -717,7 +717,7 @@ const wmMapData = {
     },
     {
       name: "Interactive generative simulator",
-      examples: "UniSim, Genie, IRASim, Cosmos",
+      examples: "UniSim, Genie, IRASim, Cosmos Predict",
       layer: "交互接口 / 生成式环境",
       readingHint: "先问它是不是能被 agent 连续 step，而不是只看生成视频是否清晰。",
       axis: "接口形态：能否 step-by-step 交互。",
@@ -889,29 +889,37 @@ const wmMapData = {
       id: "generative-sim",
       title: "生成式交互模拟器",
       question: "能不能训练一个可交互的真实世界模拟器，让机器人在模型里练习、评估和发现失败？",
-      takeaway: "这是近年最热的 WM 方向。UniSim、Genie、RoboDreamer、IRASim、Cosmos 把视频生成、动作条件和 embodied data 接起来，但关键仍是可控性、闭环稳定和 sim-to-real。",
+      takeaway: "这是近年最热的 WM 方向。UniSim、Genie、RoboDreamer、IRASim、Cosmos 把视频生成、动作条件、embodied data、合成数据和物理推理接起来；关键仍是可控性、闭环稳定和 sim-to-real。",
       priority: "重点",
       branches: [
         "Universal simulators：混合机器人、导航、视频数据，学习可交互真实世界动态。",
         "Latent action discovery：从无动作标签视频中学习可控 action space。",
         "Robot action simulation：把机器人动作和每帧变化对齐，服务 manipulation 数据生成。",
-        "Physical AI world foundation models：面向机器人/自动驾驶的 text/image/video-to-world 平台。"
+        "Physical AI world foundation models：面向机器人/自动驾驶的 text/image/video-to-world 平台。",
+        "Cosmos family：不是三个版本，不要把 Predict/Transfer/Reason 读成版本号。更准确是多代模型 + 三类能力线：Cosmos Predict 做未来世界生成/预测，Cosmos Transfer 做受 depth/seg/edge/HD map 等条件控制的仿真和数据扩增，Cosmos Reason 做 embodied/physical reasoning。",
+        "Cosmos 3：更新方向更像 omni/omnimodal world foundation model，把 reasoning、multimodal world generation 和 action prediction / World Action Model backbone 放进同一 Physical AI 底座；本页不把它主要归为 VLA policy 主线，而是归在支持 policy/WAM 开发的 WM 底座。"
       ],
       patterns: [
         "判断生成式 WM 时看三件事：是否 action-controllable、是否能闭环交互、是否提升下游机器人。",
+        "Cosmos 主体应放 WM；本页不把它主要归为 VLA policy，而是把它看作服务 VLA 的 synthetic data、rollout/evaluation、sim-to-real 和 World Action Model backbone。",
         "Sora/Gen-3 这类强视频模型是 world simulator 候选，但没有公开 step/action 接口时只能算弱 WM。",
         "对机器人最有价值的不是长视频，而是稀有失败、未见物体组合和危险动作的可控合成。"
       ],
       references: [
         { title: "UniSim: Learning Interactive Real-World Simulators", year: "2023", type: "paper", url: "https://arxiv.org/abs/2310.06114", value: "用多源数据学习交互式真实世界模拟器，并用于 agent 训练。" },
         { title: "Genie: Generative Interactive Environments", year: "2024", type: "paper", url: "https://arxiv.org/abs/2402.15391", value: "从互联网视频学习 latent action，生成可逐帧控制的环境。" },
-        { title: "RoboDreamer: Learning Compositional World Models for Robot Imagination", year: "2024", type: "paper", url: "https://arxiv.org/abs/2404.12377", value: "用组合式视频 world model 帮助机器人想象未见物体-动作组合。" },
         { title: "IRASim: Learning Interactive Real-Robot Action Simulators", year: "2024", type: "paper", url: "https://arxiv.org/abs/2406.14540", value: "强调机器人动作与视频帧的细粒度对齐，生成交互式动作模拟。" },
+        { title: "Cosmos World Foundation Model Platform", year: "2025", type: "paper", url: "https://arxiv.org/abs/2501.03575", value: "NVIDIA 面向 Physical AI 的世界基础模型平台，是后续 Predict/Transfer/Reason 能力线和 Cosmos 3 的 WM 底座。" },
+        { title: "Cosmos 3", year: "2026", type: "paper", url: "https://arxiv.org/abs/2606.02800", value: "更新一代 omnimodal WFM：统一 reasoning、multimodal world generation 和 action/WAM backbone 能力，本页把它作为服务 policy 开发的 WM 底座阅读。" },
+        { title: "RoboDreamer: Learning Compositional World Models for Robot Imagination", year: "2024", type: "paper", url: "https://arxiv.org/abs/2404.12377", value: "用组合式视频 world model 帮助机器人想象未见物体-动作组合。" },
         { title: "Pandora: Towards General World Model with Natural Language Actions", year: "2024", type: "paper", url: "https://arxiv.org/abs/2406.09455", value: "用自然语言动作控制视频状态模拟，连接 LLM 和视频 world model。" },
         { title: "DIAMOND", year: "2024", type: "paper", url: "https://arxiv.org/abs/2405.12399", value: "用 diffusion world model 在 Atari 中训练 RL，展示 neural game engine 思路。" },
         { title: "GameNGen", year: "2024", type: "paper", url: "https://arxiv.org/abs/2408.14837", value: "用扩散模型实时模拟 DOOM，说明交互神经引擎的可能性。" },
         { title: "Genie 2", year: "2024", type: "blog", url: "https://deepmind.google/discover/blog/genie-2-a-large-scale-foundation-world-model/", value: "DeepMind 展示从图像/文本生成可玩 3D 环境的 foundation world model。" },
-        { title: "Cosmos World Foundation Model Platform", year: "2025", type: "paper", url: "https://arxiv.org/abs/2501.03575", value: "NVIDIA 面向 Physical AI 的世界基础模型平台，服务合成数据和物理场景生成。" },
+        { title: "NVIDIA Cosmos official platform", year: "2026", type: "official", url: "https://www.nvidia.com/en-us/ai/cosmos/", value: "官方 Cosmos 入口：把 Cosmos 定位为 Physical AI world foundation model 平台，而不是单独 VLA policy。" },
+        { title: "Cosmos Predict2.5", year: "2026", type: "project", url: "https://github.com/nvidia-cosmos/cosmos-predict2.5", value: "Predict 能力线的当前开源入口之一：未来世界生成/预测，可理解为 Text/Image/Video-to-World 和机器人候选 rollout 的基础能力。" },
+        { title: "Cosmos Transfer2.5", year: "2026", type: "project", url: "https://github.com/nvidia-cosmos/cosmos-transfer2.5", value: "Transfer 能力线：受 depth、segmentation、edge、HD map 等条件控制的 world generation，用于仿真数据、长尾场景和 sim-to-real 数据扩增。" },
+        { title: "Cosmos Reason2", year: "2026", type: "project", url: "https://github.com/nvidia-cosmos/cosmos-reason2", value: "Reason 能力线：面向 physical commonsense 和 embodied reasoning 的 VLM/backbone，补足世界生成模型的物理理解和评估能力。" },
         { title: "Sora: Video Generation Models as World Simulators", year: "2024", type: "report", url: "https://openai.com/research/video-generation-models-as-world-simulators", value: "把大规模视频生成定位为 world simulator 候选，但公开接口不是机器人闭环 WM。" }
       ]
     },
@@ -929,6 +937,7 @@ const wmMapData = {
       ],
       patterns: [
         "VLA 和 WM 的动作接口要一致：token、delta pose、joint action、trajectory chunk 或 latent action。",
+        "Cosmos 这类 WM 平台可以为 VLA 提供合成数据、候选 rollout、失败评估和 World Action Model backbone；本页不把它主要归为 VLA policy 主线。",
         "在线部署时 WM 可能只做短 horizon 重排，长 horizon 规划交给高层 planner。",
         "不要只看生成质量，要看是否提升真实机器人 success rate、recovery 和安全性。"
       ],

@@ -56,6 +56,8 @@ const requiredNames = [
   "DreamZero",
   "StarVLA",
   "SpatialVLA",
+  "Cosmos",
+  "world model support",
   "DROID",
   "LIBERO",
 ];
@@ -64,6 +66,13 @@ const searchable = JSON.stringify(data).toLowerCase();
 for (const name of requiredNames) {
   assert.ok(searchable.includes(name.toLowerCase()), `missing required topic: ${name}`);
 }
+assert.ok(
+  searchable.includes("cosmos") &&
+    searchable.includes("wm / physical ai support") &&
+    searchable.includes("vla") &&
+    searchable.includes("policy"),
+  "VLA page should cross-link Cosmos as WM support rather than the main VLA policy family"
+);
 
 for (const route of data.routes) {
   assert.ok(route.id, "route needs id");

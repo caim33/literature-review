@@ -166,6 +166,14 @@ const requiredNames = [
   "GR-1",
   "V-JEPA 2",
   "Cosmos",
+  "Cosmos Predict",
+  "Cosmos Transfer",
+  "Cosmos Reason",
+  "Cosmos Predict2.5",
+  "Cosmos Transfer2.5",
+  "Cosmos Reason2",
+  "Cosmos 3",
+  "World Action Model",
   "Genie 2",
   "GAIA-1",
 ];
@@ -178,6 +186,29 @@ for (const name of requiredNames) {
 const autoRoute = data.routes.find((route) => route.id === "driving-3d-sim");
 assert.ok(autoRoute, "should keep an autonomous-driving/3D simulation route");
 assert.ok((autoRoute.references ?? []).length <= 8, "driving route should stay lightweight");
+const cosmosRoute = data.routes.find((route) => route.id === "generative-sim");
+assert.ok(cosmosRoute, "Cosmos should live in the generative simulator / world foundation model route");
+const cosmosBranchText = cosmosRoute.branches.join(" ");
+assert.ok(
+  cosmosBranchText.includes("版本") && cosmosBranchText.includes("能力") &&
+    ["Cosmos Predict", "Cosmos Transfer", "Cosmos Reason"].every((name) => cosmosBranchText.includes(name)),
+  "Cosmos route should distinguish versions from Predict / Transfer / Reason capability branches"
+);
+assert.ok(
+  cosmosBranchText.includes("Cosmos 3") && /omni|omnimodal/i.test(cosmosBranchText),
+  "Cosmos route should mention Cosmos 3 as the newer omni-model direction"
+);
+const cosmosPlacementText = cosmosRoute.patterns.join(" ").toLowerCase();
+assert.ok(
+  cosmosPlacementText.includes("cosmos") &&
+    cosmosPlacementText.includes("wm") &&
+    cosmosPlacementText.includes("vla policy") &&
+    (cosmosPlacementText.includes("服务") || cosmosPlacementText.includes("support")),
+  "Cosmos route should clarify that Cosmos is primarily placed as WM support for VLA rather than the VLA policy family"
+);
+assert.ok(cosmosRoute.references.some((reference) => reference.title.includes("Cosmos 3")), "Cosmos route should include Cosmos 3 reference");
+assert.ok(cosmosRoute.references.some((reference) => reference.title.includes("Cosmos Transfer")), "Cosmos route should include Cosmos Transfer reference");
+assert.ok(cosmosRoute.references.some((reference) => reference.title.includes("Cosmos Reason")), "Cosmos route should include Cosmos Reason reference");
 
 for (const route of data.routes) {
   assert.ok(route.id, "route needs id");

@@ -19,6 +19,10 @@ const vlaMapData = {
       meaning: "World Action Model: jointly models world futures and actions, so the same generative model can imagine consequences and directly propose executable actions."
     },
     {
+      term: "WM support / Cosmos",
+      meaning: "NVIDIA Cosmos is categorized here primarily as WM / Physical AI support, not as the VLA map's main policy family: it can provide synthetic data, world rollout/evaluation, sim-to-real enrichment, and a World Action Model backbone for VLA systems."
+    },
+    {
       term: "Action chunking",
       meaning: "Predicting a short horizon sequence of actions at once, usually to reduce compounding error, smooth execution, and support high-frequency control."
     },
@@ -533,7 +537,7 @@ const vlaMapData = {
       dataMix: [
         { label: "Robot/humanoid data", role: "训练可执行的双手、上身和移动操作动作。" },
         { label: "Human video / FLARE", role: "N1.5 方向强调从人类视频学习动作先验和扩展任务覆盖。" },
-        { label: "Simulation / Isaac workflow", role: "N1.6/N1.7 公开材料强调 sim-to-real、数据生成、world model 和 Isaac 生态。" },
+        { label: "Simulation / Isaac / WM support", role: "N1.6/N1.7 公开材料强调 sim-to-real、数据生成、world model support 和 Isaac/Cosmos 生态；这里的 Cosmos 是 synthetic data / rollout / WAM backbone support，不是 VLA policy 本体。" },
         { label: "VLM pretraining", role: "System 2 提供语言、对象和场景语义，服务 System 1 动作生成。" },
         { label: "Model-card post-training", role: "N1.7 开放模型卡给出权重、限制和 post-training 入口，便于实际复现。"}
       ],
@@ -809,7 +813,7 @@ const vlaMapData = {
         "传感器图像、文本指令和 proprioception 编码成多模态 tokens。",
         "VLM/System 2 负责语义理解、场景 grounding 和动作计划表征。",
         "Diffusion/flow action transformer/System 1 条件在这些表征上生成动作 chunk。",
-        "N1.7 进一步以 Cosmos-Reason2 等 backbone 和开源 post-training 入口面向 humanoid。"
+        "N1.7 进一步以 Cosmos-Reason2 等 supporting backbone 和开源 post-training 入口面向 humanoid；Cosmos 在这里是 WM/Reasoning 支持层，不是动作 policy 本体。"
       ],
       watchFor: "GR00T 图要和 Figure Helix 一起看：两者都在做快慢系统，但公开程度、数据来源和 action 模块细节不同。"
     },
