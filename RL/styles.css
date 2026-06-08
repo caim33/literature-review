@@ -771,6 +771,40 @@ tr:last-child td {
   color: var(--muted);
 }
 
+.reference-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.reference-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(31, 40, 51, 0.72);
+  padding: 17px;
+}
+
+.reference-card h3 {
+  margin: 0 0 8px;
+  color: var(--accent-2);
+}
+
+.reference-card p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.reference-card a {
+  color: var(--accent);
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.reference-card a:hover {
+  color: var(--ink);
+}
+
 .term-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -830,6 +864,7 @@ tr:last-child td {
   .grid,
   .term-grid,
   .checklist,
+  .reference-grid,
   .priority-lane {
     grid-template-columns: 1fr;
   }
