@@ -12,6 +12,7 @@
         <a href="#routes">路线</a>
         <a href="#design-axes">六轴</a>
         <a href="#architecture">架构图</a>
+        <a href="#application-domains">应用域</a>
         <a href="#training-recipes">训练表</a>
         <a href="#case-studies">案例</a>
         <a href="#paper-figures">论文图</a>
@@ -24,7 +25,7 @@
           <p class="eyebrow">VLA / WM / WAM / Humanoid Foundation Models</p>
           <h1>VLA 主流路线学习地图</h1>
           <p class="lead">
-            按能力栈拆解 Vision-Language-Action：数据层、动作表示、通用 VLA、Physical Intelligence、全身人形、WM/WAM、空间感知、精细交互、评测后训练和 Agent Stack。
+            按能力栈拆解 Vision-Language-Action：先区分 manipulation VLA 与 whole-body humanoid VLA，再看数据层、动作表示、通用 VLA、Physical Intelligence、WM/WAM、空间感知、精细交互、评测后训练和 Agent Stack。
           </p>
           <div class="hero-actions">
             <a class="button primary" href="#routes">开始看路线</a>
@@ -95,6 +96,17 @@
           <h2>把 VLA 先画成几类系统图</h2>
         </div>
         <div id="architecture-gallery" class="architecture-gallery"></div>
+      </section>
+
+      <section class="band domain-band" id="application-domains">
+        <div class="section-head">
+          <p class="eyebrow">Application Domain Split</p>
+          <h2>Manipulation VLA 和 Whole-body VLA 先分开读</h2>
+        </div>
+        <p class="section-intro">
+          本页按主流论文和公司系统口径，把 VLA 视为大 VLM/LLM backbone 加 action head/action expert 的范式。机械臂/桌面操作和人形全身任务共享语义 grounding 与动作生成问题，但控制接口、失败模式和评测指标已经是两类系统。
+        </p>
+        <div id="application-domain-map" class="application-domain-map"></div>
       </section>
 
       <section class="band recipe-band" id="training-recipes">
@@ -200,10 +212,10 @@
     </main>
 
     <footer class="footer">
-      <p>Updated 2026-06-04. 公开论文、项目页和官方 blog 混合整理；公司 demo 请按证据等级阅读。</p>
+      <p>Updated 2026-06-10. 公开论文、项目页和官方 blog 混合整理；公司 demo 请按证据等级阅读。</p>
     </footer>
 
-    <script src="./data.js?v=cosmos-20260604"></script>
-    <script src="./app.js?v=cosmos-20260604"></script>
+    <script src="./data.js?v=domain-split-tight-20260610"></script>
+    <script src="./app.js?v=domain-split-tight-20260610"></script>
   </body>
 </html>

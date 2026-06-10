@@ -27,6 +27,10 @@ assert.ok(Array.isArray(data.paradigms), "paradigms should be an array");
 assert.ok(data.paradigms.length >= 5, "should compare at least 5 VLA paradigms");
 assert.ok(Array.isArray(data.designAxes), "designAxes should be an array");
 assert.equal(data.designAxes.length, 6, "should include the 6-paper-reading VLA design axes");
+assert.ok(data.applicationDomains, "applicationDomains should exist");
+assert.ok(Array.isArray(data.applicationDomains.domains), "applicationDomains domains should be an array");
+assert.equal(data.applicationDomains.domains.length, 2, "should distinguish manipulation VLA and whole-body VLA");
+assert.ok(Array.isArray(data.applicationDomains.boundaries) && data.applicationDomains.boundaries.length >= 4, "applicationDomains should include boundary axes");
 assert.ok(Array.isArray(data.architectureDiagrams), "architectureDiagrams should be an array");
 assert.ok(data.architectureDiagrams.length >= 4, "should include at least 4 architecture diagrams");
 assert.ok(Array.isArray(data.paperFigureGuides), "paperFigureGuides should be an array");
@@ -43,6 +47,8 @@ assert.ok(allRefs.length >= 50, "should include at least 50 references");
 const requiredNames = [
   "RT-2",
   "OpenVLA",
+  "Manipulation VLA",
+  "Whole-body VLA",
   "Octo",
   "pi0.7",
   "GR00T N1.7",
@@ -72,6 +78,12 @@ assert.ok(
     searchable.includes("vla") &&
     searchable.includes("policy"),
   "VLA page should cross-link Cosmos as WM support rather than the main VLA policy family"
+);
+assert.ok(
+  searchable.includes("large vlm/llm backbone") &&
+    searchable.includes("action head") &&
+    searchable.includes("action expert"),
+  "VLA definition should stay focused on large VLM/LLM backbone plus action head/action expert"
 );
 
 for (const route of data.routes) {
@@ -115,6 +127,16 @@ for (const axis of data.designAxes) {
   assert.ok(axis.trap, `${axis.title} needs common trap`);
 }
 
+for (const domain of data.applicationDomains.domains) {
+  assert.ok(domain.id, "application domain needs id");
+  assert.ok(domain.title, `${domain.id} needs title`);
+  assert.ok(domain.summary, `${domain.id} needs summary`);
+  assert.ok(domain.actionSpace, `${domain.id} needs actionSpace`);
+  assert.ok(domain.data, `${domain.id} needs data description`);
+  assert.ok(domain.metrics, `${domain.id} needs metrics`);
+  assert.ok(Array.isArray(domain.examples) && domain.examples.length >= 4, `${domain.id} needs examples`);
+}
+
 for (const figure of data.paperFigureGuides) {
   assert.ok(figure.title, "paper figure guide needs title");
   assert.ok(figure.sourceTitle, `${figure.title} needs sourceTitle`);
@@ -133,6 +155,7 @@ for (const recipe of data.trainingRecipes) {
   assert.ok(recipe.paradigm, `${recipe.title} needs paradigm`);
   assert.ok(recipe.action, `${recipe.title} needs action/trajectory notes`);
   assert.ok(recipe.readAs, `${recipe.title} needs reading note`);
+  assert.ok(recipe.domain, `${recipe.title} needs application domain tag`);
   assert.ok(Array.isArray(recipe.sources) && recipe.sources.length >= 1, `${recipe.title} needs sources`);
   assert.ok(Array.isArray(recipe.dataMix) && recipe.dataMix.length >= 4, `${recipe.title} needs data mix entries`);
   assert.ok(Array.isArray(recipe.training) && recipe.training.length >= 3, `${recipe.title} needs training stages`);
@@ -177,18 +200,18 @@ for (const demo of data.figureSystem.demos) {
 }
 
 const html = await readFile(indexPath, "utf8");
-for (const id of ["route-tabs", "route-detail", "reference-grid", "timeline", "search-input", "formula-grid", "paradigm-grid", "design-axis-grid", "architecture-gallery", "training-recipes", "training-recipe-list", "figure-system-case", "paper-figure-guides", "evidence-legend", "route-match-count"]) {
+for (const id of ["route-tabs", "route-detail", "reference-grid", "timeline", "search-input", "formula-grid", "paradigm-grid", "design-axis-grid", "architecture-gallery", "application-domains", "application-domain-map", "training-recipes", "training-recipe-list", "figure-system-case", "paper-figure-guides", "evidence-legend", "route-match-count"]) {
   assert.ok(html.includes(id), `index should expose #${id}`);
 }
 
 const app = await readFile(appPath, "utf8");
-for (const fn of ["renderRouteTabs", "renderRouteDetail", "renderReferences", "renderRouteReferenceGroup", "renderTimeline", "renderEquations", "renderParadigms", "renderDesignAxes", "renderArchitectureDiagrams", "renderTrainingRecipes", "renderRecipeDataMix", "renderRecipeDonut", "renderRecipePyramid", "renderRecipeBlock", "renderFigureSystem", "renderPaperFigureGuides", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
+for (const fn of ["renderRouteTabs", "renderRouteDetail", "renderReferences", "renderRouteReferenceGroup", "renderTimeline", "renderEquations", "renderParadigms", "renderDesignAxes", "renderArchitectureDiagrams", "renderApplicationDomains", "renderTrainingRecipes", "renderRecipeDataMix", "renderRecipeDonut", "renderRecipePyramid", "renderRecipeBlock", "renderFigureSystem", "renderPaperFigureGuides", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
   assert.ok(app.includes(fn), `app should include ${fn}`);
 }
 assert.ok(!app.includes("innerHTML = `<strong>${reference.title}"), "mini refs should not interpolate titles with innerHTML");
 
 const styles = await readFile(stylePath, "utf8");
-for (const className of ["reference-groups", "reference-route-group", "route-reference-grid", "route-group-head", "design-axis-grid", "axis-card", "recipe-band", "training-recipe-list", "recipe-card", "recipe-donut", "recipe-mix-legend", "recipe-pyramid", "recipe-item-grid", "figure-system-case", "figure-demo-card", "figure-architecture"]) {
+for (const className of ["reference-groups", "reference-route-group", "route-reference-grid", "route-group-head", "design-axis-grid", "axis-card", "domain-band", "application-domain-map", "domain-card-grid", "domain-boundary-matrix", "domain-bridge-grid", "recipe-band", "training-recipe-list", "recipe-card", "recipe-badge.domain", "recipe-donut", "recipe-mix-legend", "recipe-pyramid", "recipe-item-grid", "figure-system-case", "figure-demo-card", "figure-architecture"]) {
   assert.ok(styles.includes(className), `styles should include ${className}`);
 }
 

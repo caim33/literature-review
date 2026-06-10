@@ -2,13 +2,13 @@ const vlaMapData = {
   meta: {
     title: "VLA Learning Map",
     subtitle: "Vision-Language-Action, World Models, WAM, and Whole-Body Robot Foundation Models",
-    updated: "2026-06-03",
+    updated: "2026-06-10",
     note: "Public papers, official project pages, and official company blogs are mixed here. Items marked as blog/model-card should be treated as engineering signals, not peer-reviewed claims."
   },
   glossary: [
     {
       term: "VLA",
-      meaning: "Vision-Language-Action model: maps observations and language goals to robot actions, often by adapting a VLM/LLM with action tokens, continuous action heads, diffusion, or flow matching."
+      meaning: "Vision-Language-Action model in this map means the mainstream large VLM/LLM backbone + action head/action expert paradigm: visual-language semantic representations are adapted to predict robot actions, trajectories, or chunks."
     },
     {
       term: "WM",
@@ -194,6 +194,67 @@ const vlaMapData = {
       trap: "不要因为论文用了大 VLM 就默认它会推理。很多时候 VLM 只是昂贵但好用的视觉特征前端。"
     }
   ],
+  applicationDomains: {
+    principle: "本页把 VLA 收紧到主流大 VLM/LLM backbone + action head/action expert 范式。然后再问机器人在控制什么身体：manipulation VLA 通常把稳定底座视为前提；whole-body VLA 必须把移动、平衡、躯干、双手和安全一起纳入系统。",
+    domains: [
+      {
+        id: "manipulation-vla",
+        title: "Manipulation VLA",
+        subtitle: "桌面/机械臂/双臂/灵巧手操作",
+        summary: "核心问题是让大 VLM/LLM backbone 的语义表示通过 action head/action expert 落到可执行的抓取、放置、插入、开合、布料和手内操作上。机器人身体通常较稳定，VLA 的主要压力集中在物体状态、接触、多视角感知、动作精度和任务泛化。",
+        actionSpace: "EEF delta、joint、gripper、双臂 action chunk、hand/finger command；很多系统不直接负责腿部平衡。",
+        data: "Open X-Embodiment、DROID、BridgeData、ALOHA/ACT、RoboSet、LIBERO/RLBench/RoboCasa、MimicGen/DexMimicGen、GENE-26.5 类灵巧数据。",
+        metrics: "物体/场景/语言泛化、接触成功率、长程步骤完成率、恢复能力、真实机器人闭环成功率。",
+        examples: ["RT-2", "OpenVLA", "Octo", "π0 / OpenPI", "Qwen-VLA", "Galaxea G0.5", "GENE-26.5"]
+      },
+      {
+        id: "wholebody-vla",
+        title: "Whole-body VLA",
+        subtitle: "人形/移动操作/全身 loco-manipulation",
+        summary: "核心问题不只是把手伸过去，而是让大 VLM/ER/System 2 语义层和 action generator 一起驱动整个身体在房间中安全移动、保持平衡、调整视角、协调双手和躯干，并在长程任务中持续感知进度。这里 VLA 往往只是系统中间层，还要接 whole-body controller、state estimator、SLAM/3D memory 和 safety monitor。",
+        actionSpace: "上身、手、头、躯干、移动底盘或腿部相关命令；常通过 System 0 / whole-body controller 转成稳定关节控制。",
+        data: "humanoid teleop、全身仿真/RL、human video/retarget、房间级部署日志、厨房/卧室/物流长程任务、跨 embodiment robot pool。",
+        metrics: "任务成功率之外，还要看失稳、碰撞、步态/姿态约束、房间级导航、多人/多机器人交互和安全中止。",
+        examples: ["Figure Helix / Helix 02", "GR00T N1 / N1.7", "Gemini Robotics 1.5", "XPENG Robotics Fe0", "Agility whole-body stack"]
+      }
+    ],
+    boundaries: [
+      {
+        label: "VLA 判定",
+        manipulation: "本页收录的 manipulation VLA 默认有大 VLM/LLM backbone，再接 token/regression/diffusion/flow action head。",
+        wholeBody: "Whole-body VLA 也应有大 VLM/ER/System 2 语义层接 action generator；只训 ego video -> joint/action 更像 humanoid visuomotor policy 或 motion foundation model。"
+      },
+      {
+        label: "控制假设",
+        manipulation: "默认机械臂基座稳定，低层控制问题较可控。",
+        wholeBody: "稳定性本身就是任务的一部分，动作输出必须受全身控制器和安全边界约束。"
+      },
+      {
+        label: "失败模式",
+        manipulation: "抓空、碰撞、遮挡、接触滑动、动作精度不足、长程步骤漂移。",
+        wholeBody: "除了操作失败，还包括跌倒、重心不稳、全身碰撞、视角丢失、空间记忆错误。"
+      },
+      {
+        label: "数据瓶颈",
+        manipulation: "真实操作演示和接触长尾昂贵，但可以较多利用桌面数据集和仿真生成。",
+        wholeBody: "目标机器人数据更贵；human video、retarget、sim-to-real 和部署回流会更关键。"
+      }
+    ],
+    bridges: [
+      {
+        title: "Dexterous manipulation 是 bridge，不自动等于 whole-body",
+        text: "灵巧手和双臂会显著增加 action 维度和接触复杂度，但如果底座/身体稳定，它仍主要属于 manipulation VLA。GENE-26.5、ALOHA/ACT、RoboSet 应放在这条线上读。"
+      },
+      {
+        title: "Mobile manipulation / loco-manipulation 才把边界推向 whole-body",
+        text: "一旦任务要求机器人走到目标、调整躯干和视角、用双手在房间中连续操作，就进入 whole-body VLA stack。Figure Helix 02 的厨房和卧室 demo 是典型样本。"
+      },
+      {
+        title: "公司系统常是混合栈，不是单一模型名字",
+        text: "GR00T、Figure、Gemini Robotics 都要拆成 VLM/ER、VLA policy、action generator、whole-body controller、safety monitor 和数据飞轮分别看。"
+      }
+    ]
+  },
   architectureDiagrams: [
     {
       title: "End-to-End VLA 基础架构",
@@ -402,6 +463,7 @@ const vlaMapData = {
       title: "Qwen-VLA",
       year: "2026",
       family: "Unified generalist VLA",
+      domain: "Manipulation-heavy generalist",
       evidence: "论文/代码",
       sources: [
         { title: "Qwen-VLA official repository", url: "https://github.com/QwenLM/Qwen-VLA" },
@@ -433,6 +495,7 @@ const vlaMapData = {
       title: "Galaxea G0.5 / GalaxeaVLA",
       year: "2026",
       family: "Open-world robot manipulation VLA",
+      domain: "Manipulation VLA",
       evidence: "项目/代码 + 技术 blog",
       sources: [
         { title: "G0.5 project page", url: "https://opengalaxea.github.io/G05/" },
@@ -465,6 +528,7 @@ const vlaMapData = {
       title: "XPENG Robotics Fe0",
       year: "2026",
       family: "Cross-embodiment robot data study",
+      domain: "Humanoid manipulation transfer",
       evidence: "官方项目页",
       sources: [
         { title: "Fe0 project page", url: "https://xpeng-robotics.github.io/fe0/" }
@@ -495,6 +559,7 @@ const vlaMapData = {
       title: "Physical Intelligence π0 → π0.7",
       year: "2024-2026",
       family: "VLM + flow action expert + post-training stack",
+      domain: "Manipulation-first generalist",
       evidence: "论文/官方 blog/model card",
       sources: [
         { title: "π0 Technical Report", url: "https://www.pi.website/download/pi0.pdf" },
@@ -526,6 +591,7 @@ const vlaMapData = {
       title: "NVIDIA GR00T N1 → N1.7",
       year: "2025-2026",
       family: "Humanoid fast-slow VLA",
+      domain: "Whole-body humanoid VLA",
       evidence: "论文/官方 blog/model card",
       sources: [
         { title: "GR00T N1 paper", url: "https://arxiv.org/abs/2503.14734" },
@@ -556,6 +622,7 @@ const vlaMapData = {
       title: "Figure Helix / Helix 02",
       year: "2025-2026",
       family: "Closed humanoid VLA system",
+      domain: "Whole-body humanoid VLA",
       evidence: "官方 blog/video",
       sources: [
         { title: "Figure Helix", url: "https://www.figure.ai/news/helix" },
@@ -587,6 +654,7 @@ const vlaMapData = {
       title: "Gemini Robotics 1.5",
       year: "2025",
       family: "Embodied reasoning + VLA execution",
+      domain: "Hybrid manipulation / humanoid stack",
       evidence: "技术报告/官方 blog",
       sources: [
         { title: "Gemini Robotics Technical Report", url: "https://arxiv.org/abs/2503.20020" },
@@ -616,6 +684,7 @@ const vlaMapData = {
       title: "GENE-26.5",
       year: "2026",
       family: "Dexterous manipulation system",
+      domain: "Dexterous manipulation VLA",
       evidence: "官方 blog",
       sources: [
         { title: "GENE-26.5 blog", url: "https://www.genesis.ai/blog/gene-26-5-advancing-robotic-manipulation-to-human-level" }

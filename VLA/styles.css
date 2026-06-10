@@ -603,6 +603,168 @@ input {
   font-size: 0.8rem;
 }
 
+.domain-band {
+  width: 100%;
+  padding-left: max(1rem, calc((100vw - 1180px) / 2));
+  padding-right: max(1rem, calc((100vw - 1180px) / 2));
+  background: #f3f1e8;
+}
+
+.application-domain-map {
+  display: grid;
+  gap: 1rem;
+}
+
+.domain-principle {
+  min-width: 0;
+  padding: 1.1rem;
+  border: 1px solid #ccd0c1;
+  background: #fffdf8;
+}
+
+.domain-principle h3 {
+  color: var(--accent);
+  font-size: clamp(1.2rem, 2.4vw, 1.7rem);
+}
+
+.domain-principle p {
+  max-width: 980px;
+  margin-bottom: 0;
+  color: #33404a;
+  font-weight: 700;
+}
+
+.domain-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.domain-card {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+  padding: 1.1rem;
+  border: 1px solid #ccd0c1;
+  background: #ffffff;
+  box-shadow: var(--shadow);
+}
+
+.domain-card.wholebody-vla {
+  border-color: #c8d8d6;
+  background: #fbfffd;
+}
+
+.domain-card-head {
+  display: grid;
+  gap: 0.35rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid #dde0d2;
+}
+
+.domain-kicker {
+  color: var(--accent-2);
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.domain-card h3 {
+  color: var(--accent);
+  font-size: clamp(1.45rem, 3vw, 2.1rem);
+  line-height: 1.08;
+}
+
+.domain-summary {
+  margin-bottom: 0.1rem;
+  color: #24343a;
+  font-weight: 720;
+}
+
+.domain-example-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.2rem;
+}
+
+.domain-example-chip {
+  max-width: 100%;
+  padding: 0.25rem 0.52rem;
+  border: 1px solid #d4c8bb;
+  border-radius: 999px;
+  color: var(--accent-3);
+  background: #fffaf2;
+  font-size: 0.8rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.domain-boundary-matrix {
+  display: grid;
+  border: 1px solid #ccd0c1;
+  background: #ccd0c1;
+  gap: 1px;
+}
+
+.domain-matrix-row {
+  display: grid;
+  grid-template-columns: minmax(130px, 0.34fr) repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: #ccd0c1;
+}
+
+.domain-matrix-row > * {
+  min-width: 0;
+  margin: 0;
+  padding: 0.85rem;
+  background: #ffffff;
+}
+
+.domain-matrix-row.head > * {
+  color: #ffffff;
+  background: var(--dark);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.domain-matrix-row strong {
+  color: var(--accent);
+}
+
+.domain-matrix-row p {
+  color: #3d4951;
+  font-size: 0.92rem;
+}
+
+.domain-matrix-row p::before {
+  display: none;
+}
+
+.domain-bridge-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.domain-bridge-card {
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid #d4c8bb;
+  background: #fffdf8;
+}
+
+.domain-bridge-card h3 {
+  color: var(--accent-2);
+  font-size: 1.08rem;
+}
+
+.domain-bridge-card p {
+  margin-bottom: 0;
+  color: #3d4951;
+  font-size: 0.94rem;
+}
+
 .recipe-band {
   width: 100%;
   padding-left: max(1rem, calc((100vw - 1180px) / 2));
@@ -702,6 +864,12 @@ input {
   font-size: 0.78rem;
   font-weight: 850;
   white-space: nowrap;
+}
+
+.recipe-badge.domain {
+  color: #ffffff;
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 .recipe-badge.muted {
@@ -1478,6 +1646,8 @@ input {
   .recipe-donut-layout,
   .recipe-quick-grid,
   .recipe-item-grid,
+  .domain-card-grid,
+  .domain-bridge-grid,
   .formula-grid,
   .paradigm-grid,
   .evidence-legend,
@@ -1535,6 +1705,23 @@ input {
 
   .route-ref-count {
     width: fit-content;
+  }
+
+  .domain-matrix-row {
+    grid-template-columns: 1fr;
+  }
+
+  .domain-matrix-row.head {
+    display: none;
+  }
+
+  .domain-matrix-row p::before {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--accent-2);
+    font-size: 0.78rem;
+    font-weight: 850;
+    content: attr(data-domain-label);
   }
 }
 

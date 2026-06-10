@@ -213,6 +213,60 @@
     });
   }
 
+  function renderApplicationDomains() {
+    const container = byId("application-domain-map");
+    container.replaceChildren();
+    const map = data.applicationDomains;
+
+    const principle = el("article", "domain-principle");
+    principle.append(el("h3", "", "先按身体和动作接口分叉"));
+    principle.append(el("p", "", map.principle));
+
+    const domainGrid = el("div", "domain-card-grid");
+    map.domains.forEach((domain) => {
+      const card = el("article", `domain-card ${domain.id}`);
+      const head = el("div", "domain-card-head");
+      head.append(el("span", "domain-kicker", domain.subtitle));
+      head.append(el("h3", "", domain.title));
+      card.append(head);
+      card.append(el("p", "domain-summary", domain.summary));
+      card.append(labelText("Action space", domain.actionSpace));
+      card.append(labelText("数据来源", domain.data));
+      card.append(labelText("评测重点", domain.metrics));
+
+      const chips = el("div", "domain-example-chips");
+      domain.examples.forEach((example) => chips.append(el("span", "domain-example-chip", example)));
+      card.append(chips);
+      domainGrid.append(card);
+    });
+
+    const matrix = el("div", "domain-boundary-matrix");
+    const matrixHead = el("div", "domain-matrix-row head");
+    matrixHead.append(el("span", "", "判断轴"), el("span", "", "Manipulation VLA"), el("span", "", "Whole-body VLA"));
+    matrix.append(matrixHead);
+    map.boundaries.forEach((boundary) => {
+      const row = el("article", "domain-matrix-row");
+      const manipulation = el("p", "", boundary.manipulation);
+      manipulation.dataset.domainLabel = "Manipulation VLA";
+      const wholeBody = el("p", "", boundary.wholeBody);
+      wholeBody.dataset.domainLabel = "Whole-body VLA";
+      row.append(el("strong", "", boundary.label));
+      row.append(manipulation);
+      row.append(wholeBody);
+      matrix.append(row);
+    });
+
+    const bridgeGrid = el("div", "domain-bridge-grid");
+    map.bridges.forEach((bridge) => {
+      const card = el("article", "domain-bridge-card");
+      card.append(el("h3", "", bridge.title));
+      card.append(el("p", "", bridge.text));
+      bridgeGrid.append(card);
+    });
+
+    container.append(principle, domainGrid, matrix, bridgeGrid);
+  }
+
   function renderTrainingRecipes() {
     const container = byId("training-recipe-list");
     container.replaceChildren();
@@ -228,6 +282,7 @@
       titleWrap.append(el("p", "recipe-read-as", recipe.readAs));
 
       const meta = el("div", "recipe-meta");
+      if (recipe.domain) meta.append(el("span", "recipe-badge domain", recipe.domain));
       meta.append(el("span", "recipe-badge", recipe.evidence));
       meta.append(el("span", "recipe-badge muted", recipe.sources.length > 1 ? `${recipe.sources.length} 个来源` : "1 个来源"));
       summary.append(toggle, titleWrap, meta);
@@ -622,6 +677,7 @@
     renderParadigms();
     renderDesignAxes();
     renderArchitectureDiagrams();
+    renderApplicationDomains();
     renderTrainingRecipes();
     renderFigureSystem();
     renderPaperFigureGuides();
