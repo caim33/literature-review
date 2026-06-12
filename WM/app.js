@@ -616,6 +616,32 @@
     });
   }
 
+  function initSideToc() {
+    const drawer = byId("side-toc");
+    const openers = [...document.querySelectorAll("[data-toc-open]")];
+    const closers = [...document.querySelectorAll("[data-toc-close]")];
+    if (!drawer || !openers.length) return;
+
+    const setOpen = (open) => {
+      document.body.classList.toggle("toc-open", open);
+      drawer.setAttribute("aria-hidden", String(!open));
+      openers.forEach((opener) => opener.setAttribute("aria-expanded", String(open)));
+    };
+
+    openers.forEach((opener) => {
+      opener.addEventListener("click", () => {
+        setOpen(!document.body.classList.contains("toc-open"));
+      });
+    });
+    closers.forEach((closer) => closer.addEventListener("click", () => setOpen(false)));
+    drawer.querySelectorAll('a[href^="#"]').forEach((link) => {
+      link.addEventListener("click", () => setOpen(false));
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") setOpen(false);
+    });
+  }
+
   function init() {
     renderCounts();
     renderFoundations();
@@ -636,6 +662,7 @@
     renderEvidenceLegend();
     renderReferences();
     bindSearch();
+    initSideToc();
   }
 
   document.addEventListener("DOMContentLoaded", init);

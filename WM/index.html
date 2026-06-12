@@ -4,13 +4,94 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>WM 学习地图</title>
-    <link rel="stylesheet" href="./styles.css?v=wm-toc-20260612">
+    <link rel="stylesheet" href="./styles.css?v=wm-side-toc-20260612">
   </head>
   <body>
+    <button class="toc-toggle" type="button" data-toc-open aria-controls="side-toc" aria-expanded="false">
+      目录
+    </button>
+    <div class="toc-backdrop" data-toc-close aria-hidden="true"></div>
+    <aside class="side-toc" id="side-toc" aria-hidden="true" aria-labelledby="side-toc-title">
+      <div class="side-toc-head">
+        <div>
+          <p class="eyebrow">Contents</p>
+          <h2 id="side-toc-title">WM 侧边目录</h2>
+        </div>
+        <button class="side-toc-close" type="button" data-toc-close aria-label="关闭目录">关闭</button>
+      </div>
+      <p class="side-toc-intro">阅读过程中随时打开，点章节即可跳转。</p>
+      <nav class="side-toc-nav" aria-label="WM page sections">
+        <a class="side-toc-link" href="#paradigms">
+          <span>01</span>
+          <strong>范式坐标</strong>
+          <em>预测目标、表征、控制用途和系统位置。</em>
+        </a>
+        <a class="side-toc-link" href="#basics">
+          <span>02</span>
+          <strong>基础概念</strong>
+          <em>state、dynamics、rollout、planning 等基本语言。</em>
+        </a>
+        <a class="side-toc-link" href="#model-based">
+          <span>03</span>
+          <strong>Model-based 对照</strong>
+          <em>model-free 和 world model 的差异。</em>
+        </a>
+        <a class="side-toc-link" href="#targets">
+          <span>04</span>
+          <strong>预测目标</strong>
+          <em>视频、latent、reward、value 和风险。</em>
+        </a>
+        <a class="side-toc-link" href="#workflow">
+          <span>05</span>
+          <strong>机器人闭环</strong>
+          <em>VLA proposal、WM rollout、safety 和 controller。</em>
+        </a>
+        <a class="side-toc-link" href="#systems">
+          <span>06</span>
+          <strong>系统直觉</strong>
+          <em>判断一个模型是不是有用的 WM。</em>
+        </a>
+        <a class="side-toc-link" href="#routes">
+          <span>07</span>
+          <strong>八条路线</strong>
+          <em>经典 MBRL、视觉预测、生成式模拟器、VLA+WM。</em>
+        </a>
+        <a class="side-toc-link" href="#figures">
+          <span>08</span>
+          <strong>论文图导读</strong>
+          <em>论文 pipeline 图和简化版架构图。</em>
+        </a>
+        <a class="side-toc-link" href="#timeline">
+          <span>09</span>
+          <strong>时间线</strong>
+          <em>Dreamer、V-JEPA、Cosmos、GR00T 等节点。</em>
+        </a>
+        <a class="side-toc-link" href="#formulas">
+          <span>10</span>
+          <strong>公式速查</strong>
+          <em>imagination、MPC、value、latent dynamics。</em>
+        </a>
+        <a class="side-toc-link" href="#misconceptions">
+          <span>11</span>
+          <strong>常见误区</strong>
+          <em>避免把视频生成、JEPA、VLA+WM 混成一类。</em>
+        </a>
+        <a class="side-toc-link" href="#study">
+          <span>12</span>
+          <strong>学习路径</strong>
+          <em>按阶段读论文，并顺手查核心术语。</em>
+        </a>
+        <a class="side-toc-link" href="#references">
+          <span>13</span>
+          <strong>文献库</strong>
+          <em>按路线和证据等级查资料。</em>
+        </a>
+      </nav>
+    </aside>
     <header class="hero">
       <nav class="topbar" aria-label="Primary">
         <a href="../">首页</a>
-        <a href="#contents">目录</a>
+        <button class="topbar-button" type="button" data-toc-open aria-controls="side-toc" aria-expanded="false">目录</button>
         <a href="#paradigms">范式</a>
         <a href="#basics">基础</a>
         <a href="#routes">路线</a>
@@ -52,81 +133,6 @@
     </header>
 
     <main>
-      <section class="band contents-band" id="contents" aria-labelledby="contents-title">
-        <div class="section-head">
-          <p class="eyebrow">Contents</p>
-          <h2 id="contents-title">WM 导航目录</h2>
-          <p class="toc-intro">按阅读顺序把页面拆成可跳转入口：先建立基本坐标，再看路线、论文图和文献库。</p>
-        </div>
-        <nav class="toc-grid" aria-label="WM page sections">
-          <a class="toc-card" href="#paradigms">
-            <span class="toc-index">01</span>
-            <strong class="toc-title">范式坐标</strong>
-            <span class="toc-note">先分清预测目标、表征、控制用途和系统位置。</span>
-          </a>
-          <a class="toc-card" href="#basics">
-            <span class="toc-index">02</span>
-            <strong class="toc-title">基础概念</strong>
-            <span class="toc-note">建立 state、dynamics、rollout、planning 等基本语言。</span>
-          </a>
-          <a class="toc-card" href="#model-based">
-            <span class="toc-index">03</span>
-            <strong class="toc-title">Model-based 对照</strong>
-            <span class="toc-note">把 model-free 和 world model 的差异讲清楚。</span>
-          </a>
-          <a class="toc-card" href="#targets">
-            <span class="toc-index">04</span>
-            <strong class="toc-title">预测目标</strong>
-            <span class="toc-note">不只预测视频，也可以预测 latent、reward、value、风险。</span>
-          </a>
-          <a class="toc-card" href="#workflow">
-            <span class="toc-index">05</span>
-            <strong class="toc-title">机器人闭环</strong>
-            <span class="toc-note">看 VLA proposal、WM rollout、safety/rerank 和 controller 怎么接。</span>
-          </a>
-          <a class="toc-card" href="#systems">
-            <span class="toc-index">06</span>
-            <strong class="toc-title">系统直觉</strong>
-            <span class="toc-note">用四条原则快速判断一个模型是不是有用的 WM。</span>
-          </a>
-          <a class="toc-card" href="#routes">
-            <span class="toc-index">07</span>
-            <strong class="toc-title">八条路线</strong>
-            <span class="toc-note">按经典 MBRL、视觉预测、生成式模拟器、VLA+WM 等路线读。</span>
-          </a>
-          <a class="toc-card" href="#figures">
-            <span class="toc-index">08</span>
-            <strong class="toc-title">论文图导读</strong>
-            <span class="toc-note">对照论文 pipeline 图和简化版架构图理解每条路线。</span>
-          </a>
-          <a class="toc-card" href="#timeline">
-            <span class="toc-index">09</span>
-            <strong class="toc-title">时间线</strong>
-            <span class="toc-note">抓住从 Dreamer 到 V-JEPA、Cosmos、GR00T 的关键节点。</span>
-          </a>
-          <a class="toc-card" href="#formulas">
-            <span class="toc-index">10</span>
-            <strong class="toc-title">公式速查</strong>
-            <span class="toc-note">用公式把 imagination、MPC、value、latent dynamics 对齐。</span>
-          </a>
-          <a class="toc-card" href="#misconceptions">
-            <span class="toc-index">11</span>
-            <strong class="toc-title">常见误区</strong>
-            <span class="toc-note">避免把强视频生成、JEPA、VLA+WM 等概念混成一类。</span>
-          </a>
-          <a class="toc-card" href="#study">
-            <span class="toc-index">12</span>
-            <strong class="toc-title">学习路径</strong>
-            <span class="toc-note">按阶段读论文，并顺手查核心术语。</span>
-          </a>
-          <a class="toc-card" href="#references">
-            <span class="toc-index">13</span>
-            <strong class="toc-title">文献库</strong>
-            <span class="toc-note">按路线和证据等级查论文、项目与官方资料。</span>
-          </a>
-        </nav>
-      </section>
-
       <section class="band" id="paradigms">
         <div class="section-head">
           <p class="eyebrow">Paradigms</p>

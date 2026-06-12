@@ -235,16 +235,19 @@ for (const equation of data.equations) {
 }
 
 const html = await readFile(indexPath, "utf8");
-for (const id of ["contents", "architecture-diagram", "figure-grid", "foundation-grid", "model-comparison", "prediction-targets", "robot-workflow", "misconception-list", "route-tabs", "route-detail", "reference-grid", "timeline", "search-input", "formula-grid", "paradigm-grid", "evidence-legend", "route-match-count"]) {
+for (const id of ["side-toc", "architecture-diagram", "figure-grid", "foundation-grid", "model-comparison", "prediction-targets", "robot-workflow", "misconception-list", "route-tabs", "route-detail", "reference-grid", "timeline", "search-input", "formula-grid", "paradigm-grid", "evidence-legend", "route-match-count"]) {
   assert.ok(html.includes(id), `index should expose #${id}`);
 }
 const tocTargets = ["paradigms", "basics", "model-based", "targets", "workflow", "systems", "routes", "figures", "timeline", "formulas", "misconceptions", "study", "references"];
 for (const target of tocTargets) {
-  assert.ok(html.includes(`href="#${target}"`), `WM directory should link to #${target}`);
+  assert.ok(html.includes(`href="#${target}"`), `WM side directory should link to #${target}`);
 }
-assert.ok(html.includes('href="#contents">目录'), "top navigation should expose the WM directory");
-assert.ok(html.includes("WM 导航目录"), "directory section should have a clear title");
-const sectionOrder = ["contents", "paradigms", "basics", "model-based", "targets", "workflow", "routes", "figures"];
+assert.ok(html.includes("data-toc-open"), "WM side directory should have open controls");
+assert.ok(html.includes("data-toc-close"), "WM side directory should have close controls");
+assert.ok(html.includes("toc-backdrop"), "WM side directory should include a backdrop");
+assert.ok(!html.includes('id="contents"'), "WM directory should be a side drawer, not a static content section");
+assert.ok(html.includes("WM 侧边目录"), "side directory should have a clear title");
+const sectionOrder = ["paradigms", "basics", "model-based", "targets", "workflow", "routes", "figures"];
 for (let index = 0; index < sectionOrder.length - 1; index += 1) {
   const current = `id="${sectionOrder[index]}"`;
   const next = `id="${sectionOrder[index + 1]}"`;
@@ -255,9 +258,12 @@ assert.ok(html.includes('class="button primary" href="#paradigms"'), "hero prima
 assert.ok(html.includes("读论文前先分清几个坐标"), "paradigm section should explain that it comes before paper reading");
 
 const app = await readFile(appPath, "utf8");
-for (const fn of ["renderArchitecture", "renderPaperFigures", "renderOriginalMedia", "renderFigure", "renderFoundations", "renderModelComparison", "renderPredictionTargets", "renderRobotWorkflow", "renderMisconceptions", "renderRouteTabs", "renderRouteDetail", "renderReferences", "renderReferenceCard", "renderTimeline", "renderEquations", "renderParadigms", "renderParadigmOverview", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
+for (const fn of ["renderArchitecture", "renderPaperFigures", "renderOriginalMedia", "renderFigure", "renderFoundations", "renderModelComparison", "renderPredictionTargets", "renderRobotWorkflow", "renderMisconceptions", "renderRouteTabs", "renderRouteDetail", "renderReferences", "renderReferenceCard", "renderTimeline", "renderEquations", "renderParadigms", "renderParadigmOverview", "renderEvidenceLegend", "initSideToc", "normalizeQuery", "applyFilters"]) {
   assert.ok(app.includes(fn), `app should include ${fn}`);
 }
+assert.ok(app.includes("toc-open"), "app should toggle the side directory open state");
+assert.ok(app.includes("aria-expanded"), "app should update side directory opener accessibility state");
+assert.ok(app.includes("Escape"), "app should close the side directory with Escape");
 assert.ok(app.includes("paper-original-media"), "app should render original paper/project media");
 assert.ok(app.includes("figure-detail"), "app should render detailed paradigm explanations when present");
 assert.ok(app.includes("renderDeepDive"), "app should render collapsible detailed paper interpretations");
@@ -276,6 +282,9 @@ assert.ok(app.includes("route.references.map"), "references should be grouped fr
 assert.ok(!app.includes("innerHTML = `<strong>${reference.title}"), "mini refs should not interpolate titles with innerHTML");
 
 const css = await readFile(stylePath, "utf8");
+for (const selector of [".toc-toggle", ".side-toc", ".toc-backdrop", "body.toc-open", ".side-toc-link"]) {
+  assert.ok(css.includes(selector), `styles should include ${selector}`);
+}
 assert.ok(css.includes(".paradigm-overview"), "styles should include paradigm overview module styles");
 assert.ok(css.includes(".taxonomy-table"), "styles should include taxonomy table styles");
 assert.ok(css.includes(".layer-chip"), "styles should include paradigm layer labels");
