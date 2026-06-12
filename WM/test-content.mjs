@@ -235,10 +235,16 @@ for (const equation of data.equations) {
 }
 
 const html = await readFile(indexPath, "utf8");
-for (const id of ["architecture-diagram", "figure-grid", "foundation-grid", "model-comparison", "prediction-targets", "robot-workflow", "misconception-list", "route-tabs", "route-detail", "reference-grid", "timeline", "search-input", "formula-grid", "paradigm-grid", "evidence-legend", "route-match-count"]) {
+for (const id of ["contents", "architecture-diagram", "figure-grid", "foundation-grid", "model-comparison", "prediction-targets", "robot-workflow", "misconception-list", "route-tabs", "route-detail", "reference-grid", "timeline", "search-input", "formula-grid", "paradigm-grid", "evidence-legend", "route-match-count"]) {
   assert.ok(html.includes(id), `index should expose #${id}`);
 }
-const sectionOrder = ["paradigms", "basics", "model-based", "targets", "workflow", "routes", "figures"];
+const tocTargets = ["paradigms", "basics", "model-based", "targets", "workflow", "systems", "routes", "figures", "timeline", "formulas", "misconceptions", "study", "references"];
+for (const target of tocTargets) {
+  assert.ok(html.includes(`href="#${target}"`), `WM directory should link to #${target}`);
+}
+assert.ok(html.includes('href="#contents">目录'), "top navigation should expose the WM directory");
+assert.ok(html.includes("WM 导航目录"), "directory section should have a clear title");
+const sectionOrder = ["contents", "paradigms", "basics", "model-based", "targets", "workflow", "routes", "figures"];
 for (let index = 0; index < sectionOrder.length - 1; index += 1) {
   const current = `id="${sectionOrder[index]}"`;
   const next = `id="${sectionOrder[index + 1]}"`;
