@@ -42,23 +42,35 @@
     return (data.tocGroups || []).flatMap((group) => group.items.map((item) => item.target));
   }
 
+  function renderTocCard(group, className = "toc-card") {
+    const card = el("article", className);
+    card.append(el("h3", "", group.title));
+    const list = el("div", "toc-link-list");
+    group.items.forEach((item) => {
+      const link = el("a", "toc-link");
+      link.href = `#${item.target}`;
+      link.dataset.target = item.target;
+      link.append(el("strong", "", item.title));
+      link.append(el("span", "", item.note));
+      list.append(link);
+    });
+    card.append(list);
+    return card;
+  }
+
   function renderPageToc() {
     const container = byId("page-toc");
     container.replaceChildren();
     data.tocGroups.forEach((group) => {
-      const card = el("article", "toc-card");
-      card.append(el("h3", "", group.title));
-      const list = el("div", "toc-link-list");
-      group.items.forEach((item) => {
-        const link = el("a", "toc-link");
-        link.href = `#${item.target}`;
-        link.dataset.target = item.target;
-        link.append(el("strong", "", item.title));
-        link.append(el("span", "", item.note));
-        list.append(link);
-      });
-      card.append(list);
-      container.append(card);
+      container.append(renderTocCard(group));
+    });
+  }
+
+  function renderTocDrawer() {
+    const container = byId("toc-drawer-list");
+    container.replaceChildren();
+    data.tocGroups.forEach((group) => {
+      container.append(renderTocCard(group, "toc-card drawer-toc-card"));
     });
   }
 
@@ -83,11 +95,47 @@
     window.setTimeout(updateActivePageToc, 320);
   }
 
+  function setTocDrawerOpen(open) {
+    const drawer = byId("toc-drawer");
+    const toggle = byId("toc-drawer-toggle");
+    const backdrop = byId("toc-backdrop");
+    drawer.setAttribute("aria-hidden", String(!open));
+    toggle.setAttribute("aria-expanded", String(open));
+    document.body.classList.toggle("toc-drawer-open", open);
+    backdrop.classList.toggle("show", open);
+    if (open) {
+      window.setTimeout(() => drawer.querySelector(".toc-link")?.focus(), 60);
+    }
+  }
+
+  function openTocDrawer() {
+    setTocDrawerOpen(true);
+  }
+
+  function closeTocDrawer() {
+    setTocDrawerOpen(false);
+  }
+
+  function toggleTocDrawer() {
+    const open = byId("toc-drawer-toggle").getAttribute("aria-expanded") === "true";
+    setTocDrawerOpen(!open);
+  }
+
+  function bindTocDrawer() {
+    byId("toc-drawer-toggle").addEventListener("click", toggleTocDrawer);
+    byId("toc-drawer-close").addEventListener("click", closeTocDrawer);
+    byId("toc-backdrop").addEventListener("click", closeTocDrawer);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeTocDrawer();
+    });
+  }
+
   function bindPageTocTracking() {
     document.querySelectorAll(".toc-link").forEach((link) => {
       link.addEventListener("click", (event) => {
         event.preventDefault();
         scrollToTocTarget(link.dataset.target);
+        if (link.closest("#toc-drawer")) closeTocDrawer();
       });
     });
     window.addEventListener("scroll", updateActivePageToc, { passive: true });
@@ -734,6 +782,7 @@
   function init() {
     renderCounts();
     renderPageToc();
+    renderTocDrawer();
     renderRouteTabs();
     renderRouteDetail();
     renderTimeline();
@@ -751,6 +800,7 @@
     renderEvidenceLegend();
     renderReferences();
     bindSearch();
+    bindTocDrawer();
     bindPageTocTracking();
   }
 

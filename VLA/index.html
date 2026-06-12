@@ -7,6 +7,21 @@
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
+    <button id="toc-drawer-toggle" class="toc-drawer-toggle" type="button" aria-expanded="false" aria-controls="toc-drawer">
+      目录
+    </button>
+    <div id="toc-backdrop" class="toc-backdrop" aria-hidden="true"></div>
+    <aside id="toc-drawer" class="toc-drawer" aria-label="侧边目录" aria-hidden="true">
+      <div class="toc-drawer-head">
+        <div>
+          <p class="eyebrow">Contents</p>
+          <h2>VLA 目录</h2>
+        </div>
+        <button id="toc-drawer-close" class="toc-drawer-close" type="button" aria-label="关闭目录">关闭</button>
+      </div>
+      <div id="toc-drawer-list" class="toc-drawer-list"></div>
+    </aside>
+
     <header class="hero">
       <nav class="topbar" aria-label="Primary">
         <a href="#contents">目录</a>
@@ -227,7 +242,7 @@
       <p>Updated 2026-06-12. 公开论文、项目页和官方 blog 混合整理；公司 demo 请按证据等级阅读。</p>
     </footer>
 
-    <script src="./data.js?v=toc-20260612b"></script>
-    <script src="./app.js?v=toc-20260612b"></script>
+    <script src="./data.js?v=drawer-toc-20260612"></script>
+    <script src="./app.js?v=drawer-toc-20260612"></script>
   </body>
 </html>
