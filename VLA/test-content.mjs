@@ -21,6 +21,8 @@ assert.equal(existsSync(stylePath), true, "styles.css should exist");
 const data = require(dataPath);
 assert.ok(Array.isArray(data.routes), "routes should be an array");
 assert.ok(data.routes.length >= 8, "should cover at least 8 VLA learning routes");
+assert.ok(Array.isArray(data.tocGroups), "tocGroups should be an array");
+assert.ok(data.tocGroups.length >= 3, "should include grouped page contents");
 assert.ok(Array.isArray(data.equations), "equations should be an array");
 assert.ok(data.equations.length >= 5, "should include at least 5 rendered equations");
 assert.ok(Array.isArray(data.paradigms), "paradigms should be an array");
@@ -200,18 +202,29 @@ for (const demo of data.figureSystem.demos) {
 }
 
 const html = await readFile(indexPath, "utf8");
-for (const id of ["route-tabs", "route-detail", "reference-grid", "timeline", "search-input", "formula-grid", "paradigm-grid", "design-axis-grid", "architecture-gallery", "application-domains", "application-domain-map", "training-recipes", "training-recipe-list", "figure-system-case", "paper-figure-guides", "evidence-legend", "route-match-count"]) {
+for (const group of data.tocGroups) {
+  assert.ok(group.title, "toc group needs title");
+  assert.ok(Array.isArray(group.items) && group.items.length >= 3, `${group.title} needs at least 3 links`);
+  for (const item of group.items) {
+    assert.ok(item.target, `${group.title} toc item needs target`);
+    assert.ok(item.title, `${group.title} toc item needs title`);
+    assert.ok(item.note, `${group.title} toc item needs note`);
+    assert.ok(html.includes(`id="${item.target}"`), `toc target #${item.target} should exist in index`);
+  }
+}
+
+for (const id of ["contents", "page-toc", "route-tabs", "route-detail", "reference-grid", "timeline", "search-input", "formula-grid", "paradigm-grid", "design-axis-grid", "architecture-gallery", "application-domains", "application-domain-map", "training-recipes", "training-recipe-list", "figure-system-case", "paper-figure-guides", "evidence-legend", "route-match-count"]) {
   assert.ok(html.includes(id), `index should expose #${id}`);
 }
 
 const app = await readFile(appPath, "utf8");
-for (const fn of ["renderRouteTabs", "renderRouteDetail", "renderReferences", "renderRouteReferenceGroup", "renderTimeline", "renderEquations", "renderParadigms", "renderDesignAxes", "renderArchitectureDiagrams", "renderApplicationDomains", "renderTrainingRecipes", "renderRecipeDataMix", "renderRecipeDonut", "renderRecipePyramid", "renderRecipeBlock", "renderFigureSystem", "renderPaperFigureGuides", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
+for (const fn of ["renderPageToc", "updateActivePageToc", "scrollToTocTarget", "bindPageTocTracking", "renderRouteTabs", "renderRouteDetail", "renderReferences", "renderRouteReferenceGroup", "renderTimeline", "renderEquations", "renderParadigms", "renderDesignAxes", "renderArchitectureDiagrams", "renderApplicationDomains", "renderTrainingRecipes", "renderRecipeDataMix", "renderRecipeDonut", "renderRecipePyramid", "renderRecipeBlock", "renderFigureSystem", "renderPaperFigureGuides", "renderEvidenceLegend", "normalizeQuery", "applyFilters"]) {
   assert.ok(app.includes(fn), `app should include ${fn}`);
 }
 assert.ok(!app.includes("innerHTML = `<strong>${reference.title}"), "mini refs should not interpolate titles with innerHTML");
 
 const styles = await readFile(stylePath, "utf8");
-for (const className of ["reference-groups", "reference-route-group", "route-reference-grid", "route-group-head", "design-axis-grid", "axis-card", "domain-band", "application-domain-map", "domain-card-grid", "domain-boundary-matrix", "domain-bridge-grid", "recipe-band", "training-recipe-list", "recipe-card", "recipe-badge.domain", "recipe-donut", "recipe-mix-legend", "recipe-pyramid", "recipe-item-grid", "figure-system-case", "figure-demo-card", "figure-architecture"]) {
+for (const className of ["reference-groups", "reference-route-group", "route-reference-grid", "route-group-head", "toc-band", "page-toc", "toc-card", "toc-link.active", "design-axis-grid", "axis-card", "domain-band", "application-domain-map", "domain-card-grid", "domain-boundary-matrix", "domain-bridge-grid", "recipe-band", "training-recipe-list", "recipe-card", "recipe-badge.domain", "recipe-donut", "recipe-mix-legend", "recipe-pyramid", "recipe-item-grid", "figure-system-case", "figure-demo-card", "figure-architecture"]) {
   assert.ok(styles.includes(className), `styles should include ${className}`);
 }
 

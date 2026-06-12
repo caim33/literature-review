@@ -216,6 +216,66 @@ h3 {
   font-weight: 650;
 }
 
+.toc-band {
+  padding-top: 4rem;
+}
+
+.page-toc {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.toc-card {
+  min-width: 0;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.toc-card h3 {
+  margin: 0;
+  padding: 1rem 1rem 0.85rem;
+  border-bottom: 1px solid var(--line);
+  color: var(--accent);
+  font-size: 1.1rem;
+}
+
+.toc-link-list {
+  display: grid;
+  gap: 1px;
+  background: var(--line);
+}
+
+.toc-link {
+  min-width: 0;
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.82rem 1rem;
+  background: #fffdf8;
+  text-decoration: none;
+}
+
+.toc-link:hover,
+.toc-link.active {
+  background: #eef5f2;
+}
+
+.toc-link.active {
+  box-shadow: inset 4px 0 0 var(--accent);
+}
+
+.toc-link strong {
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.toc-link span {
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
 .axis-band {
   width: 100%;
   padding-left: max(1rem, calc((100vw - 1180px) / 2));
@@ -1648,6 +1708,7 @@ input {
   .recipe-item-grid,
   .domain-card-grid,
   .domain-bridge-grid,
+  .page-toc,
   .formula-grid,
   .paradigm-grid,
   .evidence-legend,

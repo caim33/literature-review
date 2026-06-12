@@ -2,7 +2,7 @@ const vlaMapData = {
   meta: {
     title: "VLA Learning Map",
     subtitle: "Vision-Language-Action, World Models, WAM, and Whole-Body Robot Foundation Models",
-    updated: "2026-06-10",
+    updated: "2026-06-12",
     note: "Public papers, official project pages, and official company blogs are mixed here. Items marked as blog/model-card should be treated as engineering signals, not peer-reviewed claims."
   },
   glossary: [
@@ -29,6 +29,35 @@ const vlaMapData = {
     {
       term: "Embodiment",
       meaning: "The robot body and action interface: arms, hands, mobile base, humanoid torso, cameras, grippers, joint spaces, and control rate."
+    }
+  ],
+  tocGroups: [
+    {
+      title: "先建立框架",
+      items: [
+        { target: "systems", title: "系统视角", note: "把 VLA 当作数据、动作、模型和部署闭环一起读。" },
+        { target: "design-axes", title: "六个设计轴", note: "动作表示、训练目标、时间结构、数据配方、embodiment、VLM 职责。" },
+        { target: "architecture", title: "架构图", note: "先看端到端、动作生成、WM/WAM、人形全身和数据飞轮。" },
+        { target: "application-domains", title: "应用域分叉", note: "区分 manipulation VLA 与 whole-body humanoid VLA。" }
+      ]
+    },
+    {
+      title: "看系统和论文图",
+      items: [
+        { target: "training-recipes", title: "训练配方表", note: "拆 Qwen-VLA、π0、GR00T、Figure、GENE 等数据与训练阶段。" },
+        { target: "case-studies", title: "Figure 案例", note: "从 Helix 上身控制读到 Helix 02 厨房/卧室全身任务。" },
+        { target: "paper-figures", title: "论文图导读", note: "按 RT-2、OpenVLA、π0、GR00T、DreamZero 等核心图理解范式。" }
+      ]
+    },
+    {
+      title: "查路线和资料",
+      items: [
+        { target: "routes", title: "十条主路线", note: "按数据、动作、通用 VLA、PI、人形、WM/WAM、空间、长程等路线检索。" },
+        { target: "formulas", title: "核心公式", note: "用 MathML 看 VLA、chunk、WM、WAM 和数据混合目标。" },
+        { target: "paradigms", title: "范式取舍", note: "比较 token、flow/diffusion、generalist、whole-body、agent stack。" },
+        { target: "study", title: "学习路径", note: "按阶段安排阅读顺序和输出目标。" },
+        { target: "references", title: "文献库", note: "按路线分组查论文、项目、model card 和官方 blog。" }
+      ]
     }
   ],
   milestones: [

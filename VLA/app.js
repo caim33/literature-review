@@ -38,6 +38,69 @@
     byId("reference-count").textContent = allReferences().length;
   }
 
+  function tocTargetIds() {
+    return (data.tocGroups || []).flatMap((group) => group.items.map((item) => item.target));
+  }
+
+  function renderPageToc() {
+    const container = byId("page-toc");
+    container.replaceChildren();
+    data.tocGroups.forEach((group) => {
+      const card = el("article", "toc-card");
+      card.append(el("h3", "", group.title));
+      const list = el("div", "toc-link-list");
+      group.items.forEach((item) => {
+        const link = el("a", "toc-link");
+        link.href = `#${item.target}`;
+        link.dataset.target = item.target;
+        link.append(el("strong", "", item.title));
+        link.append(el("span", "", item.note));
+        list.append(link);
+      });
+      card.append(list);
+      container.append(card);
+    });
+  }
+
+  function updateActivePageToc() {
+    const links = [...document.querySelectorAll(".toc-link")];
+    if (!links.length) return;
+    let current = tocTargetIds()[0];
+    tocTargetIds().forEach((target) => {
+      const section = byId(target);
+      if (section && section.getBoundingClientRect().top <= 140) current = target;
+    });
+    links.forEach((link) => {
+      link.classList.toggle("active", link.dataset.target === current);
+    });
+  }
+
+  function scrollToTocTarget(target, updateHash = true) {
+    const section = byId(target);
+    if (!section) return;
+    section.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (updateHash) window.history.pushState(null, "", `#${target}`);
+    window.setTimeout(updateActivePageToc, 320);
+  }
+
+  function bindPageTocTracking() {
+    document.querySelectorAll(".toc-link").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        scrollToTocTarget(link.dataset.target);
+      });
+    });
+    window.addEventListener("scroll", updateActivePageToc, { passive: true });
+    window.addEventListener("hashchange", () => {
+      const target = window.location.hash.replace("#", "");
+      if (target) scrollToTocTarget(target, false);
+      updateActivePageToc();
+    });
+    const initialTarget = window.location.hash.replace("#", "");
+    if (initialTarget) window.setTimeout(() => scrollToTocTarget(initialTarget, false), 0);
+    updateActivePageToc();
+  }
+
   function renderRouteTabs() {
     const container = byId("route-tabs");
     container.replaceChildren();
@@ -670,6 +733,7 @@
 
   function init() {
     renderCounts();
+    renderPageToc();
     renderRouteTabs();
     renderRouteDetail();
     renderTimeline();
@@ -687,6 +751,7 @@
     renderEvidenceLegend();
     renderReferences();
     bindSearch();
+    bindPageTocTracking();
   }
 
   document.addEventListener("DOMContentLoaded", init);

@@ -9,6 +9,7 @@
   <body>
     <header class="hero">
       <nav class="topbar" aria-label="Primary">
+        <a href="#contents">目录</a>
         <a href="#routes">路线</a>
         <a href="#design-axes">六轴</a>
         <a href="#architecture">架构图</a>
@@ -28,7 +29,7 @@
             按能力栈拆解 Vision-Language-Action：先区分 manipulation VLA 与 whole-body humanoid VLA，再看数据层、动作表示、通用 VLA、Physical Intelligence、WM/WAM、空间感知、精细交互、评测后训练和 Agent Stack。
           </p>
           <div class="hero-actions">
-            <a class="button primary" href="#routes">开始看路线</a>
+            <a class="button primary" href="#contents">打开目录</a>
             <a class="button" href="#references">查文献库</a>
           </div>
         </section>
@@ -50,6 +51,17 @@
     </header>
 
     <main>
+      <section class="band toc-band" id="contents">
+        <div class="section-head">
+          <p class="eyebrow">Contents</p>
+          <h2>目录：按学习动作跳转</h2>
+        </div>
+        <p class="section-intro">
+          VLA 这页内容比较长，先按“框架、系统、资料”三组跳转。读论文时建议先看应用域和动作表示，再进入训练配方和文献库。
+        </p>
+        <div id="page-toc" class="page-toc" aria-label="VLA page contents"></div>
+      </section>
+
       <section class="band intro" id="systems">
         <div class="section-head">
           <p class="eyebrow">Mental Model</p>
@@ -212,10 +224,10 @@
     </main>
 
     <footer class="footer">
-      <p>Updated 2026-06-10. 公开论文、项目页和官方 blog 混合整理；公司 demo 请按证据等级阅读。</p>
+      <p>Updated 2026-06-12. 公开论文、项目页和官方 blog 混合整理；公司 demo 请按证据等级阅读。</p>
     </footer>
 
-    <script src="./data.js?v=domain-split-tight-20260610"></script>
-    <script src="./app.js?v=domain-split-tight-20260610"></script>
+    <script src="./data.js?v=toc-20260612b"></script>
+    <script src="./app.js?v=toc-20260612b"></script>
   </body>
 </html>
