@@ -2,7 +2,7 @@ const vlaMapData = {
   meta: {
     title: "VLA Learning Map",
     subtitle: "Vision-Language-Action, World Models, WAM, and Whole-Body Robot Foundation Models",
-    updated: "2026-06-12",
+    updated: "2026-06-16",
     note: "Public papers, official project pages, and official company blogs are mixed here. Items marked as blog/model-card should be treated as engineering signals, not peer-reviewed claims."
   },
   glossary: [
@@ -44,7 +44,7 @@ const vlaMapData = {
     {
       title: "看系统和论文图",
       items: [
-        { target: "training-recipes", title: "训练配方表", note: "拆 Qwen-VLA、π0、GR00T、Figure、GENE 等数据与训练阶段。" },
+        { target: "training-recipes", title: "训练配方表", note: "拆 Qwen-VLA、π0、GR00T、Figure、Curr-0、GENE 等数据与训练阶段。" },
         { target: "case-studies", title: "Figure 案例", note: "从 Helix 上身控制读到 Helix 02 厨房/卧室全身任务。" },
         { target: "paper-figures", title: "论文图导读", note: "按 RT-2、OpenVLA、π0、GR00T、DreamZero 等核心图理解范式。" }
       ]
@@ -66,7 +66,7 @@ const vlaMapData = {
     { year: "2023", label: "RT-2 / PaLM-E / Open X-Embodiment / Diffusion Policy", lane: "foundation", note: "Web-scale VLM knowledge meets robot actions; large robot mixtures become credible." },
     { year: "2024", label: "OpenVLA / Octo / DROID / RoboCasa / π0", lane: "open", note: "Open generalist policies and in-the-wild datasets make VLA reproducible." },
     { year: "2025", label: "π0.5 / FAST / Gemini Robotics / Figure Helix / GR00T N1", lane: "systems", note: "Long-horizon, whole-body, and company VLA systems become the frontier." },
-    { year: "2026", label: "π0.7 / GR00T N1.7 / DreamZero / GENE-26.5", lane: "systems", note: "Steerable generalists, open humanoid checkpoints, WAM-style policies, and dexterous manipulation systems reshape the map." }
+    { year: "2026", label: "π0.7 / GR00T N1.7 / DreamZero / Curr-0 / GENE-26.5", lane: "systems", note: "Steerable generalists, open humanoid checkpoints, WAM-style policies, loco-dexterous humanoid systems, and dexterous manipulation systems reshape the map." }
   ],
   equations: [
     {
@@ -244,7 +244,7 @@ const vlaMapData = {
         actionSpace: "上身、手、头、躯干、移动底盘或腿部相关命令；常通过 System 0 / whole-body controller 转成稳定关节控制。",
         data: "humanoid teleop、全身仿真/RL、human video/retarget、房间级部署日志、厨房/卧室/物流长程任务、跨 embodiment robot pool。",
         metrics: "任务成功率之外，还要看失稳、碰撞、步态/姿态约束、房间级导航、多人/多机器人交互和安全中止。",
-        examples: ["Figure Helix / Helix 02", "GR00T N1 / N1.7", "Gemini Robotics 1.5", "XPENG Robotics Fe0", "Agility whole-body stack"]
+        examples: ["Figure Helix / Helix 02", "GR00T N1 / N1.7", "Curr-0", "Gemini Robotics 1.5", "XPENG Robotics Fe0", "Agility whole-body stack"]
       }
     ],
     boundaries: [
@@ -680,6 +680,38 @@ const vlaMapData = {
       ]
     },
     {
+      title: "Current Robotics Curr-0",
+      year: "2026",
+      family: "Loco-dexterous humanoid foundation system",
+      domain: "Whole-body humanoid VLA",
+      evidence: "官方 blog",
+      sources: [
+        { title: "Curr-0 blog", url: "https://current-robotics.com/blog/curr-0" }
+      ],
+      paradigm: "Curr-0 是面向 70+ DoF 人形的三系统架构：System 2 做 reasoning / vision-language grounding / task latent，System 1 做 whole-body motion and stability，System 0 做 dexterous hand-object physical interaction。",
+      action: "目标不是先走路再操作，而是在同一闭环策略中耦合移动、躯干、平衡、双臂、21-DoF Wuji hand、工具和接触恢复；公开 demo 覆盖泡茶、盖章、点香、扔垃圾、送毛绒玩具等 loco-dexterous tasks。",
+      readAs: "把它和 Figure Helix、GR00T 一起读：Curr-0 的独特信号是 HumanEx 人类全身数据采集 + 21,000h human data + world-model evaluator/post-training loop。",
+      dataMix: [
+        { label: "21,000h human data", role: "官方 blog 公开的总量，用于训练从视觉、语言、身体状态到全身灵巧操作的一体化策略。" },
+        { label: "2,800h whole-body demos", role: "其中 whole-body human demonstrations 用来让 System 1 学 locomotion、posture、balance 和 body coordination。" },
+        { label: "Hand-centric data", role: "用于预训练 System 2 的 fine-grained manipulation priors，并配合上身 motion auxiliary objectives 提升操作精度。" },
+        { label: "HumanEx wearable signals", role: "软穿戴采集 egocentric video、hand/finger motion、whole-body proprioception、strap-mounted EMG 和 motion-in-environment signals，再同步、标定、retarget 到人形。" },
+        { label: "World-model correction loop", role: "interactive multimodal world simulator 预测 vision/proprioception/force/tactile consequences；Human-in-the-World-Model 用虚拟 rollout 中的人类纠正做可扩展 post-training。" }
+      ],
+      training: [
+        { stage: "1", title: "System 1 whole-body pretraining", detail: "先在 whole-body data 上预训练稳定移动、姿态、平衡和身体协调。" },
+        { stage: "2", title: "System 2 hand-centric pretraining", detail: "用 hand-centric data 学细粒度 manipulation prior；System 2 还预测 upper-body motion 并引入辅助监督，给下游控制更强的臂/躯干引导。" },
+        { stage: "3", title: "Joint full-mixture fine-tuning", detail: "在完整 human data mixture 上联合微调，把 vision、reasoning、whole-body motion 和 dexterous interaction 对齐到单一策略。" },
+        { stage: "4", title: "World-model evaluation and post-training", detail: "用交互式多模态 world model 做闭环 rollout、成功率排序和 human intervention segments；这是官方公开的迭代框架，训练细节和真实数据比例仍未完全披露。" }
+      ],
+      unknowns: [
+        "目前是官方 blog，不是 peer-reviewed paper 或开源权重/代码。",
+        "没有公开 VLM backbone、action decoder 结构、loss 权重、batch size、GPU 规模和 21,000h 的完整数据比例。",
+        "world-model evaluator 与真机相关性图给出系统信号，但缺少可复现 benchmark、数值表和对照设置细节。",
+        "System 2/1/0 名字和 Figure Helix/Helix 02 相似，但 Curr-0 的 System 0 是 dexterous physical interaction，Figure Helix 02 的 System 0 更偏 whole-body controller，不能混写。"
+      ]
+    },
+    {
       title: "Gemini Robotics 1.5",
       year: "2025",
       family: "Embodied reasoning + VLA execution",
@@ -942,6 +974,34 @@ const vlaMapData = {
         "后续 Helix-02 在这条路线外接 System 0 全身运动层，用于卧室整理和铺床等 loco-manipulation。"
       ],
       watchFor: "Helix 的学习点不是论文 benchmark，而是工业系统如何为高维 humanoid action space 处理实时性；铺床/叠被子请进一步看 Helix-02 Bedroom Tidy。"
+    },
+    {
+      title: "Curr-0：HumanEx 数据飞轮 + 三系统全身灵巧操作",
+      sourceTitle: "Curr-0: A Loco-Dexterous Manipulation Model for Humanoids",
+      sourceUrl: "https://current-robotics.com/blog/curr-0",
+      imageUrl: "./assets/figures/curr0-humanex.webp",
+      originalFigure: "官方 blog 的 HumanEx system overview、data-source comparison 和 world-model evaluator correlation 图：重点看人类全身数据如何变成 humanoid-actionable data。",
+      simplified: [
+        "HumanEx 把 egocentric video、hand/finger motion、whole-body proprioception、EMG 和环境运动信号同步采集。",
+        "人类数据经过 calibration、synchronization、retargeting 和 alignment，转成 70+ DoF 人形可用的训练监督。",
+        "System 2 负责 vision-language grounding 和 task latent；System 1 负责 whole-body motion/stability；System 0 负责 21-DoF hand 的接触交互。",
+        "Interactive multimodal world simulator 用于 rollout、评估、排序和 human-in-the-world-model corrective post-training。"
+      ],
+      watchFor: "Curr-0 和 Figure 都用 System 0/1/2 语言，但含义不完全一样；读时要按官方定义拆层，不要只按名字对齐。"
+    },
+    {
+      title: "Curr-0：World Model 作为人形策略评估器",
+      sourceTitle: "Curr-0 World-Model Evaluator / Human-in-the-World-Model",
+      sourceUrl: "https://current-robotics.com/blog/curr-0",
+      imageUrl: "./assets/figures/curr0-world-model-correlation.png",
+      originalFigure: "官方 blog 的 world-model evaluator correlation 和 cost scaling 图：重点看它把 WM 放在评估/纠错/部署前验证，而不是把 WM 直接写成 VLA policy。",
+      simplified: [
+        "Policy 在 interactive multimodal world simulator 中闭环 rollout。",
+        "Evaluator 不只看 RGB 未来，还要预测 proprioception、force 和 tactile consequences。",
+        "当 rollout 错误、不确定或 failure-prone，人类在 world model 中直接介入纠正。",
+        "纠正片段用于 post-training；真实机器人主要承担 grounding、calibration 和 final validation。"
+      ],
+      watchFor: "这张图适合放进 WM/WAM 章节读：它说明工业系统可能先把 WM 用作 scalable evaluator，而不是一步到位替代真实世界。"
     }
   ],
   readingPath: [
@@ -970,7 +1030,7 @@ const vlaMapData = {
       phase: "Phase 4",
       title: "进入全身人形",
       goal: "理解 Figure Helix、GR00T、Gemini Robotics 为什么不只是机械臂 VLA 的放大版。",
-      read: ["Figure Helix", "GR00T N1", "GR00T N1.7", "Gemini Robotics", "Gemini Robotics 1.5"],
+      read: ["Figure Helix", "GR00T N1", "GR00T N1.7", "Curr-0", "Gemini Robotics", "Gemini Robotics 1.5"],
       output: "能拆出上身/手/导航/全身平衡/多机器人协作各自需要的模型层。"
     },
     {
@@ -1321,6 +1381,7 @@ const vlaMapData = {
       branches: [
         "全上身 VLA：Figure Helix 直接控制手腕、躯干、头部和手指，并展示多机器人协作。",
         "开放人形 foundation model：GR00T N1/N1.5/N1.6/N1.7 逐步加入 FLARE、world model、sim-to-real 和开放权重。",
+        "Loco-dexterous foundation system：Curr-0 强调人类全身数据、三系统控制和 world-model evaluator，把移动、平衡、灵巧手和工具使用耦合训练。",
         "Agentic stack：Gemini Robotics-ER 做高层 embodied reasoning，Gemini Robotics VLA 做动作。",
         "底层 whole-body motor cortex：Agility/Digit 更接近 RL 训练的低层全身控制，可接 VLA/LLM 上层。",
         "产业 demo 与证据等级：Tesla/Optimus 值得观察，但公开 VLA 技术材料少，需要谨慎标注。"
@@ -1386,6 +1447,13 @@ const vlaMapData = {
           type: "model-card",
           url: "https://huggingface.co/nvidia/GR00T-N1.7-3B",
           value: "NVIDIA 开放的 N1.7 early access 权重/模型卡，值得跟踪实测。"
+        },
+        {
+          title: "Curr-0: A Loco-Dexterous Manipulation Model for Humanoids",
+          year: "2026",
+          type: "blog",
+          url: "https://current-robotics.com/blog/curr-0",
+          value: "Current Robotics 官方 blog：70+ DoF 人形、21,000h human data、2,800h whole-body demos、HumanEx 采集、System 2/1/0 和 world-model evaluator。"
         },
         {
           title: "Gemini Robotics",
@@ -1498,6 +1566,13 @@ const vlaMapData = {
           type: "paper",
           url: "https://arxiv.org/abs/2602.15922",
           value: "明确提出 WAM，把视频世界模型和动作生成合并成可零样本控制的策略。"
+        },
+        {
+          title: "Curr-0 World-Model Evaluator / Human-in-the-World-Model",
+          year: "2026",
+          type: "blog",
+          url: "https://current-robotics.com/blog/curr-0",
+          value: "不是 WAM paper，但展示公司系统如何把 multimodal world simulator 用作 humanoid policy 的闭环评估、排序和人类纠错 post-training 环境。"
         },
         {
           title: "SayCan",
@@ -1638,6 +1713,13 @@ const vlaMapData = {
           type: "blog",
           url: "https://www.figure.ai/news/helix-02",
           value: "厨房全身操作案例：卸载/重装洗碗机，适合和 Bedroom Tidy 对比学习 room-scale long-horizon manipulation。"
+        },
+        {
+          title: "Curr-0 Loco-Dexterous Humanoid Tasks",
+          year: "2026",
+          type: "blog",
+          url: "https://current-robotics.com/blog/curr-0",
+          value: "泡茶、盖章、点香、扔垃圾、送毛绒玩具等任务把移动、躯干、双手、21-DoF hand、工具使用和接触恢复放在同一闭环策略中学习。"
         },
         {
           title: "GENE-26.5",
