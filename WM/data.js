@@ -2,7 +2,7 @@ const wmMapData = {
   meta: {
     title: "WM Learning Map",
     subtitle: "World Models for Robotics, VLA, Humanoids, and Physical AI",
-    updated: "2026-05-29",
+    updated: "2026-06-29",
     note: "Robot-first world model map. Autonomous driving is kept as a lightweight side route for transferable simulation and evaluation ideas."
   },
   glossary: [
@@ -21,6 +21,10 @@ const wmMapData = {
     {
       term: "VLA + WM",
       meaning: "Hybrid robot stack where a VLA proposes actions or subgoals, while a WM simulates consequences, reranks candidates, predicts failures, or creates synthetic training data."
+    },
+    {
+      term: "WAM",
+      meaning: "World Action Model / World-Action Model: a robot policy route that starts from a pretrained video or world-model backbone, keeps its ability to imagine future world changes, and fine-tunes it to emit robot actions."
     },
     {
       term: "Interactive Simulator",
@@ -115,6 +119,12 @@ const wmMapData = {
       predicts: "未来几帧 RGB、深度或多视角视频。",
       usefulFor: "目标图像控制、可视化调试、生成数据、交互式模拟器。",
       caution: "视频清晰不代表动作可控，也不代表接触物理正确。"
+    },
+    {
+      name: "未来视频 + 动作",
+      predicts: "joint future video/action：同时预测 future visual/latent state 和 robot action，或先生成未来视觉变化再用 inverse dynamics 反推 action。",
+      usefulFor: "World-Action Model、DreamZero、Cosmos Policy、LingBot-VA 这类 video/world backbone policy；缓解 language-to-action grounding gap。",
+      caution: "它不是普通 video WM。关键看视频 prior 是否真的帮助 action chunk、闭环控制和真实机器人泛化。"
     },
     {
       name: "Latent State",
@@ -586,6 +596,80 @@ const wmMapData = {
         "WM 是在线重排、离线生成数据，还是训练辅助 loss。",
         "系统如何处理延迟、安全、失败恢复和真实部署日志。"
       ]
+    },
+    {
+      title: "World-Action Model：Pretrained to Imagine, Fine-Tuned to Act",
+      source: "NVIDIA WAM blog 2026, UniPi, DreamZero, Cosmos Policy, LingBot-VA, Fast-WAM",
+      originalMedia: {
+        type: "image",
+        src: "assets/paper-figures/nvidia-wam-overview.webp",
+        alt: "NVIDIA blog overview figure placing World-Action Models between action-conditioned world models and video world models",
+        caption: "NVIDIA blog 的 WAM 概览图：action-conditioned WM、video world model 和 World-Action Model 的交叉位置；WAM 复用 video/world backbone，并把它微调成会出动作的 policy。",
+        sourceUrl: "https://developer.nvidia.com/blog/pretrained-to-imagine-fine-tuned-to-act-the-rise-of-world-action-models/",
+        sourceLabel: "NVIDIA Technical Blog"
+      },
+      viewBox: "0 0 1160 430",
+      cardClass: "wide",
+      diagramClass: "pipeline",
+      thesis: "WAM 的核心不是“又生成一段 video”，而是把 pretrained video/world backbone 的未来想象 prior 接到 robot action：可以先想象再 inverse dynamics，也可以 joint video-action prediction，还可以只用 video representation 直接出动作。",
+      detail: "NVIDIA blog 把 WAM 读成第二条 robot foundation model recipe：VLA 从 VLM backbone 出发，WAM 从 video/world backbone 出发。pretrained to imagine 指大规模视频模型已经学到语言、视觉变化和物体交互的 prior；fine-tuned to act 指用机器人数据把这个 prior 接到 action chunk、proprioception、value 或 policy head。真正要比较的是 grounding、闭环速度、动作接口和真实机器人泛化，而不是视频画质。",
+      deepDive: {
+        summary: "从 VLA vs WAM、三种 formulation、三种 action integration 读懂这条新路线。",
+        sections: [
+          {
+            title: "先看什么",
+            body: "先看 backbone 起点。VLA 通常从 VLM/Vision-Language backbone 出发，把语言和图像表示适配成动作；WAM 从 video/world backbone 出发，保留或复用它预测未来视觉变化的能力，再把未来变化和动作绑在一起。"
+          },
+          {
+            title: "机制怎么跑",
+            body: "inverse dynamics WAM 先生成未来视频或 latent，再从当前到未来的变化反推出 action；joint prediction WAM 在同一个模型里同时预测未来 video/latent 和 action chunk；representation-only WAM 训练时用视频预测 regularize，推理时跳过视频生成，只用中间表征出动作。"
+          },
+          {
+            title: "和普通 WM/VLA 差在哪",
+            body: "普通 video WM 主要回答未来会长什么样，VLA 主要回答当前该做什么动作，WAM 则问 video/world prior 能不能直接成为 robot policy 的核心表征。它仍然可能生成 future token，但重点是这些 future token 如何降低 language-to-action grounding 难度。"
+          },
+          {
+            title: "容易误解",
+            body: "不要把 WAM 当成所有 video prediction 的新名字。WAM 必须连接动作输出，并且要在机器人任务上验证。也不要把 WAM 胜出当成定论：现有公开证据仍然早期，视频 prior 带来训练/推理成本，测试时生成未来视频可能比强 VLA 慢很多。"
+          }
+        ]
+      },
+      stages: [
+        { label: "Pretrain to Imagine", x: 24, y: 34, w: 300, h: 350 },
+        { label: "WAM Formulations", x: 350, y: 34, w: 430, h: 350 },
+        { label: "Fine-Tune to Act", x: 806, y: 34, w: 330, h: 350 }
+      ],
+      nodes: [
+        { id: "obs", label: "Observation + Goal", note: "image, language, state", x: 50, y: 88, w: 150, h: 58, kind: "input" },
+        { id: "backbone", label: "Video / World Backbone", note: "Wan, Cosmos, Veo-like prior", x: 48, y: 210, w: 190, h: 72, kind: "model" },
+        { id: "future", label: "Future Video / Latent", note: "imagined world change", x: 380, y: 72, w: 165, h: 66, kind: "future" },
+        { id: "inverse", label: "Inverse Dynamics", note: "future -> action", x: 592, y: 72, w: 155, h: 66, kind: "model" },
+        { id: "joint", label: "Joint Video + Action", note: "co-denoise / co-train", x: 472, y: 190, w: 170, h: 72, kind: "policy" },
+        { id: "repr", label: "Representation-Only", note: "skip test-time video", x: 472, y: 310, w: 170, h: 62, kind: "state" },
+        { id: "tokens", label: "Action Tokens", note: "continuous / discrete", x: 835, y: 68, w: 140, h: 58, kind: "action" },
+        { id: "image", label: "Action-as-Image", note: "synthetic latent frames", x: 835, y: 176, w: 150, h: 58, kind: "action" },
+        { id: "latent", label: "Latent Actions", note: "plans from video", x: 835, y: 286, w: 140, h: 58, kind: "action" },
+        { id: "action", label: "Robot Action Chunk", note: "execute + replan", x: 1010, y: 176, w: 130, h: 68, kind: "action" }
+      ],
+      edges: [
+        { from: "obs", to: "backbone", label: "condition" },
+        { from: "backbone", to: "future", label: "imagine" },
+        { from: "future", to: "inverse", label: "infer" },
+        { from: "backbone", to: "joint", label: "joint train" },
+        { from: "backbone", to: "repr", label: "features" },
+        { from: "inverse", to: "tokens", label: "action head" },
+        { from: "joint", to: "image", label: "same latent space" },
+        { from: "repr", to: "latent", label: "compact plan" },
+        { from: "tokens", to: "action", label: "decode" },
+        { from: "image", to: "action", label: "decode" },
+        { from: "latent", to: "action", label: "decode" }
+      ],
+      readingFocus: [
+        "Policy formulation：inverse dynamics、joint prediction、representation-only 分别在推理边界怎么出动作。",
+        "Action integration：action tokens、action-as-image、latent actions/plans 哪一种更贴近 pretrained video backbone。",
+        "Architecture style：monolithic、Mixture-of-Transformers、hierarchical pipeline 如何在耦合强度和推理速度之间取舍。",
+        "和 VLA baseline 公平比较：看真实机器人泛化、latency、训练成本和是否需要 test-time future video。"
+      ]
     }
   ],
   misconceptions: [
@@ -610,6 +694,10 @@ const wmMapData = {
       reality: "长程规划还需要目标、价值、可执行动作、纠错和闭环反馈。连续生成不等于能完成任务。"
     },
     {
+      myth: "WAM 就是普通视频 WM 换个名字",
+      reality: "不是。WAM 是 robot policy recipe：它复用 video/world backbone 的未来想象能力，但必须接到 action chunk、闭环控制或 policy head，并在机器人任务上验证。"
+    },
+    {
       myth: "自动驾驶 WM 可以直接搬到灵巧操作",
       reality: "驾驶的 BEV/occupancy 和闭环评估值得借鉴，但灵巧操作有更强的遮挡、接触和手物耦合。"
     }
@@ -622,7 +710,8 @@ const wmMapData = {
     { year: "2022", label: "DayDreamer / TD-MPC", lane: "robot", note: "World models move closer to real robots and task-oriented latent MPC." },
     { year: "2023", label: "DreamerV3 / UniSim / GAIA-1", lane: "foundation", note: "Scalable world-model RL, interactive real-world simulation, and driving world models accelerate." },
     { year: "2024", label: "Genie / RoboDreamer / IRASim", lane: "foundation", note: "Latent actions, robot imagination, and action-aligned simulation become central." },
-    { year: "2025", label: "Cosmos / V-JEPA 2 / GR00T N1", lane: "systems", note: "Physical AI world foundation models and humanoid VLA systems begin to converge." }
+    { year: "2025", label: "Cosmos / V-JEPA 2 / GR00T N1", lane: "systems", note: "Physical AI world foundation models and humanoid VLA systems begin to converge." },
+    { year: "2026", label: "DreamZero / Cosmos Policy / Fast-WAM", lane: "systems", note: "World-Action Models become a visible second recipe next to VLM-based VLAs." }
   ],
   equations: [
     {
@@ -649,6 +738,11 @@ const wmMapData = {
       title: "VLA + WM 重排",
       mathml: "<math display=\"block\"><msup><mi>a</mi><mo>*</mo></msup><mo>=</mo><munder><mi>argmax</mi><mrow><mi>a</mi><mo>∈</mo><msub><mi>π</mi><mtext>VLA</mtext></msub></mrow></munder><mrow><mo>[</mo><mi>S</mi><mo>(</mo><msub><mi>f</mi><mtext>WM</mtext></msub><mo>(</mo><mi>o</mi><mo>,</mo><mi>a</mi><mo>)</mo><mo>)</mo><mo>]</mo></mrow></math>",
       explain: "VLA 生成候选动作，WM 预测后果，评分器按成功、风险、进度或安全约束重排。"
+    },
+    {
+      title: "WAM 联合未来与动作",
+      mathml: "<math display=\"block\"><msub><mi>π</mi><mtext>WAM</mtext></msub><mo>:</mo><mo>(</mo><msub><mi>o</mi><mrow><mn>0</mn><mo>:</mo><mi>t</mi></mrow></msub><mo>,</mo><mi>g</mi><mo>)</mo><mo>↦</mo><mo>(</mo><msub><mi>o</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn><mo>:</mo><mi>t</mi><mo>+</mo><mi>H</mi></mrow></msub><mo>,</mo><msub><mi>a</mi><mrow><mi>t</mi><mo>:</mo><mi>t</mi><mo>+</mo><mi>H</mi></mrow></msub><mo>)</mo></math>",
+      explain: "WAM 把 future video/latent 和 action chunk 绑在一起：可以先想象未来再 inverse dynamics，也可以联合预测未来和动作。"
     },
     {
       title: "JEPA 式预测",
@@ -727,6 +821,17 @@ const wmMapData = {
       notSameAs: "它不只是生成未来视频；重点是有动作接口、可连续交互、能被 agent 用来训练或评估。"
     },
     {
+      name: "World-Action Model / WAM",
+      examples: "UniPi, DreamZero, Cosmos Policy, LingBot-VA, mimic-video, Fast-WAM",
+      layer: "policy backbone / video-world prior 到动作",
+      readingHint: "先问它怎样把 pretrained video/world backbone 接到动作：先想象再反推、视频动作联合预测，还是只用视频表征。",
+      axis: "系统位置 + 预测目标：video/world model prior 是否直接成为 robot policy。",
+      question: "能否把“语言到视觉变化”的大视频模型能力，转成“视觉变化到动作”的机器人控制能力？",
+      strength: "利用大规模视频模型已有的时空和物体交互 prior，可能比从 VLM 直接学 language-to-action grounding 更省机器人数据。",
+      caution: "训练和推理通常更贵；测试时生成未来视频会慢，且强视频 prior 不自动等于硬件一致、接触正确或可部署。",
+      notSameAs: "它不是普通视频生成，也不是单纯 VLA 加 action head；WAM 的重点是 pretrained world/video backbone 如何同时服务未来预测和动作生成。"
+    },
+    {
       name: "VLA + WM system integration",
       examples: "GR-1, OpenVLA + critic, π0 + rollout, GR00T stack",
       layer: "系统集成 / 机器人部署架构",
@@ -784,10 +889,10 @@ const wmMapData = {
     },
     {
       phase: "Phase 4",
-      title: "接上 VLA / 人形",
-      goal: "把 WM 放进 VLA 和 humanoid stack：提议、rollout、重排、失败预测、whole-body execution。",
-      read: ["GR-1", "OpenVLA", "π0", "GR00T N1", "RoboDreamer", "IRASim"],
-      output: "能设计一个 VLA proposal + WM evaluator + controller 的混合系统。"
+      title: "接上 VLA / WAM / 人形",
+      goal: "把 WM 放进 robot foundation model stack：VLA 提议、WAM video-action policy、rollout、重排、失败预测、whole-body execution。",
+      read: ["GR-1", "OpenVLA", "π0", "DreamZero", "Cosmos Policy", "GR00T N1", "RoboDreamer", "IRASim"],
+      output: "能区分 VLA、WAM 和 VLA+WM hybrid，并设计 proposal + evaluator + controller 的混合系统。"
     },
     {
       phase: "Phase 5",
@@ -886,6 +991,39 @@ const wmMapData = {
       ]
     },
     {
+      id: "world-action-model",
+      title: "World Action Model / WAM",
+      question: "能否从 pretrained video/world backbone 出发，保留 future video/latent imagination，再 fine-tune 成会输出 robot action 的 policy？",
+      takeaway: "NVIDIA blog 的一句话是 Pretrained to imagine, fine-tuned to act。WAM 不是普通视频生成，也不是 VLM-based VLA 的小 action head；它把大视频/世界模型的语言-视觉变化 prior 迁移到机器人动作，试图把 language-to-action grounding 改成更容易的 video-to-action / future-to-action grounding。",
+      priority: "重点",
+      branches: [
+        "Policy formulation：inverse dynamics 先预测 future video/latent，再从视觉变化反推 action；joint prediction 同时输出 future video 和 action；representation-only 训练时用视频预测，推理时跳过 test-time future generation。",
+        "Action integration：action tokens 把连续/离散动作当新模态；action-as-image 把 action/proprio/value 编成 synthetic latent frames；latent actions/plans 从视频里学 compact plan，再 decode 成 robot action。",
+        "Architecture style：monolithic transformer 强耦合 video/action；Mixture-of-Transformers 用 shared attention 连接 video expert 和 action expert；hierarchical pipeline 先跑 video/world module 再跑 action module。",
+        "Backbone bet：Wan、Cosmos、Veo-like video/world models 提供 language-conditioned physical change prior；机器人数据负责把 language-to-action grounding 对齐到 hardware、proprioception、action chunk 和 closed-loop recovery。"
+      ],
+      patterns: [
+        "读 WAM 先问：推理时到底生成 future video，还是只用 predictive representation？这决定 latency 和是否适合实时控制。",
+        "DreamZero / GR-1 更像 joint video-action prediction；LingBot-VA / VPP / mimic-video 更强调 inverse-dynamics 或中间视频特征；Fast-WAM 代表 representation-only 的效率问题。",
+        "Cosmos Policy 是 action-as-image 的典型：把 action、proprioception、value target 表成 synthetic latent frames，让视频 denoising interface 直接产生动作相关量。",
+        "不要把 WAM 优势讲成定论：blog 也强调当前证据仍早，训练和推理成本高，强 VLA baseline、视觉子目标和 hybrid system 仍然很重要。"
+      ],
+      references: [
+        { title: "Pretrained to Imagine, Fine-Tuned to Act: The Rise of World-Action Models", year: "2026", type: "blog", url: "https://developer.nvidia.com/blog/pretrained-to-imagine-fine-tuned-to-act-the-rise-of-world-action-models/", value: "NVIDIA blog 系统整理 WAM：VLA vs WAM、三种 formulation、动作接入方式、架构风格、成本和未解问题。" },
+        { title: "UniPi: Learning Universal Policies via Text-Guided Video Generation", year: "2023", type: "paper", url: "https://proceedings.neurips.cc/paper_files/paper/2023/file/1d5b9233ad716a43be5c0d3023cb82d0-Paper-Conference.pdf", value: "早期 WAM 思路：先用 text-guided video generation 生成视觉计划，再通过 inverse dynamics 输出动作。" },
+        { title: "GR-1: Unleashing Large-Scale Video Generative Pre-training for Visual Robot Manipulation", year: "2023", type: "paper", url: "https://arxiv.org/abs/2312.13139", value: "同时预测动作和未来图像，是 joint video-action robot policy 的关键早期样本。" },
+        { title: "DreamZero: World Action Models Are Zero-shot Policies", year: "2026", type: "paper", url: "https://arxiv.org/abs/2602.15922", value: "scaled WAM 代表：从 Wan video backbone 出发，联合 video/action fine-tuning，并报告真实机器人评测信号。" },
+        { title: "Cosmos Policy: Fine-Tuning Video Models for Visuomotor Control and Planning", year: "2026", type: "paper", url: "https://arxiv.org/abs/2601.16163", value: "action-as-image / synthetic latent frames 代表：把 action、proprioception、value target 放进视频模型 denoising 接口。" },
+        { title: "LingBot-VA: Causal World Modeling for Robot Control", year: "2026", type: "paper", url: "https://arxiv.org/abs/2601.21998", value: "inverse-dynamics WAM 代表：fine-tuned Wan backbone + causal closed-loop rollout + MoT 架构。" },
+        { title: "mimic-video: Video-Action Models for Generalizable Robot Control Beyond VLAs", year: "2025", type: "paper", url: "https://arxiv.org/abs/2512.15692", value: "用视频模型特征辅助动作生成，适合理解 WAM 如何绕开完整 RGB rollout。" },
+        { title: "Fast-WAM: Do World Action Models Need Test-time Future Imagination?", year: "2026", type: "paper", url: "https://arxiv.org/abs/2603.16666", value: "直接讨论 WAM 推理速度：representation-only 路线跳过测试时视频生成，回答实时控制成本问题。" },
+        { title: "Video Prediction Policy", year: "2025", type: "paper", url: "https://arxiv.org/abs/2412.14803", value: "用 predictive visual representation 条件化机器人动作，是 video backbone policy 的重要中间形态。" },
+        { title: "Unified Video Action Model", year: "2025", type: "paper", url: "https://arxiv.org/abs/2503.00200", value: "把 video dynamics 和 action 放进统一建模框架，适合读 WAM 的 joint modeling 设计空间。" },
+        { title: "Wan: Open and Advanced Large-Scale Video Generative Models", year: "2025", type: "paper", url: "https://arxiv.org/abs/2503.20314", value: "许多现代 WAM 复用的 video backbone；重要性在于开放强视频 prior，而不是机器人 policy 本身。" },
+        { title: "Do World Action Models Generalize Better than VLAs? A Robustness Study", year: "2026", type: "paper", url: "https://arxiv.org/abs/2603.22078", value: "WAM 与 VLA 的鲁棒性对比入口，提醒不要只看单篇 leaderboard 胜负。" }
+      ]
+    },
+    {
       id: "generative-sim",
       title: "生成式交互模拟器",
       question: "能不能训练一个可交互的真实世界模拟器，让机器人在模型里练习、评估和发现失败？",
@@ -927,16 +1065,18 @@ const wmMapData = {
       id: "vla-wm-hybrid",
       title: "VLA + WM 混合架构",
       question: "VLA 会直接反应，但它会不会先想一下？WM 可以成为 VLA 的慢速想象和校验层。",
-      takeaway: "最实用的近期路线不是纯 WM 替代 VLA，而是 VLA proposal + WM rollout/evaluator + safety/reranker + controller。GR-1、OpenVLA、π0、GR00T、RoboDreamer、IRASim 都能放进这条线理解。",
+      takeaway: "最实用的近期路线不是纯 WM 替代 VLA，而是 VLA proposal + WAM/video-action policy + WM rollout/evaluator + safety/reranker + controller 的混合系统。WAM 可以是 policy backbone，WM 也可以是慢速校验层，二者在部署系统里常会合流。",
       priority: "重点",
       branches: [
         "VLA proposal：从视觉、语言和状态生成动作 chunk、轨迹或子目标。",
+        "WAM policy backbone：从 video/world backbone 出发，jointly predict future/action 或用 predictive representation 直接出 action。",
         "WM evaluation：对候选动作 rollout，预测成功、碰撞、物体变化、任务进度或失败风险。",
         "Synthetic data engine：用 WM 生成长尾场景、未见物体组合和纠错数据。",
         "Auxiliary prediction：给 VLA 加未来帧、latent、progress、affordance 等辅助目标。"
       ],
       patterns: [
         "VLA 和 WM 的动作接口要一致：token、delta pose、joint action、trajectory chunk 或 latent action。",
+        "不要把 DreamZero/Cosmos Policy 这类 WAM 硬读成纯 reranker；它们更像 video/world prior 直接进入 policy backbone。",
         "Cosmos 这类 WM 平台可以为 VLA 提供合成数据、候选 rollout、失败评估和 World Action Model backbone；本页不把它主要归为 VLA policy 主线。",
         "在线部署时 WM 可能只做短 horizon 重排，长 horizon 规划交给高层 planner。",
         "不要只看生成质量，要看是否提升真实机器人 success rate、recovery 和安全性。"

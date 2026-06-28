@@ -22,6 +22,7 @@ const data = require(dataPath);
 assert.equal(data.meta.title, "WM Learning Map");
 assert.ok(Array.isArray(data.routes), "routes should be an array");
 assert.ok(data.routes.length >= 8, "should cover at least 8 world model routes");
+assert.ok(data.routes.some((route) => route.id === "world-action-model"), "should include a dedicated World Action Model route");
 assert.ok(Array.isArray(data.equations), "equations should be an array");
 assert.ok(data.equations.length >= 5, "should include at least 5 rendered equations");
 assert.ok(data.paradigmOverview, "should include a paradigm overview/reading guide");
@@ -174,6 +175,16 @@ const requiredNames = [
   "Cosmos Reason2",
   "Cosmos 3",
   "World Action Model",
+  "WAM",
+  "DreamZero",
+  "Cosmos Policy",
+  "LingBot-VA",
+  "mimic-video",
+  "Fast-WAM",
+  "Video Prediction Policy",
+  "Unified Video Action Model",
+  "UniPi",
+  "Wan",
   "Genie 2",
   "GAIA-1",
 ];
@@ -209,6 +220,57 @@ assert.ok(
 assert.ok(cosmosRoute.references.some((reference) => reference.title.includes("Cosmos 3")), "Cosmos route should include Cosmos 3 reference");
 assert.ok(cosmosRoute.references.some((reference) => reference.title.includes("Cosmos Transfer")), "Cosmos route should include Cosmos Transfer reference");
 assert.ok(cosmosRoute.references.some((reference) => reference.title.includes("Cosmos Reason")), "Cosmos route should include Cosmos Reason reference");
+
+const wamRoute = data.routes.find((route) => route.id === "world-action-model");
+assert.ok(wamRoute, "WAM should have its own route instead of being hidden inside VLA+WM");
+assert.ok(
+  wamRoute.question.includes("video") && wamRoute.question.includes("action"),
+  "WAM route should frame the video/world-backbone-to-action question"
+);
+assert.ok(
+  wamRoute.takeaway.includes("Pretrained to imagine") && wamRoute.takeaway.includes("fine-tuned to act"),
+  "WAM route should carry the NVIDIA blog's core framing"
+);
+const wamRouteText = `${wamRoute.branches.join(" ")} ${wamRoute.patterns.join(" ")}`;
+for (const phrase of [
+  "inverse dynamics",
+  "joint prediction",
+  "representation-only",
+  "action tokens",
+  "action-as-image",
+  "latent actions",
+  "monolithic",
+  "Mixture-of-Transformers",
+  "hierarchical",
+  "language-to-action grounding",
+]) {
+  assert.ok(wamRouteText.includes(phrase), `WAM route should explain ${phrase}`);
+}
+for (const title of ["Pretrained to Imagine, Fine-Tuned to Act", "DreamZero", "Cosmos Policy", "LingBot-VA", "mimic-video", "Fast-WAM", "Video Prediction Policy", "Unified Video Action Model"]) {
+  assert.ok(wamRoute.references.some((reference) => reference.title.includes(title)), `WAM route should include ${title}`);
+}
+assert.ok(
+  data.paradigms.some((item) => item.name.includes("World-Action Model") && item.notSameAs.includes("普通视频生成")),
+  "paradigms should distinguish WAM from ordinary video generation"
+);
+assert.ok(
+  data.predictionTargets.some((target) => target.name.includes("视频 + 动作") && target.predicts.includes("future") && target.predicts.includes("action")),
+  "prediction targets should include joint future-video/action prediction"
+);
+assert.ok(
+  data.misconceptions.some((item) => item.myth.includes("WAM") && item.reality.includes("policy")),
+  "misconceptions should warn that WAM is not just a generic video world model"
+);
+
+const wamFigure = data.paperFigures.find((figure) => figure.title.includes("World-Action Model"));
+assert.ok(wamFigure, "paper figures should include a WAM pipeline figure");
+assert.ok(wamFigure.originalMedia.src.endsWith("nvidia-wam-overview.webp"), "WAM figure should use the local NVIDIA blog overview image");
+assert.ok(wamFigure.thesis.includes("video") && wamFigure.thesis.includes("action"), "WAM figure should explain video-action coupling");
+assert.ok(wamFigure.deepDive.sections.some((section) => section.body.includes("VLA") && section.body.includes("WAM")), "WAM figure deep dive should contrast VLA and WAM");
+const wamFigureLabels = wamFigure.nodes.map((node) => node.label);
+for (const label of ["Video / World Backbone", "Future Video / Latent", "Inverse Dynamics", "Joint Video + Action", "Representation-Only", "Robot Action Chunk"]) {
+  assert.ok(wamFigureLabels.includes(label), `WAM simplified pipeline should include ${label}`);
+}
 
 for (const route of data.routes) {
   assert.ok(route.id, "route needs id");
