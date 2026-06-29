@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VLM Learning Map</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <header class="hero">
+      <nav class="topbar" aria-label="Primary">
+        <a href="../">首页</a>
+        <a href="#contents">目录</a>
+        <a href="#learning-path">路线</a>
+        <a href="#families">家族</a>
+        <a href="#model-atlas">模型</a>
+        <a href="#unified-models">统一模型</a>
+        <a href="#benchmark-map">评测</a>
+        <a href="#references">文献</a>
+      </nav>
+      <div class="hero-grid">
+        <section>
+          <p class="eyebrow">VLM / MLLM / Unified Multimodal Models</p>
+          <h1>VLM 多模态大模型学习地图</h1>
+          <p class="lead">
+            从 CLIP、BLIP-2、Flamingo、LLaVA 读到 Qwen2.5-VL、InternVL、Molmo、Kimi-VL 和 BAGEL 这类统一理解与生成模型。目标不是背模型名，而是看清视觉编码器、连接器、数据配方、评测和生成目标如何共同塑造能力。
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#contents">打开目录</a>
+            <a class="button" href="#unified-models">看统一模型</a>
+          </div>
+        </section>
+        <aside class="hero-panel" aria-label="Quick map">
+          <div class="metric">
+            <span id="family-count">0</span>
+            <strong>条模型家族</strong>
+          </div>
+          <div class="metric">
+            <span id="model-count">0</span>
+            <strong>个关键模型</strong>
+          </div>
+          <div class="metric">
+            <span id="benchmark-count">0</span>
+            <strong>个数据/评测</strong>
+          </div>
+        </aside>
+      </div>
+    </header>
+
+    <main>
+      <section class="band toc-band" id="contents">
+        <div class="section-head">
+          <p class="eyebrow">Contents</p>
+          <h2>目录：按学习动作跳转</h2>
+        </div>
+        <p class="section-intro">
+          这页按“建立框架、看模型谱系、查资料评测”三组组织。新手建议先读学习路线和模型家族，再进入统一模型和 benchmark 地图。
+        </p>
+        <div id="page-toc" class="page-toc" aria-label="VLM page contents"></div>
+      </section>
+
+      <section class="band intro" id="principles">
+        <div class="section-head">
+          <p class="eyebrow">Mental Model</p>
+          <h2>先把 VLM 看成能力栈</h2>
+        </div>
+        <div id="principle-grid" class="principle-grid"></div>
+      </section>
+
+      <section class="band path-band" id="learning-path">
+        <div class="section-head">
+          <p class="eyebrow">Study Path</p>
+          <h2>从 CLIP 到 BAGEL 的阅读顺序</h2>
+        </div>
+        <div id="learning-path-list" class="learning-path"></div>
+      </section>
+
+      <section class="band family-band" id="families">
+        <div class="section-head">
+          <p class="eyebrow">Model Families</p>
+          <h2>六条主路线：别只按模型名记</h2>
+        </div>
+        <div id="family-tabs" class="family-tabs" role="tablist" aria-label="VLM families"></div>
+        <div id="family-detail" class="family-detail"></div>
+      </section>
+
+      <section class="band atlas-band" id="model-atlas">
+        <div class="section-head row">
+          <div>
+            <p class="eyebrow">Model Atlas</p>
+            <h2>关键模型图谱</h2>
+          </div>
+          <label class="search">
+            <span>搜索模型 / 关键词</span>
+            <input id="model-search" type="search" placeholder="LLaVA / Qwen / Molmo / OCR / unified">
+          </label>
+        </div>
+        <p id="model-match-count" class="match-count" aria-live="polite">显示全部模型</p>
+        <div id="model-grid" class="model-grid"></div>
+      </section>
+
+      <section class="band unified-band" id="unified-models">
+        <div class="section-head">
+          <p class="eyebrow">Unified Models</p>
+          <h2>从 VLM 到多模态生成大模型</h2>
+        </div>
+        <div id="unified-grid" class="unified-grid"></div>
+      </section>
+
+      <section class="band benchmark-band" id="benchmark-map">
+        <div class="section-head">
+          <p class="eyebrow">Datasets & Benchmarks</p>
+          <h2>数据、任务和评测地图</h2>
+        </div>
+        <p class="section-intro">
+          VLM 的能力要按数据和 benchmark 读：图文预训练解决语义覆盖，VQA/OCR/图表/视频评测解决具体能力，POPE/HallusionBench 等帮助识别幻觉和鲁棒性问题。
+        </p>
+        <div id="benchmark-groups" class="benchmark-groups"></div>
+      </section>
+
+      <section class="band split" id="references">
+        <div>
+          <div class="section-head compact">
+            <p class="eyebrow">References</p>
+            <h2>论文、项目与评测入口</h2>
+          </div>
+          <div id="reference-grid" class="reference-grid"></div>
+        </div>
+        <aside class="glossary" id="glossary">
+          <div class="section-head compact">
+            <p class="eyebrow">Glossary</p>
+            <h2>术语表</h2>
+          </div>
+          <div id="glossary-list" class="glossary-grid"></div>
+        </aside>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Updated 2026-06-29. 公开论文、项目页、官方报告、模型卡和 benchmark 混合整理；闭源产品能力请按证据等级阅读。</p>
+    </footer>
+
+    <script src="./data.js?v=20260629"></script>
+    <script src="./app.js?v=20260629"></script>
+  </body>
+</html>
