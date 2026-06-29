@@ -81,6 +81,52 @@
     });
   }
 
+  function findDiagramNode(diagram, id) {
+    return diagram.nodes.find((node) => node.id === id);
+  }
+
+  function renderParadigmDiagrams() {
+    const container = byId("paradigm-diagram-gallery");
+    container.replaceChildren();
+    data.paradigmDiagrams.forEach((diagram) => {
+      const card = el("article", "paradigm-diagram-card");
+
+      const head = el("div", "diagram-head");
+      head.append(el("span", "diagram-kicker", diagram.kicker));
+      head.append(el("h3", "", diagram.title));
+      head.append(el("p", "", diagram.summary));
+      head.append(el("span", "diagram-reference", diagram.reference));
+
+      const flow = el("div", "diagram-flow");
+      diagram.nodes.forEach((node, index) => {
+        const nodeEl = el("section", `diagram-node ${node.kind}`);
+        nodeEl.append(el("span", "node-index", String(index + 1).padStart(2, "0")));
+        nodeEl.append(el("strong", "", node.label));
+        nodeEl.append(el("p", "", node.detail));
+        flow.append(nodeEl);
+      });
+
+      const edges = el("div", "diagram-edges");
+      diagram.edges.forEach((edge) => {
+        const from = findDiagramNode(diagram, edge.from)?.label || edge.from;
+        const to = findDiagramNode(diagram, edge.to)?.label || edge.to;
+        const edgeEl = el("p", "diagram-edge");
+        edgeEl.append(el("strong", "", `${from} → ${to}`));
+        edgeEl.append(el("span", "", edge.label));
+        edges.append(edgeEl);
+      });
+
+      const watch = el("div", "diagram-watch");
+      watch.append(el("h4", "", "读图时看"));
+      const list = el("ul");
+      diagram.watch.forEach((item) => list.append(el("li", "", item)));
+      watch.append(list);
+
+      card.append(head, flow, edges, watch);
+      container.append(card);
+    });
+  }
+
   function renderFamilyTabs() {
     const container = byId("family-tabs");
     container.replaceChildren();
@@ -248,6 +294,7 @@
     renderToc();
     renderPrinciples();
     renderLearningPath();
+    renderParadigmDiagrams();
     renderFamilyTabs();
     renderFamilyDetail();
     renderModelAtlas();

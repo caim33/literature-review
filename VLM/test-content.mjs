@@ -30,6 +30,8 @@ assert.ok(Array.isArray(data.learningStages), "learningStages should be an array
 assert.ok(data.learningStages.length >= 5, "should include at least 5 learning stages");
 assert.ok(Array.isArray(data.families), "families should be an array");
 assert.ok(data.families.length >= 6, "should include at least 6 VLM families");
+assert.ok(Array.isArray(data.paradigmDiagrams), "paradigmDiagrams should be an array");
+assert.ok(data.paradigmDiagrams.length >= 8, "should include at least 8 visual paradigm diagrams");
 assert.ok(Array.isArray(data.keyModels), "keyModels should be an array");
 assert.ok(data.keyModels.length >= 18, "should include at least 18 key models");
 assert.ok(Array.isArray(data.unifiedModels), "unifiedModels should be an array");
@@ -92,6 +94,27 @@ for (const family of data.families) {
   assert.ok(Array.isArray(family.mustRead) && family.mustRead.length >= 3, `${family.id} needs must-read items`);
 }
 
+for (const diagram of data.paradigmDiagrams) {
+  assert.ok(diagram.title, "paradigm diagram needs title");
+  assert.ok(diagram.kicker, `${diagram.title} needs kicker`);
+  assert.ok(diagram.summary, `${diagram.title} needs summary`);
+  assert.ok(Array.isArray(diagram.nodes) && diagram.nodes.length >= 4, `${diagram.title} needs at least 4 visual nodes`);
+  assert.ok(Array.isArray(diagram.edges) && diagram.edges.length >= 3, `${diagram.title} needs at least 3 edges`);
+  assert.ok(Array.isArray(diagram.watch) && diagram.watch.length >= 3, `${diagram.title} needs reading cues`);
+  assert.ok(diagram.reference, `${diagram.title} needs reference label`);
+  for (const node of diagram.nodes) {
+    assert.ok(node.id, `${diagram.title} node needs id`);
+    assert.ok(node.label, `${diagram.title} node needs label`);
+    assert.ok(node.detail, `${diagram.title} node needs detail`);
+    assert.ok(node.kind, `${diagram.title} node needs kind`);
+  }
+  for (const edge of diagram.edges) {
+    assert.ok(edge.from, `${diagram.title} edge needs from`);
+    assert.ok(edge.to, `${diagram.title} edge needs to`);
+    assert.ok(edge.label, `${diagram.title} edge needs label`);
+  }
+}
+
 for (const model of data.keyModels) {
   assert.ok(model.name, "key model needs name");
   assert.ok(model.year, `${model.name} needs year`);
@@ -152,6 +175,8 @@ for (const id of [
   "principles",
   "learning-path",
   "families",
+  "paradigm-diagrams",
+  "paradigm-diagram-gallery",
   "family-tabs",
   "family-detail",
   "model-atlas",
@@ -169,6 +194,7 @@ for (const fn of [
   "renderToc",
   "renderPrinciples",
   "renderLearningPath",
+  "renderParadigmDiagrams",
   "renderFamilyTabs",
   "renderFamilyDetail",
   "renderModelAtlas",
@@ -187,6 +213,10 @@ for (const className of [
   "toc-card",
   "principle-grid",
   "learning-path",
+  "paradigm-diagram-gallery",
+  "paradigm-diagram-card",
+  "diagram-node",
+  "diagram-edge",
   "family-tabs",
   "model-grid",
   "unified-grid",
