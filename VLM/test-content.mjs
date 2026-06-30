@@ -34,6 +34,8 @@ assert.ok(Array.isArray(data.families), "families should be an array");
 assert.ok(data.families.length >= 6, "should include at least 6 VLM families");
 assert.ok(Array.isArray(data.visualFigureGuides), "visualFigureGuides should be an array");
 assert.ok(data.visualFigureGuides.length >= 9, "should include at least 9 visible SVG paradigm figures");
+assert.ok(Array.isArray(data.paperFigureGuides), "paperFigureGuides should be an array");
+assert.ok(data.paperFigureGuides.length >= 9, "should include at least 9 paper/project figure guides with local images");
 assert.ok(Array.isArray(data.paradigmDiagrams), "paradigmDiagrams should be an array");
 assert.ok(data.paradigmDiagrams.length >= 8, "should include at least 8 visual paradigm diagrams");
 assert.ok(Array.isArray(data.keyModels), "keyModels should be an array");
@@ -112,6 +114,23 @@ for (const figure of data.visualFigureGuides) {
   }
 }
 
+for (const figure of data.paperFigureGuides) {
+  const keys = Object.keys(figure).sort();
+  assert.deepEqual(
+    keys,
+    ["imageUrl", "originalFigure", "simplified", "sourceTitle", "sourceUrl", "title", "watchFor"].sort(),
+    `${figure.title || "paper figure guide"} should use the paper figure guide contract`
+  );
+  assert.ok(figure.title, "paper figure guide needs title");
+  assert.ok(figure.sourceTitle, `${figure.title} needs sourceTitle`);
+  assert.ok(figure.sourceUrl?.startsWith("http"), `${figure.title} needs source URL`);
+  assert.ok(figure.imageUrl?.startsWith("./assets/figures/"), `${figure.title} should use a local figure asset`);
+  assert.ok(existsSync(path.join(__dirname, figure.imageUrl.replace("./", ""))), `${figure.title} local figure asset should exist`);
+  assert.ok(figure.originalFigure, `${figure.title} needs original figure description`);
+  assert.ok(Array.isArray(figure.simplified) && figure.simplified.length >= 3, `${figure.title} needs simplified steps`);
+  assert.ok(figure.watchFor, `${figure.title} needs reading focus`);
+}
+
 for (const diagram of data.paradigmDiagrams) {
   assert.ok(diagram.title, "paradigm diagram needs title");
   assert.ok(diagram.kicker, `${diagram.title} needs kicker`);
@@ -188,9 +207,13 @@ function hasAnchor(markup, href, text) {
 
 const html = await readFile(indexPath, "utf8");
 assert.ok(hasAnchor(html, "#visual-figures", "范式图"), "top navigation should expose visible paradigm figures directly");
+assert.ok(hasAnchor(html, "#paper-figures", "论文图"), "top navigation should expose paper figure guides directly");
 assert.ok(hasAnchor(html, "#visual-figures", "看范式图"), "hero action should jump directly to the visible SVG figure section");
-assert.ok(html.includes("./data.js?v=20260630-figures2"), "data script should use the figure cache buster");
-assert.ok(html.includes("./app.js?v=20260630-figures2"), "app script should use the figure cache buster");
+assert.ok(html.includes('id="paper-figures"'), "index should expose the paper figure section");
+assert.ok(html.includes('id="paper-figure-guides"'), "index should expose the paper figure guide mount");
+assert.ok(html.includes("paper-figures-band"), "index should use the paper figure band class");
+assert.ok(html.includes("./data.js?v=20260630-paperfigures"), "data script should use the paper figure cache buster");
+assert.ok(html.includes("./app.js?v=20260630-paperfigures"), "app script should use the paper figure cache buster");
 const siteHtml = await readFile(siteIndexPath, "utf8");
 assert.ok(hasAnchor(siteHtml, "./VLM/#visual-figures", "VLM 多模态大模型学习地图"), "site homepage should deep-link the VLM card to visible figures");
 assert.ok(siteHtml.includes("9 张范式图"), "site homepage should advertise VLM paradigm diagrams");
@@ -204,6 +227,8 @@ for (const id of [
   "contents",
   "visual-figures",
   "visual-figure-grid",
+  "paper-figures",
+  "paper-figure-guides",
   "page-toc",
   "principles",
   "learning-path",
@@ -226,6 +251,7 @@ const app = await readFile(appPath, "utf8");
 for (const fn of [
   "renderToc",
   "renderVisualFigures",
+  "renderPaperFigureGuides",
   "renderPrinciples",
   "renderLearningPath",
   "renderParadigmDiagrams",
@@ -261,6 +287,16 @@ for (const className of [
   "visual-figure-grid",
   "visual-figure-card",
   "visual-figure-svg",
+  "paper-figures-band",
+  "paper-figure-guides",
+  "figure-guide",
+  "figure-media",
+  "figure-body",
+  "figure-steps",
+  "figure-open-label",
+  "figure-guide-body",
+  "figure-simplified",
+  "figure-watch",
   "paradigm-diagram-gallery",
   "paradigm-diagram-card",
   "diagram-node",
@@ -274,6 +310,11 @@ for (const className of [
 ]) {
   assert.ok(styles.includes(className), `styles should include ${className}`);
 }
+
+assert.ok(/\.figure-guide\s*{[\s\S]*grid-template-columns:\s*minmax\(0,\s*1\.35fr\)\s+minmax\(280px,\s*0\.65fr\)/.test(styles), "paper figure guides should keep image media dominant on desktop");
+assert.ok(/\.figure-media\s*{[\s\S]*min-height:\s*clamp\(300px,\s*48vw,\s*620px\)/.test(styles), "paper figure media should reserve visible image height");
+assert.ok(/@media\s*\(max-width:\s*640px\)\s*{[\s\S]*\.figure-guide\s*{[\s\S]*grid-template-columns:\s*1fr/.test(styles), "paper figure guides should stack on mobile");
+assert.ok(/@media\s*\(max-width:\s*640px\)\s*{[\s\S]*\.figure-media\s*{[\s\S]*min-height:\s*260px/.test(styles), "paper figure media should remain visible on mobile");
 
 assert.ok(!html.includes('id="bagel"'), "BAGEL should not have a dedicated page section");
 assert.ok(!app.includes("renderBagelCase"), "app should not render a dedicated BAGEL section");

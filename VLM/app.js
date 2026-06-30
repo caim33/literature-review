@@ -191,6 +191,52 @@
     });
   }
 
+  function renderPaperFigureGuides() {
+    const container = byId("paper-figure-guides");
+    container.replaceChildren();
+    data.paperFigureGuides.forEach((figure) => {
+      const card = el("article", "figure-guide");
+
+      const media = el("a", figure.imageUrl ? "figure-media has-image" : "figure-media");
+      media.href = figure.sourceUrl;
+      media.target = "_blank";
+      media.rel = "noreferrer";
+      if (figure.imageUrl) {
+        const img = document.createElement("img");
+        img.src = figure.imageUrl;
+        img.alt = `${figure.title} original figure`;
+        img.loading = "lazy";
+        media.append(img);
+        media.append(el("span", "figure-open-label", "点击查看原图来源"));
+      } else {
+        media.append(el("span", "figure-placeholder", "原图见论文 / 官方页"));
+      }
+
+      const body = el("div", "figure-body");
+      const source = el("a", "figure-source", figure.sourceTitle);
+      source.href = figure.sourceUrl;
+      source.target = "_blank";
+      source.rel = "noreferrer";
+      body.append(el("h3", "", figure.title), source);
+      body.append(labelText("原图入口", figure.originalFigure));
+
+      const steps = el("ol", "figure-steps");
+      figure.simplified.forEach((step) => steps.append(el("li", "", step)));
+      body.append(steps);
+      body.append(labelText("读图重点", figure.watchFor));
+
+      const simplified = el("div", "simplified-flow");
+      figure.simplified.forEach((step, index) => {
+        const shortStep = step.split("，")[0].replaceAll("。", "");
+        simplified.append(el("span", "simple-step", `${index + 1}. ${shortStep}`));
+      });
+      body.append(simplified);
+
+      card.append(media, body);
+      container.append(card);
+    });
+  }
+
   function findDiagramNode(diagram, id) {
     return diagram.nodes.find((node) => node.id === id);
   }
@@ -425,6 +471,7 @@
   function init() {
     renderCounts();
     renderVisualFigures();
+    renderPaperFigureGuides();
     renderToc();
     renderPrinciples();
     renderLearningPath();

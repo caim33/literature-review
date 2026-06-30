@@ -221,90 +221,84 @@ const vlmMapData = {
       readAs: ["看 contrastive 和 caption loss 是否同时存在", "BLIP 的 captioner/filter 是数据清洗核心", "PaLI/CoCa 说明生成和检索可以合流"]
     },
     {
-      kicker: "Frozen Bridge",
-      title: "BLIP-2 / InstructBLIP：Q-Former 桥接",
-      summary: "冻结强视觉编码器和 LLM，只训练轻量 Q-Former，把海量视觉 token 压缩成 LLM 能消费的查询表示。",
+      kicker: "Frozen Backbone Bridge",
+      title: "BLIP-2 / InstructBLIP：Q-Former 桥接冻结模型",
+      summary: "BLIP-2 的关键不是把所有模型端到端训练，而是在冻结视觉编码器和冻结 LLM 之间训练一个轻量 Q-Former，把视觉压成少量查询 token。",
       sourceUrl: "https://arxiv.org/abs/2301.12597",
       nodes: [
-        { label: "Frozen image encoder", detail: "CLIP / EVA visual tokens", x: 38, y: 92, w: 176, h: 78, kind: "vision" },
-        { label: "Learned queries", detail: "small query set", x: 258, y: 40, w: 150, h: 66, kind: "connector" },
-        { label: "Q-Former", detail: "query transformer bridge", x: 258, y: 150, w: 180, h: 82, kind: "connector" },
-        { label: "Frozen LLM", detail: "OPT / FlanT5 / Vicuna", x: 500, y: 112, w: 166, h: 76, kind: "language" },
-        { label: "Instruction answer", detail: "caption / VQA / dialogue", x: 718, y: 112, w: 150, h: 76, kind: "output" }
+        { label: "Frozen Image Encoder", detail: "CLIP/EVA 视觉编码器", x: 38, y: 104, w: 168, h: 76, kind: "vision" },
+        { label: "Learned Queries", detail: "少量 query 抽视觉信息", x: 250, y: 48, w: 170, h: 72, kind: "connector" },
+        { label: "Q-Former", detail: "查询 Transformer 压缩对齐", x: 250, y: 164, w: 170, h: 72, kind: "connector" },
+        { label: "Frozen LLM", detail: "OPT / FlanT5 / Vicuna", x: 500, y: 104, w: 160, h: 76, kind: "language" },
+        { label: "Instruction VLM", detail: "caption / VQA / chat", x: 724, y: 104, w: 158, h: 76, kind: "output" }
       ],
       edges: [
-        { from: 0, to: 2, label: "read visual tokens" },
-        { from: 1, to: 2, label: "query bottleneck" },
-        { from: 2, to: 3, label: "project to LLM" },
-        { from: 3, to: 4, label: "decode" }
+        { from: 0, to: 2, label: "visual tokens" },
+        { from: 1, to: 2, label: "learned queries" },
+        { from: 2, to: 3, label: "projected tokens" },
+        { from: 3, to: 4, label: "generate" }
       ],
-      readAs: ["哪些模块冻结、哪些模块训练最关键", "query 数量决定视觉信息瓶颈", "InstructBLIP 把 instruction 注入 Q-Former"]
+      readAs: ["哪些模块冻结，哪些模块训练", "query 数量和压缩瓶颈", "InstructBLIP 如何让 Q-Former instruction-aware"]
     },
     {
       kicker: "Visual Instruction Tuning",
       title: "LLaVA：视觉编码器 + Projector + LLM",
-      summary: "最经典开源 MLLM 骨架：视觉编码器抽 token，MLP projector 对齐到 LLM embedding 空间，再用视觉指令数据 SFT。",
+      summary: "开源 VLM 的教学主线：用 CLIP/SigLIP 视觉编码器抽图像特征，MLP projector 映射到 LLM token 空间，再用视觉指令数据做 SFT。",
       sourceUrl: "https://arxiv.org/abs/2304.08485",
       nodes: [
-        { label: "Image / video", detail: "single image, multi-image, frames", x: 36, y: 100, w: 150, h: 72, kind: "vision" },
-        { label: "CLIP / SigLIP", detail: "visual encoder", x: 228, y: 100, w: 150, h: 72, kind: "vision" },
-        { label: "MLP projector", detail: "visual tokens to LLM space", x: 420, y: 100, w: 158, h: 72, kind: "connector" },
-        { label: "Instruction data", detail: "GPT-4 generated / human curated", x: 420, y: 205, w: 190, h: 68, kind: "data" },
-        { label: "LLM decoder", detail: "Vicuna / LLaMA / Qwen", x: 638, y: 100, w: 160, h: 72, kind: "language" },
-        { label: "Chat response", detail: "answer / reason / describe", x: 638, y: 205, w: 160, h: 68, kind: "output" }
+        { label: "Image / Video", detail: "图片、多图或视频帧", x: 38, y: 84, w: 150, h: 72, kind: "vision" },
+        { label: "CLIP / SigLIP Encoder", detail: "抽取 visual tokens", x: 232, y: 84, w: 176, h: 72, kind: "vision" },
+        { label: "MLP Projector", detail: "映射到 LLM embedding", x: 454, y: 84, w: 160, h: 72, kind: "connector" },
+        { label: "Instruction Data", detail: "GPT-4 合成问答/对话", x: 454, y: 190, w: 170, h: 72, kind: "data" },
+        { label: "LLM Decoder", detail: "Vicuna / LLaMA / Qwen", x: 690, y: 84, w: 170, h: 72, kind: "language" }
       ],
       edges: [
         { from: 0, to: 1, label: "encode" },
-        { from: 1, to: 2, label: "visual features" },
+        { from: 1, to: 2, label: "project" },
         { from: 2, to: 4, label: "visual prefix" },
-        { from: 3, to: 4, label: "SFT" },
-        { from: 4, to: 5, label: "generate" }
+        { from: 3, to: 4, label: "SFT" }
       ],
-      readAs: ["projector 简单不等于数据简单", "重点看 SFT 数据来源和质量", "后续 OneVision 解决多图/视频/高分辨率"]
+      readAs: ["projector 是 MLP 还是更复杂 adapter", "SFT 数据来自真实人工还是闭源模型合成", "是否支持高分辨率、多图和视频"]
     },
     {
-      kicker: "Interleaved Context",
-      title: "Flamingo：图文交错 few-shot",
-      summary: "Flamingo 让 LLM 在图文交错上下文里做 few-shot 推理：视觉 token 先被 Perceiver Resampler 压缩，再通过 gated cross-attention 插层。",
+      kicker: "Interleaved Few-shot",
+      title: "Flamingo：图文交错上下文和少样本学习",
+      summary: "Flamingo 面向图文交错输入：用 Perceiver Resampler 压缩视觉 token，并通过 gated cross-attention 把它们插入冻结 LLM 的推理过程。",
       sourceUrl: "https://arxiv.org/abs/2204.14198",
       nodes: [
-        { label: "Interleaved prompt", detail: "image, text, image, question", x: 34, y: 96, w: 172, h: 78, kind: "data" },
-        { label: "Frozen vision encoder", detail: "multi-image / frames", x: 250, y: 54, w: 168, h: 72, kind: "vision" },
-        { label: "Perceiver Resampler", detail: "fixed visual latents", x: 250, y: 168, w: 178, h: 72, kind: "connector" },
-        { label: "Frozen LLM layers", detail: "language context", x: 500, y: 58, w: 170, h: 72, kind: "language" },
-        { label: "Gated cross-attn", detail: "visual injection between layers", x: 500, y: 170, w: 174, h: 72, kind: "fusion" },
-        { label: "Few-shot answer", detail: "new image/question response", x: 724, y: 116, w: 156, h: 78, kind: "output" }
+        { label: "Interleaved Context", detail: "图片、文本、图片、问题", x: 34, y: 74, w: 164, h: 76, kind: "data" },
+        { label: "Frozen Vision Encoder", detail: "编码图像或视频帧", x: 244, y: 74, w: 170, h: 76, kind: "vision" },
+        { label: "Perceiver Resampler", detail: "压缩成固定 latent", x: 462, y: 74, w: 174, h: 76, kind: "connector" },
+        { label: "Gated Cross-attn", detail: "层间注入视觉信息", x: 462, y: 190, w: 174, h: 76, kind: "fusion" },
+        { label: "Few-shot Answer", detail: "从图文示例泛化", x: 716, y: 130, w: 158, h: 76, kind: "output" }
       ],
       edges: [
-        { from: 0, to: 1, label: "extract media" },
-        { from: 1, to: 2, label: "compress" },
-        { from: 2, to: 4, label: "visual latents" },
-        { from: 3, to: 4, label: "gated fusion" },
-        { from: 4, to: 5, label: "in-context output" }
+        { from: 0, to: 1, label: "visual chunks" },
+        { from: 1, to: 2, label: "features" },
+        { from: 2, to: 3, label: "latents" },
+        { from: 3, to: 4, label: "generate" }
       ],
-      readAs: ["看模型是否真正支持图文交错输入", "Perceiver Resampler 解决视觉 token 太多", "gated cross-attn 与简单 projector 路线不同"]
+      readAs: ["是否原生支持多图交错", "视觉 token 如何压缩", "cross-attention 是插层还是只做输入前缀"]
     },
     {
-      kicker: "High Resolution",
-      title: "Qwen2.5-VL / InternVL：动态分辨率与 OCR",
-      summary: "工程化 VLM 必须处理截图、文档、表格、小目标和视频；关键在动态切图、位置编码、视觉 backbone scaling 和专门数据配方。",
+      kicker: "High-resolution / OCR",
+      title: "Qwen2.5-VL / InternVL：动态分辨率和视觉侧 scaling",
+      summary: "真实应用里文档、图表、UI、OCR 和小目标需要高分辨率处理。Qwen/InternVL 类路线重点看动态切图、位置编码、视觉 backbone scaling 和数据配方。",
       sourceUrl: "https://arxiv.org/abs/2502.13923",
       nodes: [
-        { label: "High-res input", detail: "doc / UI / chart / video", x: 34, y: 102, w: 160, h: 76, kind: "vision" },
-        { label: "Dynamic tiling", detail: "variable patches / crops", x: 240, y: 64, w: 166, h: 72, kind: "vision" },
-        { label: "M-RoPE / positions", detail: "2D + temporal order", x: 240, y: 178, w: 166, h: 72, kind: "connector" },
-        { label: "OCR / doc data", detail: "text, layout, chart QA", x: 468, y: 64, w: 164, h: 72, kind: "data" },
-        { label: "LLM reasoning", detail: "long context / grounding", x: 468, y: 178, w: 164, h: 72, kind: "language" },
-        { label: "Detailed answer", detail: "OCR, locate, video QA", x: 704, y: 118, w: 160, h: 78, kind: "output" }
+        { label: "High-res Image / Video", detail: "文档、截图、长视频", x: 36, y: 84, w: 170, h: 76, kind: "vision" },
+        { label: "Dynamic Resolution", detail: "切图、多尺度 patch", x: 254, y: 84, w: 172, h: 76, kind: "vision" },
+        { label: "Position Encoding", detail: "M-RoPE / 2D / 时间", x: 474, y: 84, w: 172, h: 76, kind: "connector" },
+        { label: "OCR / Doc Data", detail: "图表、文字、grounding", x: 474, y: 196, w: 172, h: 76, kind: "data" },
+        { label: "Detailed VLM", detail: "OCR、定位、长视频", x: 718, y: 84, w: 160, h: 76, kind: "output" }
       ],
       edges: [
-        { from: 0, to: 1, label: "split" },
-        { from: 1, to: 2, label: "preserve layout" },
-        { from: 2, to: 4, label: "visual tokens" },
-        { from: 3, to: 4, label: "task data" },
-        { from: 4, to: 5, label: "answer" }
+        { from: 0, to: 1, label: "tile" },
+        { from: 1, to: 2, label: "place" },
+        { from: 2, to: 4, label: "reason" },
+        { from: 3, to: 4, label: "supervise" }
       ],
-      readAs: ["固定缩放会丢文字和小目标", "位置编码决定文档和视频是否可读", "OCR/图表能力来自专门数据而非只靠模型大"]
+      readAs: ["分辨率策略是否会丢文字", "位置编码如何表达二维/视频", "OCR/文档/图表数据是否足够"]
     },
     {
       kicker: "Unified Generation",
@@ -312,41 +306,158 @@ const vlmMapData = {
       summary: "统一模型同时看懂、回答、生成和编辑图像；核心分歧在图像表示、理解/生成路径是否共享，以及 AR、diffusion、flow loss 如何混合。",
       sourceUrl: "https://arxiv.org/abs/2505.14683",
       nodes: [
-        { label: "Text tokens", detail: "next-token language", x: 36, y: 64, w: 150, h: 70, kind: "language" },
-        { label: "Understanding tokens", detail: "ViT / SigLIP visual tokens", x: 36, y: 180, w: 178, h: 70, kind: "vision" },
-        { label: "Generation latents", detail: "VAE latent / image tokens / noise", x: 256, y: 180, w: 190, h: 70, kind: "generator" },
-        { label: "Shared / expert transformer", detail: "MoT / decoupled paths / mixed loss", x: 494, y: 116, w: 214, h: 90, kind: "fusion" },
-        { label: "Answer + image + edit", detail: "VQA, T2I, editing, interleaved output", x: 754, y: 116, w: 150, h: 90, kind: "output" }
+        { id: "text", label: "Text Tokens", detail: "next-token language", x: 36, y: 64, w: 150, h: 70, kind: "language" },
+        { id: "understand", label: "Understanding Tokens", detail: "ViT / SigLIP visual tokens", x: 36, y: 180, w: 178, h: 70, kind: "vision" },
+        { id: "generate", label: "Generation Latents", detail: "VAE latent / image tokens / noise", x: 256, y: 180, w: 190, h: 70, kind: "generator" },
+        { id: "shared", label: "Shared / Decoupled Transformer", detail: "BAGEL 共享 attention + MoT；Janus 解耦视觉编码；Transfusion 混合 loss。", x: 494, y: 116, w: 214, h: 90, kind: "fusion" },
+        { id: "output", label: "Answer + Image + Edit", detail: "回答问题、生成图像、编辑图像、预测未来帧。", x: 754, y: 116, w: 150, h: 90, kind: "output" }
       ],
       edges: [
-        { from: 0, to: 3, label: "AR text" },
+        { from: 0, to: 3, label: "text context" },
         { from: 1, to: 3, label: "understand" },
         { from: 2, to: 3, label: "generate" },
-        { from: 3, to: 4, label: "unified output" }
+        { from: 3, to: 4, label: "unify" }
       ],
-      readAs: ["BAGEL 不是单独加扩散，而是统一 token/latent 和专家", "Janus 解耦理解和生成视觉路径", "Transfusion 混合 language next-token 与 image diffusion"]
+      readAs: ["理解和生成视觉路径是否共享", "图像是离散 token 还是连续 latent", "loss 是 AR、diffusion 还是 rectified flow"]
     },
     {
       kicker: "Evaluation Stack",
-      title: "VLM 评测栈：按能力分层看榜单",
-      summary: "一个榜单不能代表 VLM 总能力；要把 VQA、OCR/文档、图表数学、综合推理、幻觉安全和视频理解拆开看。",
+      title: "VLM 评测栈：别用一个榜单判断模型",
+      summary: "VLM 能力要分层评测：基础 VQA、OCR/文档、图表数学、综合推理、幻觉安全和视频长上下文回答的是不同问题。",
       sourceUrl: "https://arxiv.org/abs/2311.16502",
       nodes: [
-        { label: "Basic VQA", detail: "VQAv2 / GQA / OK-VQA", x: 34, y: 66, w: 154, h: 70, kind: "benchmark" },
-        { label: "OCR / Doc / Chart", detail: "TextVQA / DocVQA / ChartQA", x: 232, y: 66, w: 178, h: 70, kind: "benchmark" },
-        { label: "Reasoning", detail: "MMMU / MathVista / MM-Vet", x: 454, y: 66, w: 172, h: 70, kind: "benchmark" },
-        { label: "Hallucination / safety", detail: "POPE / HallusionBench", x: 232, y: 180, w: 178, h: 70, kind: "loss" },
-        { label: "Video / long context", detail: "Video-MME / SEED-Bench", x: 454, y: 180, w: 172, h: 70, kind: "benchmark" },
-        { label: "Deployment readout", detail: "choose by task, not one score", x: 700, y: 122, w: 160, h: 76, kind: "output" }
+        { label: "VQA / Caption", detail: "VQAv2 / GQA / OK-VQA", x: 38, y: 56, w: 170, h: 76, kind: "benchmark" },
+        { label: "OCR / Doc / Chart", detail: "TextVQA / DocVQA / ChartQA", x: 38, y: 188, w: 180, h: 76, kind: "benchmark" },
+        { label: "Reasoning", detail: "MMMU / MathVista / MM-Vet", x: 292, y: 122, w: 178, h: 76, kind: "benchmark" },
+        { label: "Hallucination / Safety", detail: "POPE / HallusionBench", x: 548, y: 56, w: 184, h: 76, kind: "benchmark" },
+        { label: "Video", detail: "SEED-Bench / Video-MME", x: 548, y: 188, w: 170, h: 76, kind: "benchmark" }
       ],
       edges: [
         { from: 0, to: 2, label: "perception" },
-        { from: 1, to: 2, label: "document reasoning" },
-        { from: 2, to: 5, label: "capability score" },
-        { from: 3, to: 5, label: "risk score" },
-        { from: 4, to: 5, label: "temporal ability" }
+        { from: 1, to: 2, label: "documents" },
+        { from: 2, to: 3, label: "risk" },
+        { from: 4, to: 2, label: "time" }
       ],
-      readAs: ["MMMU 高不代表 OCR/视频都强", "开放生成和选择题评分不可混看", "幻觉与安全要独立评估"]
+      readAs: ["benchmark 测的是哪类能力", "选择题和开放生成评分不可混看", "幻觉/安全要单独评估"]
+    }
+  ],
+  paperFigureGuides: [
+    {
+      title: "CLIP：双塔对比学习和 zero-shot 分类",
+      sourceTitle: "CLIP Figure 1",
+      sourceUrl: "https://arxiv.org/abs/2103.00020",
+      imageUrl: "./assets/figures/clip_fig1_contrastive_zeroshot.png",
+      originalFigure: "Summary of CLIP’s approach and zero-shot classifier.",
+      simplified: [
+        "图像和文本分别编码，不做早融合。",
+        "batch 内做图文配对对比学习。",
+        "测试时用文本编码器合成 zero-shot classifier。"
+      ],
+      watchFor: "双塔结构、batch 内对比和 zero-shot classifier。"
+    },
+    {
+      title: "BLIP-2：Q-Former 桥接冻结模型",
+      sourceTitle: "BLIP-2 Figure 1",
+      sourceUrl: "https://arxiv.org/abs/2301.12597",
+      imageUrl: "./assets/figures/blip2_fig1_qformer_bridge.png",
+      originalFigure: "Overview of BLIP-2’s framework.",
+      simplified: [
+        "冻结 image encoder 和 LLM。",
+        "训练 Q-Former 把视觉特征压成 query token。",
+        "再把 query token 接到 LLM 上做生成。"
+      ],
+      watchFor: "信息瓶颈、冻结模块和两阶段训练。"
+    },
+    {
+      title: "Flamingo：图文交错 few-shot",
+      sourceTitle: "Flamingo Figure 3",
+      sourceUrl: "https://arxiv.org/abs/2204.14198",
+      imageUrl: "./assets/figures/flamingo_fig3_architecture.png",
+      originalFigure: "Flamingo architecture overview.",
+      simplified: [
+        "视觉输入可以是图像或视频。",
+        "Perceiver Resampler 压缩视觉特征。",
+        "gated cross-attn 在 LLM 层间注入视觉信息。"
+      ],
+      watchFor: "图文交错输入、视觉压缩和层间 cross-attn。"
+    },
+    {
+      title: "LLaVA：视觉编码器 + Projector + LLM",
+      sourceTitle: "LLaVA Figure 1",
+      sourceUrl: "https://arxiv.org/abs/2304.08485",
+      imageUrl: "./assets/figures/llava_fig1_architecture.png",
+      originalFigure: "LLaVA network architecture.",
+      simplified: [
+        "CLIP 视觉编码器抽图像特征。",
+        "Projector 把视觉特征接到语言模型。",
+        "用 GPT-4 合成的视觉指令数据做微调。"
+      ],
+      watchFor: "projector 是最小桥接层，真正拉开差距的是指令数据。"
+    },
+    {
+      title: "Qwen2.5-VL：动态分辨率与 OCR",
+      sourceTitle: "Qwen2.5-VL Figure 1",
+      sourceUrl: "https://arxiv.org/abs/2502.13923",
+      imageUrl: "./assets/figures/qwen25vl_fig1_overview.png",
+      originalFigure: "Model overview and dynamic resolution pipeline.",
+      simplified: [
+        "输入先按内容和尺寸动态切分。",
+        "位置编码保留空间和时间结构。",
+        "专门 OCR / 文档 / 图表数据补齐真实任务能力。"
+      ],
+      watchFor: "动态分辨率和 OCR 细节，而不是只看模型名字。"
+    },
+    {
+      title: "InternVL：视觉侧 scaling + 对齐",
+      sourceTitle: "InternVL Figure 1",
+      sourceUrl: "https://arxiv.org/abs/2312.14238",
+      imageUrl: "./assets/figures/internvl_fig1_scaling.png",
+      originalFigure: "Scale vision foundation model and align to LLM.",
+      simplified: [
+        "先扩大视觉 backbone 能力。",
+        "再把更强的视觉表征对齐到语言模型。",
+        "对照 LLaVA / Qwen 看视觉侧投入的价值。"
+      ],
+      watchFor: "别把 VLM 只理解成 projector + LLM。"
+    },
+    {
+      title: "Janus-Pro：理解与生成路径解耦",
+      sourceTitle: "Janus-Pro Figure 2",
+      sourceUrl: "https://arxiv.org/abs/2501.17811",
+      imageUrl: "./assets/figures/januspro_fig2_unified.png",
+      originalFigure: "Unified multimodal understanding and generation.",
+      simplified: [
+        "理解和生成不共享同一条视觉编码路径。",
+        "分离路径缓解目标冲突。",
+        "再用数据和规模把统一能力做强。"
+      ],
+      watchFor: "理解/生成分叉点和路径解耦。"
+    },
+    {
+      title: "Transfusion：文本 next-token + 图像 diffusion",
+      sourceTitle: "Transfusion Figure 1",
+      sourceUrl: "https://arxiv.org/abs/2408.11039",
+      imageUrl: "./assets/figures/transfusion_fig1_transformer.png",
+      originalFigure: "One Transformer for text and image generation.",
+      simplified: [
+        "文本仍然走 next-token prediction。",
+        "图像走 diffusion / continuous latent path。",
+        "同一个 Transformer 统一训练两类目标。"
+      ],
+      watchFor: "离散语言和连续图像目标怎么共存。"
+    },
+    {
+      title: "BAGEL：MoT + shared multimodal self-attention",
+      sourceTitle: "BAGEL Figure 2",
+      sourceUrl: "https://arxiv.org/abs/2505.14683",
+      imageUrl: "./assets/figures/bagel_fig2_mot_shared_attention.png",
+      originalFigure: "MoT and shared multimodal self-attention.",
+      simplified: [
+        "理解 expert 处理文本和 ViT token。",
+        "生成 expert 处理 VAE latent。",
+        "共享多模态 self-attention 连接理解与生成。"
+      ],
+      watchFor: "MoT 分工和共享 attention 的结合。"
     }
   ],
   paradigmDiagrams: [
