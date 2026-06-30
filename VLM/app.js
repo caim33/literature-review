@@ -81,6 +81,116 @@
     });
   }
 
+  function svgEl(tag, attrs = {}) {
+    const svgNS = "http://www.w3.org/2000/svg";
+    const node = document.createElementNS(svgNS, tag);
+    Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, value));
+    return node;
+  }
+
+  function renderSvgText(parent, lines, x, y, className, fill) {
+    lines.forEach((line, index) => {
+      const text = svgEl("text", { x, y: y + index * 17, class: className, fill });
+      text.textContent = line;
+      parent.append(text);
+    });
+  }
+
+  function splitSvgText(text, maxChars) {
+    const words = String(text).split(" ");
+    const lines = [];
+    let current = "";
+    words.forEach((word) => {
+      const next = current ? `${current} ${word}` : word;
+      if (next.length > maxChars && current) {
+        lines.push(current);
+        current = word;
+      } else {
+        current = next;
+      }
+    });
+    if (current) lines.push(current);
+    return lines.slice(0, 3);
+  }
+
+  function renderVisualFigures() {
+    const container = byId("visual-figure-grid");
+    container.replaceChildren();
+    const figurePalette = {
+      vision: ["#f5fffb", "#9fc9ba"],
+      language: ["#f7faff", "#aebfdb"],
+      connector: ["#fbf8ff", "#c7aed7"],
+      fusion: ["#fbf8ff", "#c7aed7"],
+      loss: ["#fff6f0", "#d7ad98"],
+      generator: ["#fff6f0", "#d7ad98"],
+      data: ["#fffff1", "#cacc90"],
+      benchmark: ["#fffff1", "#cacc90"],
+      output: ["#f6fbf2", "#afc6a4"]
+    };
+    data.visualFigureGuides.forEach((figure) => {
+      const card = el("article", "visual-figure-card");
+      const head = el("div", "visual-figure-head");
+      head.append(el("span", "diagram-kicker", figure.kicker));
+      head.append(el("h3", "", figure.title));
+      head.append(el("p", "", figure.summary));
+
+      const svg = svgEl("svg", { class: "visual-figure-svg", viewBox: "0 0 920 320", role: "img", "aria-label": figure.title });
+      const defs = svgEl("defs");
+      const marker = svgEl("marker", { id: `arrow-${figure.title.replace(/\W+/g, "-")}`, viewBox: "0 0 10 10", refX: "8", refY: "5", markerWidth: "7", markerHeight: "7", orient: "auto-start-reverse" });
+      const markerPath = svgEl("path", { d: "M 0 0 L 10 5 L 0 10 z", class: "figure-arrow-head", fill: "#8a9b95" });
+      marker.append(markerPath);
+      defs.append(marker);
+      svg.append(defs);
+
+      figure.edges.forEach((edge) => {
+        const from = figure.nodes[edge.from];
+        const to = figure.nodes[edge.to];
+        const startX = from.x + from.w;
+        const startY = from.y + from.h / 2;
+        const endX = to.x;
+        const endY = to.y + to.h / 2;
+        const midX = (startX + endX) / 2;
+        const path = svgEl("path", {
+          d: `M ${startX} ${startY} C ${midX} ${startY}, ${midX} ${endY}, ${endX - 8} ${endY}`,
+          class: "figure-edge-path",
+          fill: "none",
+          stroke: "#8a9b95",
+          "stroke-width": "2.4",
+          "marker-end": `url(#arrow-${figure.title.replace(/\W+/g, "-")})`
+        });
+        svg.append(path);
+        const label = svgEl("text", {
+          x: midX - 36,
+          y: Math.min(startY, endY) + Math.abs(startY - endY) / 2 - 8,
+          class: "figure-edge-label",
+          fill: "#5f6e77"
+        });
+        label.textContent = edge.label;
+        svg.append(label);
+      });
+
+      figure.nodes.forEach((node, index) => {
+        const group = svgEl("g", { class: `figure-node ${node.kind}` });
+        const [fill, stroke] = figurePalette[node.kind] || ["#ffffff", "#ccd4ce"];
+        group.append(svgEl("rect", { x: node.x, y: node.y, width: node.w, height: node.h, rx: "9", fill, stroke, "stroke-width": "2" }));
+        const indexText = svgEl("text", { x: node.x + 12, y: node.y + 22, class: "figure-node-index", fill: "#1f6f69" });
+        indexText.textContent = String(index + 1).padStart(2, "0");
+        group.append(indexText);
+        renderSvgText(group, splitSvgText(node.label, 18), node.x + 12, node.y + 43, "figure-node-title", "#1c2430");
+        renderSvgText(group, splitSvgText(node.detail, 23), node.x + 12, node.y + 63, "figure-node-detail", "#5d6b73");
+        svg.append(group);
+      });
+
+      const body = el("div", "visual-figure-body");
+      const list = el("ul", "visual-read-list");
+      figure.readAs.forEach((item) => list.append(el("li", "", item)));
+      const link = linkEl("figure-source", figure.sourceUrl, "打开论文 / 项目入口");
+      body.append(list, link);
+      card.append(head, svg, body);
+      container.append(card);
+    });
+  }
+
   function findDiagramNode(diagram, id) {
     return diagram.nodes.find((node) => node.id === id);
   }
@@ -314,6 +424,7 @@
 
   function init() {
     renderCounts();
+    renderVisualFigures();
     renderToc();
     renderPrinciples();
     renderLearningPath();

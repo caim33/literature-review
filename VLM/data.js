@@ -33,7 +33,7 @@ const vlmMapData = {
       items: [
         { target: "principles", title: "四个心智模型", note: "先把 VLP、VLM、MLLM 和统一生成理解分清。" },
         { target: "learning-path", title: "学习路线", note: "从 CLIP 到 BAGEL 的阅读顺序。" },
-        { target: "paradigm-diagrams", title: "范式图", note: "用图看懂双塔、融合、Q-Former、LLaVA、Flamingo、BAGEL 等架构。" }
+        { target: "visual-figures", title: "范式图", note: "先看 9 张 SVG 图：双塔、融合、Q-Former、LLaVA、Flamingo、BAGEL 等。" }
       ]
     },
     {
@@ -157,6 +157,196 @@ const vlmMapData = {
         "BAGEL 用 MoT 和共享 multimodal self-attention 把理解 token 与生成 latent 放进同一框架。"
       ],
       mustRead: ["BAGEL", "Chameleon", "Show-o", "Janus-Pro", "Transfusion"]
+    }
+  ],
+  visualFigureGuides: [
+    {
+      kicker: "Contrastive Foundation",
+      title: "CLIP / ALIGN：双塔图文对比学习",
+      summary: "图像和文本先分开编码，再用对比学习把匹配样本拉近；现代 VLM 的视觉语义底座从这里开始。",
+      sourceUrl: "https://arxiv.org/abs/2103.00020",
+      nodes: [
+        { label: "Image batch", detail: "网页图像 / LAION / DataComp", x: 32, y: 78, w: 150, h: 68, kind: "vision" },
+        { label: "Vision encoder", detail: "ResNet / ViT / SigLIP", x: 230, y: 54, w: 160, h: 68, kind: "vision" },
+        { label: "Text encoder", detail: "caption / alt-text", x: 230, y: 160, w: 160, h: 68, kind: "language" },
+        { label: "Similarity matrix", detail: "large-batch pair scores", x: 438, y: 106, w: 166, h: 74, kind: "fusion" },
+        { label: "Open-vocab features", detail: "retrieval / zero-shot / backbone", x: 652, y: 106, w: 176, h: 74, kind: "output" }
+      ],
+      edges: [
+        { from: 0, to: 1, label: "image views" },
+        { from: 1, to: 3, label: "image embedding" },
+        { from: 2, to: 3, label: "text embedding" },
+        { from: 3, to: 4, label: "contrastive loss" }
+      ],
+      readAs: ["双塔不提前融合图文 token", "重点看 batch 构造和 loss", "后续 LLaVA/Qwen 常继承视觉侧能力"]
+    },
+    {
+      kicker: "Fusion VLP",
+      title: "ViLBERT / UNITER / ViLT：跨模态融合预训练",
+      summary: "早期 VLP 把区域或 patch token 与文本 token 放进融合 Transformer，用 MLM、ITM、MRM 等任务学习细粒度对齐。",
+      sourceUrl: "https://arxiv.org/abs/1909.11740",
+      nodes: [
+        { label: "Image regions", detail: "detector regions / patches", x: 34, y: 62, w: 156, h: 70, kind: "vision" },
+        { label: "Text tokens", detail: "caption / question", x: 34, y: 168, w: 156, h: 70, kind: "language" },
+        { label: "Single / two stream", detail: "co-attention or shared transformer", x: 254, y: 94, w: 220, h: 104, kind: "fusion" },
+        { label: "Pretrain heads", detail: "MLM / ITM / MRM", x: 540, y: 82, w: 150, h: 70, kind: "loss" },
+        { label: "Downstream heads", detail: "VQA / retrieval / grounding", x: 540, y: 178, w: 170, h: 70, kind: "output" }
+      ],
+      edges: [
+        { from: 0, to: 2, label: "visual tokens" },
+        { from: 1, to: 2, label: "word tokens" },
+        { from: 2, to: 3, label: "self/cross attention" },
+        { from: 2, to: 4, label: "fused representation" }
+      ],
+      readAs: ["先问视觉输入是 region 还是 patch", "看 single-stream / two-stream 差异", "判别式任务多，和生成式 VLM 对照读"]
+    },
+    {
+      kicker: "Generative VLM",
+      title: "BLIP / CoCa / PaLI：对齐与生成合并",
+      summary: "把 CLIP 式对齐、caption 生成和 VQA/检索等任务放进同一个训练配方，让模型从表征走向生成。",
+      sourceUrl: "https://arxiv.org/abs/2201.12086",
+      nodes: [
+        { label: "Image encoder", detail: "ViT visual tokens", x: 40, y: 100, w: 160, h: 72, kind: "vision" },
+        { label: "Alignment losses", detail: "ITC / ITM / filtering", x: 250, y: 54, w: 170, h: 76, kind: "loss" },
+        { label: "Text decoder", detail: "caption / answer generation", x: 250, y: 168, w: 170, h: 76, kind: "language" },
+        { label: "Multi-task data", detail: "caption / VQA / OCR / multilingual", x: 470, y: 108, w: 180, h: 76, kind: "data" },
+        { label: "Unified outputs", detail: "retrieval + VQA + caption", x: 700, y: 108, w: 158, h: 76, kind: "output" }
+      ],
+      edges: [
+        { from: 0, to: 1, label: "align" },
+        { from: 0, to: 2, label: "condition" },
+        { from: 3, to: 2, label: "supervise" },
+        { from: 2, to: 4, label: "generate" }
+      ],
+      readAs: ["看 contrastive 和 caption loss 是否同时存在", "BLIP 的 captioner/filter 是数据清洗核心", "PaLI/CoCa 说明生成和检索可以合流"]
+    },
+    {
+      kicker: "Frozen Bridge",
+      title: "BLIP-2 / InstructBLIP：Q-Former 桥接",
+      summary: "冻结强视觉编码器和 LLM，只训练轻量 Q-Former，把海量视觉 token 压缩成 LLM 能消费的查询表示。",
+      sourceUrl: "https://arxiv.org/abs/2301.12597",
+      nodes: [
+        { label: "Frozen image encoder", detail: "CLIP / EVA visual tokens", x: 38, y: 92, w: 176, h: 78, kind: "vision" },
+        { label: "Learned queries", detail: "small query set", x: 258, y: 40, w: 150, h: 66, kind: "connector" },
+        { label: "Q-Former", detail: "query transformer bridge", x: 258, y: 150, w: 180, h: 82, kind: "connector" },
+        { label: "Frozen LLM", detail: "OPT / FlanT5 / Vicuna", x: 500, y: 112, w: 166, h: 76, kind: "language" },
+        { label: "Instruction answer", detail: "caption / VQA / dialogue", x: 718, y: 112, w: 150, h: 76, kind: "output" }
+      ],
+      edges: [
+        { from: 0, to: 2, label: "read visual tokens" },
+        { from: 1, to: 2, label: "query bottleneck" },
+        { from: 2, to: 3, label: "project to LLM" },
+        { from: 3, to: 4, label: "decode" }
+      ],
+      readAs: ["哪些模块冻结、哪些模块训练最关键", "query 数量决定视觉信息瓶颈", "InstructBLIP 把 instruction 注入 Q-Former"]
+    },
+    {
+      kicker: "Visual Instruction Tuning",
+      title: "LLaVA：视觉编码器 + Projector + LLM",
+      summary: "最经典开源 MLLM 骨架：视觉编码器抽 token，MLP projector 对齐到 LLM embedding 空间，再用视觉指令数据 SFT。",
+      sourceUrl: "https://arxiv.org/abs/2304.08485",
+      nodes: [
+        { label: "Image / video", detail: "single image, multi-image, frames", x: 36, y: 100, w: 150, h: 72, kind: "vision" },
+        { label: "CLIP / SigLIP", detail: "visual encoder", x: 228, y: 100, w: 150, h: 72, kind: "vision" },
+        { label: "MLP projector", detail: "visual tokens to LLM space", x: 420, y: 100, w: 158, h: 72, kind: "connector" },
+        { label: "Instruction data", detail: "GPT-4 generated / human curated", x: 420, y: 205, w: 190, h: 68, kind: "data" },
+        { label: "LLM decoder", detail: "Vicuna / LLaMA / Qwen", x: 638, y: 100, w: 160, h: 72, kind: "language" },
+        { label: "Chat response", detail: "answer / reason / describe", x: 638, y: 205, w: 160, h: 68, kind: "output" }
+      ],
+      edges: [
+        { from: 0, to: 1, label: "encode" },
+        { from: 1, to: 2, label: "visual features" },
+        { from: 2, to: 4, label: "visual prefix" },
+        { from: 3, to: 4, label: "SFT" },
+        { from: 4, to: 5, label: "generate" }
+      ],
+      readAs: ["projector 简单不等于数据简单", "重点看 SFT 数据来源和质量", "后续 OneVision 解决多图/视频/高分辨率"]
+    },
+    {
+      kicker: "Interleaved Context",
+      title: "Flamingo：图文交错 few-shot",
+      summary: "Flamingo 让 LLM 在图文交错上下文里做 few-shot 推理：视觉 token 先被 Perceiver Resampler 压缩，再通过 gated cross-attention 插层。",
+      sourceUrl: "https://arxiv.org/abs/2204.14198",
+      nodes: [
+        { label: "Interleaved prompt", detail: "image, text, image, question", x: 34, y: 96, w: 172, h: 78, kind: "data" },
+        { label: "Frozen vision encoder", detail: "multi-image / frames", x: 250, y: 54, w: 168, h: 72, kind: "vision" },
+        { label: "Perceiver Resampler", detail: "fixed visual latents", x: 250, y: 168, w: 178, h: 72, kind: "connector" },
+        { label: "Frozen LLM layers", detail: "language context", x: 500, y: 58, w: 170, h: 72, kind: "language" },
+        { label: "Gated cross-attn", detail: "visual injection between layers", x: 500, y: 170, w: 174, h: 72, kind: "fusion" },
+        { label: "Few-shot answer", detail: "new image/question response", x: 724, y: 116, w: 156, h: 78, kind: "output" }
+      ],
+      edges: [
+        { from: 0, to: 1, label: "extract media" },
+        { from: 1, to: 2, label: "compress" },
+        { from: 2, to: 4, label: "visual latents" },
+        { from: 3, to: 4, label: "gated fusion" },
+        { from: 4, to: 5, label: "in-context output" }
+      ],
+      readAs: ["看模型是否真正支持图文交错输入", "Perceiver Resampler 解决视觉 token 太多", "gated cross-attn 与简单 projector 路线不同"]
+    },
+    {
+      kicker: "High Resolution",
+      title: "Qwen2.5-VL / InternVL：动态分辨率与 OCR",
+      summary: "工程化 VLM 必须处理截图、文档、表格、小目标和视频；关键在动态切图、位置编码、视觉 backbone scaling 和专门数据配方。",
+      sourceUrl: "https://arxiv.org/abs/2502.13923",
+      nodes: [
+        { label: "High-res input", detail: "doc / UI / chart / video", x: 34, y: 102, w: 160, h: 76, kind: "vision" },
+        { label: "Dynamic tiling", detail: "variable patches / crops", x: 240, y: 64, w: 166, h: 72, kind: "vision" },
+        { label: "M-RoPE / positions", detail: "2D + temporal order", x: 240, y: 178, w: 166, h: 72, kind: "connector" },
+        { label: "OCR / doc data", detail: "text, layout, chart QA", x: 468, y: 64, w: 164, h: 72, kind: "data" },
+        { label: "LLM reasoning", detail: "long context / grounding", x: 468, y: 178, w: 164, h: 72, kind: "language" },
+        { label: "Detailed answer", detail: "OCR, locate, video QA", x: 704, y: 118, w: 160, h: 78, kind: "output" }
+      ],
+      edges: [
+        { from: 0, to: 1, label: "split" },
+        { from: 1, to: 2, label: "preserve layout" },
+        { from: 2, to: 4, label: "visual tokens" },
+        { from: 3, to: 4, label: "task data" },
+        { from: 4, to: 5, label: "answer" }
+      ],
+      readAs: ["固定缩放会丢文字和小目标", "位置编码决定文档和视频是否可读", "OCR/图表能力来自专门数据而非只靠模型大"]
+    },
+    {
+      kicker: "Unified Generation",
+      title: "BAGEL / Janus / Transfusion：理解与生成统一",
+      summary: "统一模型同时看懂、回答、生成和编辑图像；核心分歧在图像表示、理解/生成路径是否共享，以及 AR、diffusion、flow loss 如何混合。",
+      sourceUrl: "https://arxiv.org/abs/2505.14683",
+      nodes: [
+        { label: "Text tokens", detail: "next-token language", x: 36, y: 64, w: 150, h: 70, kind: "language" },
+        { label: "Understanding tokens", detail: "ViT / SigLIP visual tokens", x: 36, y: 180, w: 178, h: 70, kind: "vision" },
+        { label: "Generation latents", detail: "VAE latent / image tokens / noise", x: 256, y: 180, w: 190, h: 70, kind: "generator" },
+        { label: "Shared / expert transformer", detail: "MoT / decoupled paths / mixed loss", x: 494, y: 116, w: 214, h: 90, kind: "fusion" },
+        { label: "Answer + image + edit", detail: "VQA, T2I, editing, interleaved output", x: 754, y: 116, w: 150, h: 90, kind: "output" }
+      ],
+      edges: [
+        { from: 0, to: 3, label: "AR text" },
+        { from: 1, to: 3, label: "understand" },
+        { from: 2, to: 3, label: "generate" },
+        { from: 3, to: 4, label: "unified output" }
+      ],
+      readAs: ["BAGEL 不是单独加扩散，而是统一 token/latent 和专家", "Janus 解耦理解和生成视觉路径", "Transfusion 混合 language next-token 与 image diffusion"]
+    },
+    {
+      kicker: "Evaluation Stack",
+      title: "VLM 评测栈：按能力分层看榜单",
+      summary: "一个榜单不能代表 VLM 总能力；要把 VQA、OCR/文档、图表数学、综合推理、幻觉安全和视频理解拆开看。",
+      sourceUrl: "https://arxiv.org/abs/2311.16502",
+      nodes: [
+        { label: "Basic VQA", detail: "VQAv2 / GQA / OK-VQA", x: 34, y: 66, w: 154, h: 70, kind: "benchmark" },
+        { label: "OCR / Doc / Chart", detail: "TextVQA / DocVQA / ChartQA", x: 232, y: 66, w: 178, h: 70, kind: "benchmark" },
+        { label: "Reasoning", detail: "MMMU / MathVista / MM-Vet", x: 454, y: 66, w: 172, h: 70, kind: "benchmark" },
+        { label: "Hallucination / safety", detail: "POPE / HallusionBench", x: 232, y: 180, w: 178, h: 70, kind: "loss" },
+        { label: "Video / long context", detail: "Video-MME / SEED-Bench", x: 454, y: 180, w: 172, h: 70, kind: "benchmark" },
+        { label: "Deployment readout", detail: "choose by task, not one score", x: 700, y: 122, w: 160, h: 76, kind: "output" }
+      ],
+      edges: [
+        { from: 0, to: 2, label: "perception" },
+        { from: 1, to: 2, label: "document reasoning" },
+        { from: 2, to: 5, label: "capability score" },
+        { from: 3, to: 5, label: "risk score" },
+        { from: 4, to: 5, label: "temporal ability" }
+      ],
+      readAs: ["MMMU 高不代表 OCR/视频都强", "开放生成和选择题评分不可混看", "幻觉与安全要独立评估"]
     }
   ],
   paradigmDiagrams: [

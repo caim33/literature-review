@@ -302,11 +302,161 @@ h3 {
 
 .path-band,
 .diagram-band,
-.unified-band {
+.unified-band,
+.visual-figures-band {
   width: 100%;
   padding-left: max(1rem, calc((100vw - 1180px) / 2));
   padding-right: max(1rem, calc((100vw - 1180px) / 2));
   background: #edf1ea;
+}
+
+.visual-figures-band {
+  background: #fffaf2;
+}
+
+.visual-figure-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.15rem;
+}
+
+.visual-figure-card {
+  min-width: 0;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.visual-figure-head {
+  display: grid;
+  gap: 0.45rem;
+  padding: 1.1rem 1.15rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.visual-figure-head h3 {
+  margin-bottom: 0;
+  color: var(--accent);
+  font-size: clamp(1.35rem, 3vw, 2.15rem);
+}
+
+.visual-figure-head p {
+  max-width: 980px;
+  margin-bottom: 0;
+  color: #364953;
+  font-weight: 650;
+}
+
+.visual-figure-svg {
+  display: block;
+  width: 100%;
+  min-height: 340px;
+  border-bottom: 1px solid var(--line);
+  background:
+    linear-gradient(#eef3ed 1px, transparent 1px),
+    linear-gradient(90deg, #eef3ed 1px, transparent 1px),
+    #fffdf8;
+  background-size: 40px 40px;
+}
+
+.figure-edge-path {
+  fill: none;
+  stroke: #8a9b95;
+  stroke-width: 2.4;
+}
+
+.figure-arrow-head {
+  fill: #8a9b95;
+}
+
+.figure-edge-label {
+  fill: #5f6e77;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.figure-node rect {
+  fill: #ffffff;
+  stroke: #ccd4ce;
+  stroke-width: 2;
+}
+
+.figure-node.vision rect {
+  fill: #f5fffb;
+  stroke: #9fc9ba;
+}
+
+.figure-node.language rect {
+  fill: #f7faff;
+  stroke: #aebfdb;
+}
+
+.figure-node.connector rect,
+.figure-node.fusion rect {
+  fill: #fbf8ff;
+  stroke: #c7aed7;
+}
+
+.figure-node.loss rect,
+.figure-node.generator rect {
+  fill: #fff6f0;
+  stroke: #d7ad98;
+}
+
+.figure-node.data rect,
+.figure-node.benchmark rect {
+  fill: #fffff1;
+  stroke: #cacc90;
+}
+
+.figure-node.output rect {
+  fill: #f6fbf2;
+  stroke: #afc6a4;
+}
+
+.figure-node-index {
+  fill: var(--accent);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.figure-node-title {
+  fill: var(--ink);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.figure-node-detail {
+  fill: #5d6b73;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.visual-figure-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: start;
+  padding: 1rem 1.15rem;
+}
+
+.visual-read-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.visual-read-list li {
+  min-width: 0;
+  padding: 0.65rem;
+  border-left: 3px solid #9fc9ba;
+  background: #f5fbf7;
+  color: #3f4d55;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
 }
 
 .learning-path {
@@ -904,6 +1054,19 @@ input {
   .benchmark-grid,
   .unified-grid,
   .reference-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .visual-figure-card {
+    overflow-x: auto;
+  }
+
+  .visual-figure-svg {
+    min-width: 880px;
+  }
+
+  .visual-figure-body,
+  .visual-read-list {
     grid-template-columns: 1fr;
   }
 

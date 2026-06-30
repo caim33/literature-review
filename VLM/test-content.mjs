@@ -32,6 +32,8 @@ assert.ok(Array.isArray(data.learningStages), "learningStages should be an array
 assert.ok(data.learningStages.length >= 5, "should include at least 5 learning stages");
 assert.ok(Array.isArray(data.families), "families should be an array");
 assert.ok(data.families.length >= 6, "should include at least 6 VLM families");
+assert.ok(Array.isArray(data.visualFigureGuides), "visualFigureGuides should be an array");
+assert.ok(data.visualFigureGuides.length >= 9, "should include at least 9 visible SVG paradigm figures");
 assert.ok(Array.isArray(data.paradigmDiagrams), "paradigmDiagrams should be an array");
 assert.ok(data.paradigmDiagrams.length >= 8, "should include at least 8 visual paradigm diagrams");
 assert.ok(Array.isArray(data.keyModels), "keyModels should be an array");
@@ -94,6 +96,20 @@ for (const family of data.families) {
   assert.ok(family.takeaway, `${family.id} needs takeaway`);
   assert.ok(Array.isArray(family.patterns) && family.patterns.length >= 3, `${family.id} needs patterns`);
   assert.ok(Array.isArray(family.mustRead) && family.mustRead.length >= 3, `${family.id} needs must-read items`);
+}
+
+for (const figure of data.visualFigureGuides) {
+  assert.ok(figure.title, "visual figure needs title");
+  assert.ok(figure.kicker, `${figure.title} needs kicker`);
+  assert.ok(figure.summary, `${figure.title} needs summary`);
+  assert.ok(Array.isArray(figure.nodes) && figure.nodes.length >= 4, `${figure.title} needs at least 4 SVG nodes`);
+  assert.ok(Array.isArray(figure.edges) && figure.edges.length >= 3, `${figure.title} needs at least 3 SVG edges`);
+  assert.ok(Array.isArray(figure.readAs) && figure.readAs.length >= 3, `${figure.title} needs reading notes`);
+  assert.ok(figure.sourceUrl?.startsWith("http"), `${figure.title} needs source URL`);
+  for (const node of figure.nodes) {
+    assert.ok(node.label, `${figure.title} SVG node needs label`);
+    assert.ok(node.detail, `${figure.title} SVG node needs detail`);
+  }
 }
 
 for (const diagram of data.paradigmDiagrams) {
@@ -171,12 +187,12 @@ function hasAnchor(markup, href, text) {
 }
 
 const html = await readFile(indexPath, "utf8");
-assert.ok(hasAnchor(html, "#paradigm-diagrams", "范式图"), "top navigation should expose paradigm diagrams directly");
-assert.ok(hasAnchor(html, "#paradigm-diagram-gallery", "看范式图"), "hero action should jump directly to the rendered diagram gallery");
-assert.ok(html.includes("./data.js?v=20260630-diagrams3"), "data script should use the diagram cache buster");
-assert.ok(html.includes("./app.js?v=20260630-diagrams3"), "app script should use the diagram cache buster");
+assert.ok(hasAnchor(html, "#visual-figures", "范式图"), "top navigation should expose visible paradigm figures directly");
+assert.ok(hasAnchor(html, "#visual-figures", "看范式图"), "hero action should jump directly to the visible SVG figure section");
+assert.ok(html.includes("./data.js?v=20260630-figures2"), "data script should use the figure cache buster");
+assert.ok(html.includes("./app.js?v=20260630-figures2"), "app script should use the figure cache buster");
 const siteHtml = await readFile(siteIndexPath, "utf8");
-assert.ok(hasAnchor(siteHtml, "./VLM/#paradigm-diagram-gallery", "VLM 多模态大模型学习地图"), "site homepage should deep-link the VLM card to the diagram gallery");
+assert.ok(hasAnchor(siteHtml, "./VLM/#visual-figures", "VLM 多模态大模型学习地图"), "site homepage should deep-link the VLM card to visible figures");
 assert.ok(siteHtml.includes("9 张范式图"), "site homepage should advertise VLM paradigm diagrams");
 for (const group of data.tocGroups) {
   for (const item of group.items) {
@@ -186,6 +202,8 @@ for (const group of data.tocGroups) {
 
 for (const id of [
   "contents",
+  "visual-figures",
+  "visual-figure-grid",
   "page-toc",
   "principles",
   "learning-path",
@@ -207,6 +225,7 @@ for (const id of [
 const app = await readFile(appPath, "utf8");
 for (const fn of [
   "renderToc",
+  "renderVisualFigures",
   "renderPrinciples",
   "renderLearningPath",
   "renderParadigmDiagrams",
@@ -225,6 +244,8 @@ for (const fn of [
 assert.ok(app.includes("decodeURIComponent(window.location.hash.slice(1))"), "app should decode the current hash after dynamic rendering");
 assert.ok(app.includes("window.scrollTo({"), "app should restore hash scroll after dynamic rendering");
 assert.ok(app.includes("target.getBoundingClientRect().top + window.scrollY"), "app should align to the target's final document position");
+assert.ok(app.includes("createElementNS(svgNS"), "app should render visible SVG figures");
+assert.ok(app.includes("figurePalette"), "app should assign explicit SVG colors for visible figures");
 assert.ok(app.includes("requestAnimationFrame(alignTarget)"), "app should defer hash scrolling until layout settles");
 assert.ok(app.includes("setTimeout(alignTarget, 120)"), "app should restore hash scroll after native anchor scrolling");
 assert.ok(app.includes("setTimeout(alignTarget, 450)"), "app should restore hash scroll after smooth anchor scrolling");
@@ -237,6 +258,9 @@ for (const className of [
   "toc-card",
   "principle-grid",
   "learning-path",
+  "visual-figure-grid",
+  "visual-figure-card",
+  "visual-figure-svg",
   "paradigm-diagram-gallery",
   "paradigm-diagram-card",
   "diagram-node",
