@@ -295,11 +295,22 @@
     const alignTarget = () => {
       const target = byId(id);
       if (!target) return;
-      target.scrollIntoView();
+      const previousScrollBehavior = document.documentElement.style.scrollBehavior;
+      document.documentElement.style.scrollBehavior = "auto";
+      window.scrollTo({
+        top: Math.max(0, target.getBoundingClientRect().top + window.scrollY),
+        left: 0,
+        behavior: "auto"
+      });
+      document.documentElement.style.scrollBehavior = previousScrollBehavior;
     };
     requestAnimationFrame(alignTarget);
+    setTimeout(alignTarget, 120);
+    setTimeout(alignTarget, 450);
     window.addEventListener("load", alignTarget, { once: true });
   }
+
+  window.addEventListener("hashchange", restoreHashScroll);
 
   function init() {
     renderCounts();
