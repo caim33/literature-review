@@ -289,6 +289,18 @@
     byId("model-search").addEventListener("input", applyModelSearch);
   }
 
+  function restoreHashScroll() {
+    if (!window.location.hash) return;
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    const alignTarget = () => {
+      const target = byId(id);
+      if (!target) return;
+      target.scrollIntoView();
+    };
+    requestAnimationFrame(alignTarget);
+    window.addEventListener("load", alignTarget, { once: true });
+  }
+
   function init() {
     renderCounts();
     renderToc();
@@ -303,6 +315,7 @@
     renderReferences();
     renderGlossary();
     bind();
+    restoreHashScroll();
   }
 
   init();

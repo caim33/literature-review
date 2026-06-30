@@ -173,8 +173,8 @@ function hasAnchor(markup, href, text) {
 const html = await readFile(indexPath, "utf8");
 assert.ok(hasAnchor(html, "#paradigm-diagrams", "范式图"), "top navigation should expose paradigm diagrams directly");
 assert.ok(hasAnchor(html, "#paradigm-diagram-gallery", "看范式图"), "hero action should jump directly to the rendered diagram gallery");
-assert.ok(html.includes("./data.js?v=20260630-diagrams"), "data script should use the diagram cache buster");
-assert.ok(html.includes("./app.js?v=20260630-diagrams"), "app script should use the diagram cache buster");
+assert.ok(html.includes("./data.js?v=20260630-diagrams2"), "data script should use the diagram cache buster");
+assert.ok(html.includes("./app.js?v=20260630-diagrams2"), "app script should use the diagram cache buster");
 const siteHtml = await readFile(siteIndexPath, "utf8");
 assert.ok(hasAnchor(siteHtml, "./VLM/#paradigm-diagram-gallery", "VLM 多模态大模型学习地图"), "site homepage should deep-link the VLM card to the diagram gallery");
 assert.ok(siteHtml.includes("9 张范式图"), "site homepage should advertise VLM paradigm diagrams");
@@ -217,10 +217,15 @@ for (const fn of [
   "renderBenchmarkMap",
   "renderReferences",
   "renderGlossary",
+  "restoreHashScroll",
   "applyModelSearch"
 ]) {
   assert.ok(app.includes(fn), `app should include ${fn}`);
 }
+assert.ok(app.includes("decodeURIComponent(window.location.hash.slice(1))"), "app should decode the current hash after dynamic rendering");
+assert.ok(app.includes("target.scrollIntoView()"), "app should restore hash scroll after dynamic rendering");
+assert.ok(app.includes("requestAnimationFrame(alignTarget)"), "app should defer hash scrolling until layout settles");
+assert.ok(app.includes('window.addEventListener("load"'), "app should restore hash scroll again after page load");
 
 const styles = await readFile(stylePath, "utf8");
 for (const className of [
