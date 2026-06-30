@@ -12,11 +12,13 @@ const dataPath = path.join(__dirname, "data.js");
 const indexPath = path.join(__dirname, "index.html");
 const appPath = path.join(__dirname, "app.js");
 const stylePath = path.join(__dirname, "styles.css");
+const siteIndexPath = path.join(__dirname, "..", "index.html");
 
 assert.equal(existsSync(dataPath), true, "data.js should exist");
 assert.equal(existsSync(indexPath), true, "index.html should exist");
 assert.equal(existsSync(appPath), true, "app.js should exist");
 assert.equal(existsSync(stylePath), true, "styles.css should exist");
+assert.equal(existsSync(siteIndexPath), true, "site index.html should exist");
 
 const data = require(dataPath);
 
@@ -162,7 +164,20 @@ for (const ref of data.references) {
   assert.ok(ref.value, `${ref.title} needs learning value`);
 }
 
+function hasAnchor(markup, href, text) {
+  const escapedHref = href.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const escapedText = text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`<a\\b[^>]*href=["']${escapedHref}["'][^>]*>[\\s\\S]*?${escapedText}[\\s\\S]*?</a>`, "s").test(markup);
+}
+
 const html = await readFile(indexPath, "utf8");
+assert.ok(hasAnchor(html, "#paradigm-diagrams", "范式图"), "top navigation should expose paradigm diagrams directly");
+assert.ok(hasAnchor(html, "#paradigm-diagram-gallery", "看范式图"), "hero action should jump directly to the rendered diagram gallery");
+assert.ok(html.includes("./data.js?v=20260630-diagrams"), "data script should use the diagram cache buster");
+assert.ok(html.includes("./app.js?v=20260630-diagrams"), "app script should use the diagram cache buster");
+const siteHtml = await readFile(siteIndexPath, "utf8");
+assert.ok(hasAnchor(siteHtml, "./VLM/#paradigm-diagram-gallery", "VLM 多模态大模型学习地图"), "site homepage should deep-link the VLM card to the diagram gallery");
+assert.ok(siteHtml.includes("9 张范式图"), "site homepage should advertise VLM paradigm diagrams");
 for (const group of data.tocGroups) {
   for (const item of group.items) {
     assert.ok(html.includes(`id="${item.target}"`), `toc target #${item.target} should exist in index`);
