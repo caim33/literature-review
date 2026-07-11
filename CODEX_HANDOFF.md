@@ -111,7 +111,8 @@ Important RL page decisions:
 Validation command for the RL site:
 
 ```bash
-node RL/validate-site.mjs
+cd RL
+node validate-site.mjs
 ```
 
 ## WeCP RL Interview Reference
@@ -485,6 +486,6 @@ When continuing work:
 1. Read this file first.
 2. Run `git status --short --branch`.
 3. For VLM page edits, run `node VLM/test-content.mjs` before committing.
-4. For RL page edits, run `node RL/validate-site.mjs` before committing.
+4. For RL page edits, run `cd RL && node validate-site.mjs` before committing.
 5. For WeCP reference edits, run `node RL/reference/build-wecp-fixed.mjs` and inspect formula rendering.
 6. Keep the RL page practical and visual; avoid turning it into a long undifferentiated paper list.
