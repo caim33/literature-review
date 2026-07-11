@@ -45,6 +45,51 @@ Please read CODEX_HANDOFF.md and continue from the latest repository state.
 - Pages should be visual and easy to scan, similar in spirit to the VLA page.
 - Dense glossary/reference sections should be compact by default, with expand/search behavior.
 
+## VLM Page State
+
+The user asked for a `VLM/` learning page that references the existing `VLA/` page style and is visual, not just a text-heavy paper list.
+
+Important VLM page requirements from the conversation:
+
+- Include multimodal large models such as BAGEL.
+- Do not create a separate BAGEL-only section. BAGEL should stay inside the unified multimodal model flow.
+- Include GitHub/project links where useful.
+- Publish to `https://caim33.github.io/literature-review/VLM/`.
+- The user specifically said the VLA page has many images and that they wanted VLM paradigm figures visible too.
+
+Current VLM implementation:
+
+- `VLM/index.html` exposes both `#visual-figures` and `#paper-figures`.
+- The top nav includes `范式图` and `论文图`.
+- `VLM/app.js` renders both `renderVisualFigures()` and `renderPaperFigureGuides()`.
+- `VLM/data.js` contains `visualFigureGuides` and `paperFigureGuides`.
+- `VLM/assets/figures/` contains local paper figure images for CLIP, BLIP-2, Flamingo, LLaVA, Qwen2.5-VL, InternVL, Janus-Pro, Transfusion, and BAGEL.
+- `VLM/styles.css` includes VLA-like paper figure card styles and mobile stacking behavior.
+- `VLM/test-content.mjs` verifies data contracts, local image assets, page anchors, renderer hooks, cache-busting strings, and that BAGEL has no dedicated page section.
+
+Relevant pushed commits:
+
+- `ad31751 Add visible VLM paradigm figures`
+- `260fa3d Add VLM paper figure guides`
+
+Validation command for the VLM page:
+
+```bash
+node VLM/test-content.mjs
+```
+
+Expected passing output:
+
+```text
+OK: 6 families, 28 models, 29 benchmarks, 73 references
+```
+
+Future VLM cautions:
+
+- Keep `#paper-figures` image-first because the user wanted to see real paper/paradigm figures.
+- Keep BAGEL in the unified model/grid/resource flow; do not add `id="bagel"` or a `renderBagelCase()` dedicated section unless the user explicitly changes that requirement.
+- For any VLM page change, run `node VLM/test-content.mjs` before reporting completion.
+
 ## RL Page State
 
 The `RL/` page has already been expanded from a thin route into a more useful visual RL learning map.
@@ -139,6 +184,7 @@ When continuing work:
 
 1. Read this file first.
 2. Run `git status --short --branch`.
-3. For RL page edits, run `node RL/validate-site.mjs` before committing.
-4. For WeCP reference edits, run `node RL/reference/build-wecp-fixed.mjs` and inspect formula rendering.
-5. Keep the RL page practical and visual; avoid turning it into a long undifferentiated paper list.
+3. For VLM page edits, run `node VLM/test-content.mjs` before committing.
+4. For RL page edits, run `node RL/validate-site.mjs` before committing.
+5. For WeCP reference edits, run `node RL/reference/build-wecp-fixed.mjs` and inspect formula rendering.
+6. Keep the RL page practical and visual; avoid turning it into a long undifferentiated paper list.
