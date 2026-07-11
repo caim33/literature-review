@@ -1,0 +1,1088 @@
+{
+  "source": "https://www.wecreateproblems.com/interview-questions/reinforcement-learning-interview-questions",
+  "downloadedAt": "2026-06-04T11:36:14.965Z",
+  "lineCount": 1212,
+  "questionLikeCount": 216,
+  "questions": [
+    {
+      "index": 1,
+      "title": "What are AI Interviews?",
+      "line": 20
+    },
+    {
+      "index": 2,
+      "title": "What is AI Assessment?",
+      "line": 22
+    },
+    {
+      "index": 3,
+      "title": "What are Panel Interviews?",
+      "line": 24
+    },
+    {
+      "index": 4,
+      "title": "What is Sherlock AI?",
+      "line": 26
+    },
+    {
+      "index": 5,
+      "title": "What is WeCP AI?",
+      "line": 28
+    },
+    {
+      "index": 6,
+      "title": "What is English Pro?",
+      "line": 30
+    },
+    {
+      "index": 7,
+      "title": "What is Culture Pro?",
+      "line": 32
+    },
+    {
+      "index": 8,
+      "title": "What is AI Interviewer?",
+      "line": 34
+    },
+    {
+      "index": 9,
+      "title": "What is Vibe Coder Assessment?",
+      "line": 36
+    },
+    {
+      "index": 10,
+      "title": "What is Exams?",
+      "line": 38
+    },
+    {
+      "index": 11,
+      "title": "Reinforcement Learning interview Questions and Answers",
+      "line": 63
+    },
+    {
+      "index": 12,
+      "title": "Reinforcement Learning Interview Questions",
+      "line": 81
+    },
+    {
+      "index": 13,
+      "title": "Reinforcement Learning – Beginner (1–40)",
+      "line": 82
+    },
+    {
+      "index": 14,
+      "title": "- What is Reinforcement Learning (RL)?",
+      "line": 83
+    },
+    {
+      "index": 15,
+      "title": "- How does RL differ from supervised and unsupervised learning?",
+      "line": 84
+    },
+    {
+      "index": 16,
+      "title": "- What are the main components of an RL system?",
+      "line": 85
+    },
+    {
+      "index": 17,
+      "title": "- What is a policy in RL?",
+      "line": 87
+    },
+    {
+      "index": 18,
+      "title": "- What is a reward signal?",
+      "line": 88
+    },
+    {
+      "index": 19,
+      "title": "- What is a state in the context of RL?",
+      "line": 89
+    },
+    {
+      "index": 20,
+      "title": "- What is an action space?",
+      "line": 90
+    },
+    {
+      "index": 21,
+      "title": "- What is a trajectory in RL?",
+      "line": 92
+    },
+    {
+      "index": 22,
+      "title": "- What is a Markov Decision Process (MDP)?",
+      "line": 93
+    },
+    {
+      "index": 23,
+      "title": "- What is a value function?",
+      "line": 95
+    },
+    {
+      "index": 24,
+      "title": "- What is the Q-value or action-value function?",
+      "line": 96
+    },
+    {
+      "index": 25,
+      "title": "- What is exploration vs. exploitation?",
+      "line": 98
+    },
+    {
+      "index": 26,
+      "title": "- What is the epsilon-greedy strategy?",
+      "line": 99
+    },
+    {
+      "index": 27,
+      "title": "- What is the purpose of the learning rate in RL algorithms?",
+      "line": 100
+    },
+    {
+      "index": 28,
+      "title": "- What is temporal difference (TD) learning?",
+      "line": 101
+    },
+    {
+      "index": 29,
+      "title": "- What is the difference between on-policy and off-policy learning?",
+      "line": 103
+    },
+    {
+      "index": 30,
+      "title": "- What is Q-learning?",
+      "line": 104
+    },
+    {
+      "index": 31,
+      "title": "- What is SARSA?",
+      "line": 105
+    },
+    {
+      "index": 32,
+      "title": "- What is the Bellman equation?",
+      "line": 107
+    },
+    {
+      "index": 33,
+      "title": "- What is a discount factor (γ), and why is it used?",
+      "line": 109
+    },
+    {
+      "index": 34,
+      "title": "- What is policy evaluation?",
+      "line": 110
+    },
+    {
+      "index": 35,
+      "title": "- What is policy improvement?",
+      "line": 111
+    },
+    {
+      "index": 36,
+      "title": "- What is policy iteration?",
+      "line": 112
+    },
+    {
+      "index": 37,
+      "title": "- What is value iteration?",
+      "line": 113
+    },
+    {
+      "index": 38,
+      "title": "- How does dynamic programming relate to RL?",
+      "line": 114
+    },
+    {
+      "index": 39,
+      "title": "- What are some simple examples of RL applications?",
+      "line": 115
+    },
+    {
+      "index": 40,
+      "title": "- What is the difference between model-free and model-based RL?",
+      "line": 116
+    },
+    {
+      "index": 41,
+      "title": "- What is function approximation in RL?",
+      "line": 117
+    },
+    {
+      "index": 42,
+      "title": "- What is the role of experience replay in RL?",
+      "line": 118
+    },
+    {
+      "index": 43,
+      "title": "- What is an environment simulator?",
+      "line": 119
+    },
+    {
+      "index": 44,
+      "title": "- What metrics are used to evaluate an RL agent’s performance?",
+      "line": 120
+    },
+    {
+      "index": 45,
+      "title": "- What is delayed reward in RL?",
+      "line": 121
+    },
+    {
+      "index": 46,
+      "title": "- What is the exploration-exploitation tradeoff?",
+      "line": 122
+    },
+    {
+      "index": 47,
+      "title": "Reinforcement Learning – Intermediate (1–40)",
+      "line": 123
+    },
+    {
+      "index": 48,
+      "title": "- What are the limitations of tabular RL methods?",
+      "line": 124
+    },
+    {
+      "index": 49,
+      "title": "- How is deep learning integrated with RL (Deep RL)?",
+      "line": 125
+    },
+    {
+      "index": 50,
+      "title": "- What is Deep Q-Network (DQN)?",
+      "line": 126
+    },
+    {
+      "index": 51,
+      "title": "- What is target network in DQN and why is it needed?",
+      "line": 128
+    },
+    {
+      "index": 52,
+      "title": "- What is experience replay, and how does it help training?",
+      "line": 129
+    },
+    {
+      "index": 53,
+      "title": "- What is Double DQN, and how does it improve over DQN?",
+      "line": 130
+    },
+    {
+      "index": 54,
+      "title": "- What is Dueling DQN?",
+      "line": 131
+    },
+    {
+      "index": 55,
+      "title": "- What is Prioritized Experience Replay?",
+      "line": 132
+    },
+    {
+      "index": 56,
+      "title": "- What are the main challenges in Deep RL?",
+      "line": 133
+    },
+    {
+      "index": 57,
+      "title": "- What is Actor-Critic architecture?",
+      "line": 134
+    },
+    {
+      "index": 58,
+      "title": "- What is the difference between actor and critic in RL?",
+      "line": 135
+    },
+    {
+      "index": 59,
+      "title": "- What is the Advantage function in RL?",
+      "line": 136
+    },
+    {
+      "index": 60,
+      "title": "- What is A3C (Asynchronous Advantage Actor-Critic)?",
+      "line": 137
+    },
+    {
+      "index": 61,
+      "title": "- What is PPO (Proximal Policy Optimization)?",
+      "line": 138
+    },
+    {
+      "index": 62,
+      "title": "- What is TRPO (Trust Region Policy Optimization)?",
+      "line": 140
+    },
+    {
+      "index": 63,
+      "title": "- What is DDPG (Deep Deterministic Policy Gradient)?",
+      "line": 141
+    },
+    {
+      "index": 64,
+      "title": "- What is TD3 (Twin Delayed DDPG)?",
+      "line": 142
+    },
+    {
+      "index": 65,
+      "title": "- What is Soft Actor-Critic (SAC)?",
+      "line": 144
+    },
+    {
+      "index": 66,
+      "title": "- What is entropy regularization in RL?",
+      "line": 145
+    },
+    {
+      "index": 67,
+      "title": "- What is the difference between continuous and discrete action spaces?",
+      "line": 146
+    },
+    {
+      "index": 68,
+      "title": "- What are policy gradient methods?",
+      "line": 147
+    },
+    {
+      "index": 69,
+      "title": "- What is the REINFORCE algorithm?",
+      "line": 148
+    },
+    {
+      "index": 70,
+      "title": "- What are baseline functions in policy gradient methods?",
+      "line": 149
+    },
+    {
+      "index": 71,
+      "title": "- What is variance reduction in policy gradients?",
+      "line": 150
+    },
+    {
+      "index": 72,
+      "title": "- What is Generalized Advantage Estimation (GAE)?",
+      "line": 151
+    },
+    {
+      "index": 73,
+      "title": "- What is model-based RL and how does it differ from model-free RL?",
+      "line": 152
+    },
+    {
+      "index": 74,
+      "title": "- What is imitation learning?",
+      "line": 153
+    },
+    {
+      "index": 75,
+      "title": "- What is inverse reinforcement learning (IRL)?",
+      "line": 154
+    },
+    {
+      "index": 76,
+      "title": "- What is multi-agent reinforcement learning (MARL)?",
+      "line": 155
+    },
+    {
+      "index": 77,
+      "title": "- What are cooperative vs. competitive MARL setups?",
+      "line": 156
+    },
+    {
+      "index": 78,
+      "title": "- What is reward shaping and why is it important?",
+      "line": 157
+    },
+    {
+      "index": 79,
+      "title": "- What is curriculum learning in RL?",
+      "line": 158
+    },
+    {
+      "index": 80,
+      "title": "- What is hierarchical reinforcement learning?",
+      "line": 159
+    },
+    {
+      "index": 81,
+      "title": "- What is the options framework?",
+      "line": 160
+    },
+    {
+      "index": 82,
+      "title": "- What are the challenges of sparse rewards in RL?",
+      "line": 161
+    },
+    {
+      "index": 83,
+      "title": "- What is credit assignment problem in RL?",
+      "line": 162
+    },
+    {
+      "index": 84,
+      "title": "- What are some popular RL environments (e.g., OpenAI Gym, MuJoCo, Atari)?",
+      "line": 163
+    },
+    {
+      "index": 85,
+      "title": "Reinforcement Learning – Experienced (1–40)",
+      "line": 164
+    },
+    {
+      "index": 86,
+      "title": "- What are the main limitations of current RL algorithms?",
+      "line": 165
+    },
+    {
+      "index": 87,
+      "title": "- What is offline reinforcement learning?",
+      "line": 167
+    },
+    {
+      "index": 88,
+      "title": "- What is behavior cloning?",
+      "line": 168
+    },
+    {
+      "index": 89,
+      "title": "- What is policy distillation?",
+      "line": 169
+    },
+    {
+      "index": 90,
+      "title": "- What are replay buffer stabilization techniques?",
+      "line": 171
+    },
+    {
+      "index": 91,
+      "title": "- How do you handle catastrophic forgetting in RL agents?",
+      "line": 172
+    },
+    {
+      "index": 92,
+      "title": "- What is intrinsic motivation in RL?",
+      "line": 174
+    },
+    {
+      "index": 93,
+      "title": "- How can curiosity-driven exploration improve learning?",
+      "line": 175
+    },
+    {
+      "index": 94,
+      "title": "- What is meta-reinforcement learning?",
+      "line": 176
+    },
+    {
+      "index": 95,
+      "title": "- How does RL relate to transfer learning?",
+      "line": 177
+    },
+    {
+      "index": 96,
+      "title": "- What is population-based training (PBT)?",
+      "line": 178
+    },
+    {
+      "index": 97,
+      "title": "- What is evolutionary RL?",
+      "line": 179
+    },
+    {
+      "index": 98,
+      "title": "- How is reinforcement learning used in robotics?",
+      "line": 180
+    },
+    {
+      "index": 99,
+      "title": "- What are the challenges of applying RL to real-world systems?",
+      "line": 182
+    },
+    {
+      "index": 100,
+      "title": "- What is the sim-to-real transfer problem in robotics?",
+      "line": 183
+    },
+    {
+      "index": 101,
+      "title": "- How do you make RL models more explainable?",
+      "line": 184
+    },
+    {
+      "index": 102,
+      "title": "- How can you ensure stability in policy gradient training?",
+      "line": 185
+    },
+    {
+      "index": 103,
+      "title": "- What are techniques for safe reinforcement learning?",
+      "line": 186
+    },
+    {
+      "index": 104,
+      "title": "- What is constrained RL?",
+      "line": 187
+    },
+    {
+      "index": 105,
+      "title": "- What is multi-objective reinforcement learning?",
+      "line": 188
+    },
+    {
+      "index": 106,
+      "title": "- What is offline-to-online RL adaptation?",
+      "line": 189
+    },
+    {
+      "index": 107,
+      "title": "- What is continual reinforcement learning?",
+      "line": 190
+    },
+    {
+      "index": 108,
+      "title": "- What is probabilistic reinforcement learning?",
+      "line": 192
+    },
+    {
+      "index": 109,
+      "title": "- What are world models in RL?",
+      "line": 193
+    },
+    {
+      "index": 110,
+      "title": "- How do transformers improve RL models?",
+      "line": 194
+    },
+    {
+      "index": 111,
+      "title": "- What are diffusion-based RL methods?",
+      "line": 195
+    },
+    {
+      "index": 112,
+      "title": "- What are model-based policy optimization methods?",
+      "line": 196
+    },
+    {
+      "index": 113,
+      "title": "- How do you evaluate the generalization ability of an RL agent?",
+      "line": 197
+    },
+    {
+      "index": 114,
+      "title": "- How is reinforcement learning combined with imitation learning?",
+      "line": 198
+    },
+    {
+      "index": 115,
+      "title": "- What is federated reinforcement learning?",
+      "line": 199
+    },
+    {
+      "index": 116,
+      "title": "- How do large foundation models impact RL research?",
+      "line": 200
+    },
+    {
+      "index": 117,
+      "title": "- What are current trends in RL research (e.g., RAG-RL, LLM-RL)?",
+      "line": 201
+    },
+    {
+      "index": 118,
+      "title": "- How is reinforcement learning used in recommendation systems?",
+      "line": 202
+    },
+    {
+      "index": 119,
+      "title": "- What ethical considerations arise with autonomous RL systems?",
+      "line": 203
+    },
+    {
+      "index": 120,
+      "title": "- What is the future of reinforcement learning?",
+      "line": 204
+    },
+    {
+      "index": 121,
+      "title": "Reinforcement Learning Interview Questions and Answers",
+      "line": 205
+    },
+    {
+      "index": 122,
+      "title": "Beginner (Q&A)",
+      "line": 206
+    },
+    {
+      "index": 123,
+      "title": "1. What is Reinforcement Learning (RL)?",
+      "line": 207
+    },
+    {
+      "index": 124,
+      "title": "2. How does RL differ from supervised and unsupervised learning?",
+      "line": 212
+    },
+    {
+      "index": 125,
+      "title": "3. What are the main components of an RL system?",
+      "line": 222
+    },
+    {
+      "index": 126,
+      "title": "4. Define agent, environment, and reward in RL.",
+      "line": 234
+    },
+    {
+      "index": 127,
+      "title": "5. What is a policy in RL?",
+      "line": 239
+    },
+    {
+      "index": 128,
+      "title": "6. What is a reward signal?",
+      "line": 247
+    },
+    {
+      "index": 129,
+      "title": "7. What is a state in the context of RL?",
+      "line": 256
+    },
+    {
+      "index": 130,
+      "title": "8. What is an action space?",
+      "line": 263
+    },
+    {
+      "index": 131,
+      "title": "9. Explain the concept of an episode in RL.",
+      "line": 269
+    },
+    {
+      "index": 132,
+      "title": "10. What is a trajectory in RL?",
+      "line": 279
+    },
+    {
+      "index": 133,
+      "title": "11. What is a Markov Decision Process (MDP)?",
+      "line": 286
+    },
+    {
+      "index": 134,
+      "title": "12. Define the Markov property.",
+      "line": 298
+    },
+    {
+      "index": 135,
+      "title": "13. What is a value function?",
+      "line": 304
+    },
+    {
+      "index": 136,
+      "title": "14. What is the Q-value or action-value function?",
+      "line": 312
+    },
+    {
+      "index": 137,
+      "title": "15. Explain the difference between deterministic and stochastic policies.",
+      "line": 321
+    },
+    {
+      "index": 138,
+      "title": "16. What is exploration vs. exploitation?",
+      "line": 332
+    },
+    {
+      "index": 139,
+      "title": "17. What is the epsilon-greedy strategy?",
+      "line": 340
+    },
+    {
+      "index": 140,
+      "title": "18. What is the purpose of the learning rate in RL algorithms?",
+      "line": 349
+    },
+    {
+      "index": 141,
+      "title": "19. What is temporal difference (TD) learning?",
+      "line": 357
+    },
+    {
+      "index": 142,
+      "title": "20. Explain Monte Carlo methods in RL.",
+      "line": 368
+    },
+    {
+      "index": 143,
+      "title": "21. What is the difference between on-policy and off-policy learning?",
+      "line": 375
+    },
+    {
+      "index": 144,
+      "title": "22. What is Q-learning?",
+      "line": 389
+    },
+    {
+      "index": 145,
+      "title": "23. What is SARSA?",
+      "line": 410
+    },
+    {
+      "index": 146,
+      "title": "24. Compare Q-learning and SARSA.",
+      "line": 425
+    },
+    {
+      "index": 147,
+      "title": "25. What is the Bellman equation?",
+      "line": 429
+    },
+    {
+      "index": 148,
+      "title": "26. Explain the Bellman optimality principle.",
+      "line": 440
+    },
+    {
+      "index": 149,
+      "title": "27. What is a discount factor (γ), and why is it used?",
+      "line": 449
+    },
+    {
+      "index": 150,
+      "title": "28. What is policy evaluation?",
+      "line": 462
+    },
+    {
+      "index": 151,
+      "title": "29. What is policy improvement?",
+      "line": 473
+    },
+    {
+      "index": 152,
+      "title": "30. What is policy iteration?",
+      "line": 484
+    },
+    {
+      "index": 153,
+      "title": "31. What is value iteration?",
+      "line": 496
+    },
+    {
+      "index": 154,
+      "title": "32. How does dynamic programming relate to RL?",
+      "line": 514
+    },
+    {
+      "index": 155,
+      "title": "33. What are some simple examples of RL applications?",
+      "line": 525
+    },
+    {
+      "index": 156,
+      "title": "34. What is the difference between model-free and model-based RL?",
+      "line": 537
+    },
+    {
+      "index": 157,
+      "title": "35. What is function approximation in RL?",
+      "line": 543
+    },
+    {
+      "index": 158,
+      "title": "36. What is the role of experience replay in RL?",
+      "line": 561
+    },
+    {
+      "index": 159,
+      "title": "37. What is an environment simulator?",
+      "line": 576
+    },
+    {
+      "index": 160,
+      "title": "38. What metrics are used to evaluate an RL agent’s performance?",
+      "line": 591
+    },
+    {
+      "index": 161,
+      "title": "39. What is delayed reward in RL?",
+      "line": 603
+    },
+    {
+      "index": 162,
+      "title": "40. What is the exploration-exploitation tradeoff?",
+      "line": 614
+    },
+    {
+      "index": 163,
+      "title": "Intermediate (Q&A)",
+      "line": 630
+    },
+    {
+      "index": 164,
+      "title": "1. What are the limitations of tabular RL methods?",
+      "line": 631
+    },
+    {
+      "index": 165,
+      "title": "2. How is deep learning integrated with RL (Deep RL)?",
+      "line": 642
+    },
+    {
+      "index": 166,
+      "title": "3. What is Deep Q-Network (DQN)?",
+      "line": 656
+    },
+    {
+      "index": 167,
+      "title": "4. Explain the architecture of a DQN.",
+      "line": 665
+    },
+    {
+      "index": 168,
+      "title": "5. What is target network in DQN and why is it needed?",
+      "line": 676
+    },
+    {
+      "index": 169,
+      "title": "6. What is experience replay, and how does it help training?",
+      "line": 688
+    },
+    {
+      "index": 170,
+      "title": "7. What is Double DQN, and how does it improve over DQN?",
+      "line": 698
+    },
+    {
+      "index": 171,
+      "title": "8. What is Dueling DQN?",
+      "line": 710
+    },
+    {
+      "index": 172,
+      "title": "9. What is Prioritized Experience Replay?",
+      "line": 720
+    },
+    {
+      "index": 173,
+      "title": "10. What are the main challenges in Deep RL?",
+      "line": 731
+    },
+    {
+      "index": 174,
+      "title": "11. What is Actor-Critic architecture?",
+      "line": 742
+    },
+    {
+      "index": 175,
+      "title": "12. What is the difference between actor and critic in RL?",
+      "line": 756
+    },
+    {
+      "index": 176,
+      "title": "13. What is the Advantage function in RL?",
+      "line": 760
+    },
+    {
+      "index": 177,
+      "title": "14. What is A3C (Asynchronous Advantage Actor-Critic)?",
+      "line": 771
+    },
+    {
+      "index": 178,
+      "title": "15. What is PPO (Proximal Policy Optimization)?",
+      "line": 782
+    },
+    {
+      "index": 179,
+      "title": "16. Compare PPO and A3C.",
+      "line": 791
+    },
+    {
+      "index": 180,
+      "title": "17. What is TRPO (Trust Region Policy Optimization)?",
+      "line": 796
+    },
+    {
+      "index": 181,
+      "title": "18. What is DDPG (Deep Deterministic Policy Gradient)?",
+      "line": 807
+    },
+    {
+      "index": 182,
+      "title": "19. What is TD3 (Twin Delayed DDPG)?",
+      "line": 820
+    },
+    {
+      "index": 183,
+      "title": "20. Compare DDPG and TD3.",
+      "line": 829
+    },
+    {
+      "index": 184,
+      "title": "21. What is Soft Actor-Critic (SAC)?",
+      "line": 833
+    },
+    {
+      "index": 185,
+      "title": "22. What is entropy regularization in RL?",
+      "line": 846
+    },
+    {
+      "index": 186,
+      "title": "23. What is the difference between continuous and discrete action spaces?",
+      "line": 856
+    },
+    {
+      "index": 187,
+      "title": "24. What are policy gradient methods?",
+      "line": 860
+    },
+    {
+      "index": 188,
+      "title": "25. What is the REINFORCE algorithm?",
+      "line": 872
+    },
+    {
+      "index": 189,
+      "title": "26. What are baseline functions in policy gradient methods?",
+      "line": 885
+    },
+    {
+      "index": 190,
+      "title": "27. What is variance reduction in policy gradients?",
+      "line": 896
+    },
+    {
+      "index": 191,
+      "title": "28. What is Generalized Advantage Estimation (GAE)?",
+      "line": 906
+    },
+    {
+      "index": 192,
+      "title": "29. What is model-based RL and how does it differ from model-free RL?",
+      "line": 917
+    },
+    {
+      "index": 193,
+      "title": "30. What is imitation learning?",
+      "line": 922
+    },
+    {
+      "index": 194,
+      "title": "31. What is inverse reinforcement learning (IRL)?",
+      "line": 936
+    },
+    {
+      "index": 195,
+      "title": "32. What is multi-agent reinforcement learning (MARL)?",
+      "line": 947
+    },
+    {
+      "index": 196,
+      "title": "33. What are cooperative vs. competitive MARL setups?",
+      "line": 961
+    },
+    {
+      "index": 197,
+      "title": "34. What is reward shaping and why is it important?",
+      "line": 967
+    },
+    {
+      "index": 198,
+      "title": "35. What is curriculum learning in RL?",
+      "line": 979
+    },
+    {
+      "index": 199,
+      "title": "36. What is hierarchical reinforcement learning?",
+      "line": 990
+    },
+    {
+      "index": 200,
+      "title": "37. What is the options framework?",
+      "line": 1001
+    },
+    {
+      "index": 201,
+      "title": "38. What are the challenges of sparse rewards in RL?",
+      "line": 1013
+    },
+    {
+      "index": 202,
+      "title": "39. What is credit assignment problem in RL?",
+      "line": 1025
+    },
+    {
+      "index": 203,
+      "title": "- In chess, winning occurs after 50 moves. How do we assign credit to each move?",
+      "line": 1028
+    },
+    {
+      "index": 204,
+      "title": "40. What are some popular RL environments (e.g., OpenAI Gym, MuJoCo, Atari)?",
+      "line": 1035
+    },
+    {
+      "index": 205,
+      "title": "Experienced (Q&A)",
+      "line": 1049
+    },
+    {
+      "index": 206,
+      "title": "1. What are the main limitations of current RL algorithms?",
+      "line": 1050
+    },
+    {
+      "index": 207,
+      "title": "2. Explain sample efficiency in RL and ways to improve it.",
+      "line": 1061
+    },
+    {
+      "index": 208,
+      "title": "3. What is offline reinforcement learning?",
+      "line": 1075
+    },
+    {
+      "index": 209,
+      "title": "4. What is behavior cloning?",
+      "line": 1089
+    },
+    {
+      "index": 210,
+      "title": "5. What is policy distillation?",
+      "line": 1100
+    },
+    {
+      "index": 211,
+      "title": "6. Explain distributed reinforcement learning.",
+      "line": 1111
+    },
+    {
+      "index": 212,
+      "title": "7. What are replay buffer stabilization techniques?",
+      "line": 1124
+    },
+    {
+      "index": 213,
+      "title": "8. How do you handle catastrophic forgetting in RL agents?",
+      "line": 1133
+    },
+    {
+      "index": 214,
+      "title": "9. Explain reward hacking and how to prevent it.",
+      "line": 1142
+    },
+    {
+      "index": 215,
+      "title": "10. What is intrinsic motivation in RL?",
+      "line": 1153
+    },
+    {
+      "index": 216,
+      "title": "Check out these other Interview Questions...",
+      "line": 1169
+    }
+  ]
+}

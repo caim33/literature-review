@@ -1,0 +1,353 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1500" viewBox="0 0 2400 1500">
+  <defs>
+    <marker id="arrow-dark" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#2f3437"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#2f6fb2"/>
+    </marker>
+    <marker id="arrow-gold" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#c89500"/>
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#7962c8"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#2ca56a"/>
+    </marker>
+    <marker id="arrow-dark-mini" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="4" markerHeight="4" orient="auto">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="#2f3437"/>
+    </marker>
+    <marker id="arrow-purple-mini" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="4" markerHeight="4" orient="auto">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="#7962c8"/>
+    </marker>
+    <filter id="shadow" x="-10%" y="-20%" width="120%" height="150%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.12"/>
+    </filter>
+    <style>
+      .title { font-family: Inter, Arial, sans-serif; font-weight: 800; font-size: 36px; fill: #202124; }
+      .subtitle { font-family: Inter, Arial, sans-serif; font-weight: 650; font-size: 21px; fill: #62676b; }
+      .section { font-family: Inter, Arial, sans-serif; font-weight: 800; font-size: 28px; fill: #202124; }
+      .body { font-family: Inter, Arial, sans-serif; font-weight: 750; font-size: 23px; fill: #2a2d30; }
+      .small { font-family: Inter, Arial, sans-serif; font-weight: 650; font-size: 17px; fill: #62676b; }
+      .tiny { font-family: Inter, Arial, sans-serif; font-weight: 650; font-size: 14px; fill: #6a7075; }
+      .micro { font-family: Inter, Arial, sans-serif; font-weight: 650; font-size: 12px; fill: #6a7075; }
+      .mono { font-family: "SFMono-Regular", Consolas, monospace; font-size: 19px; fill: #4c545b; }
+      .box-gray { fill: #ffffff; stroke: #a4a4a4; stroke-width: 3; }
+      .box-blue { fill: #eaf3ff; stroke: #2f6fb2; stroke-width: 4; }
+      .box-gold { fill: #fff6d8; stroke: #d5a000; stroke-width: 4; }
+      .box-purple { fill: #f2efff; stroke: #7962c8; stroke-width: 4; }
+      .box-green { fill: #f2fbf6; stroke: #31a86f; stroke-width: 4; }
+      .card { fill: #ffffff; stroke-width: 3; }
+      .line-dark { fill: none; stroke: #2f3437; stroke-width: 2.4; marker-end: url(#arrow-dark); }
+      .line-blue { fill: none; stroke: #2f6fb2; stroke-width: 2.4; marker-end: url(#arrow-blue); }
+      .line-gold { fill: none; stroke: #c89500; stroke-width: 2.4; marker-end: url(#arrow-gold); }
+      .line-purple { fill: none; stroke: #7962c8; stroke-width: 2.4; marker-end: url(#arrow-purple); }
+      .line-green { fill: none; stroke: #2ca56a; stroke-width: 2.4; marker-end: url(#arrow-green); }
+      .dash-blue { fill: none; stroke: #2f6fb2; stroke-width: 2.4; stroke-dasharray: 12 10; marker-end: url(#arrow-blue); }
+      .dash-purple { fill: none; stroke: #7962c8; stroke-width: 2.4; stroke-dasharray: 12 10; marker-end: url(#arrow-purple); }
+      .image-bg { fill: #dbe7e6; }
+      .table { fill: #edf2ee; }
+      .banana { fill: none; stroke: #f4c43a; stroke-width: 11; stroke-linecap: round; }
+      .bowl { fill: #56a5d8; }
+      .hand { fill: none; stroke: #202124; stroke-width: 10; stroke-linecap: round; }
+    </style>
+  </defs>
+
+  <rect width="2400" height="1500" fill="#ffffff"/>
+  <text x="1200" y="56" text-anchor="middle" class="title">VLM + World Model Conditions for Flow Matching VLA</text>
+  <text x="1200" y="90" text-anchor="middle" class="subtitle">Each condition is tensorized with a visual module before being fused into the action flow</text>
+
+  <!-- Left inputs -->
+  <g filter="url(#shadow)">
+    <rect x="68" y="155" width="410" height="270" rx="24" class="box-gray"/>
+    <text x="273" y="192" text-anchor="middle" class="body">Single-frame</text>
+    <text x="273" y="224" text-anchor="middle" class="body">Ego-view Image</text>
+    <rect x="102" y="247" width="342" height="138" rx="18" class="image-bg"/>
+    <polygon points="102,385 444,385 392,306 153,306" class="table"/>
+    <polygon points="128,260 211,248 222,328 128,328" fill="#93a1a1"/>
+    <rect x="254" y="262" width="64" height="34" rx="5" fill="#727f83"/>
+    <path d="M272 318 C302 294 333 294 357 318" class="banana"/>
+    <circle cx="354" cy="335" r="26" class="bowl"/>
+    <rect x="166" y="321" width="78" height="48" rx="5" fill="#d5cec4"/>
+    <g fill="#7d5a45">
+      <circle cx="181" cy="334" r="2.1"/><circle cx="202" cy="345" r="2.1"/><circle cx="227" cy="334" r="2.1"/>
+      <circle cx="191" cy="360" r="2.1"/><circle cx="232" cy="356" r="2.1"/><circle cx="214" cy="368" r="2.1"/>
+    </g>
+    <path d="M390 382 C378 357 383 333 401 324 C418 316 432 324 440 338" class="hand"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="68" y="468" width="410" height="132" rx="24" class="box-gray"/>
+    <text x="273" y="518" text-anchor="middle" class="body">Language Instruction</text>
+    <text x="273" y="558" text-anchor="middle" class="subtitle">"Pick up the bowl"</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="68" y="1085" width="410" height="142" rx="24" class="box-gray"/>
+    <text x="273" y="1139" text-anchor="middle" class="body">Robot State</text>
+    <text x="273" y="1190" text-anchor="middle" class="subtitle">joint pos / hand state / force</text>
+  </g>
+
+  <!-- Top modules -->
+  <g filter="url(#shadow)">
+    <rect x="585" y="128" width="850" height="210" rx="30" class="box-blue"/>
+    <text x="1010" y="210" text-anchor="middle" class="title">Qwen3-VL</text>
+    <text x="1010" y="253" text-anchor="middle" class="subtitle">semantic perception and grounding</text>
+    <text x="1010" y="296" text-anchor="middle" class="mono">h_vlm = f(image, instruction)</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="1510" y="128" width="575" height="210" rx="30" class="box-purple"/>
+    <text x="1798" y="210" text-anchor="middle" class="title">World Model</text>
+    <text x="1798" y="253" text-anchor="middle" class="subtitle">predict future state and residual dynamics</text>
+    <text x="1798" y="292" text-anchor="middle" class="mono">z_wm = g(image, instruction)</text>
+    <text x="1798" y="318" text-anchor="middle" class="tiny">prediction prior: future image + pose residual</text>
+  </g>
+
+  <path d="M478 292 L585 292" class="line-dark"/>
+  <path d="M478 534 L532 534 L532 315 L585 315" class="line-dark"/>
+  <path d="M1435 233 L1510 233" class="line-blue"/>
+
+  <!-- VLM condition bank -->
+  <g filter="url(#shadow)">
+    <rect x="565" y="405" width="1245" height="330" rx="28" class="box-gold"/>
+    <text x="1188" y="450" text-anchor="middle" class="section">VLM Semantic Conditions</text>
+    <text x="1188" y="482" text-anchor="middle" class="small">grounded, interpretable conditions generated from language and image</text>
+
+    <!-- 2D to 3D trajectory -->
+    <g>
+      <rect x="595" y="515" width="155" height="170" rx="18" class="card" stroke="#d5a000"/>
+      <text x="673" y="548" text-anchor="middle" class="small">2D to 3D</text>
+      <text x="673" y="571" text-anchor="middle" class="small">Trajectory</text>
+      <rect x="614" y="590" width="50" height="52" rx="8" fill="#e5eef1" stroke="#93a1a1" stroke-width="2"/>
+      <path d="M623 632 C632 606 653 600 661 618" stroke="#d5a000" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M670 616 L696 616" stroke="#6a7075" stroke-width="3" marker-end="url(#arrow-dark)"/>
+      <path d="M704 642 L704 594 L738 642 Z" fill="#f7fbff" stroke="#2f6fb2" stroke-width="2"/>
+      <path d="M709 635 C720 607 733 613 737 590" stroke="#d5a000" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <line x1="704" y1="642" x2="735" y2="642" stroke="#2f6fb2" stroke-width="2"/>
+      <line x1="704" y1="642" x2="704" y2="596" stroke="#2f6fb2" stroke-width="2"/>
+    </g>
+
+    <!-- Object grounding -->
+    <g>
+      <rect x="765" y="515" width="155" height="170" rx="18" class="card" stroke="#d5a000"/>
+      <text x="843" y="548" text-anchor="middle" class="small">Object</text>
+      <text x="843" y="571" text-anchor="middle" class="small">Grounding</text>
+      <rect x="784" y="592" width="116" height="78" rx="10" fill="#dbe7e6"/>
+      <polygon points="784,670 900,670 886,622 798,622" class="table"/>
+      <circle cx="857" cy="637" r="18" class="bowl"/>
+      <rect x="833" y="613" width="50" height="50" rx="4" fill="none" stroke="#df4e41" stroke-width="4"/>
+      <text x="843" y="682" text-anchor="middle" class="tiny">bbox / mask</text>
+    </g>
+
+    <!-- Phase -->
+    <g>
+      <rect x="935" y="515" width="155" height="170" rx="18" class="card" stroke="#d5a000"/>
+      <text x="1013" y="548" text-anchor="middle" class="small">Phase</text>
+      <text x="1013" y="571" text-anchor="middle" class="small">Belief</text>
+      <rect x="953" y="606" width="118" height="16" rx="8" fill="#e9edf0"/>
+      <rect x="953" y="606" width="32" height="16" rx="8" fill="#84b6e6"/>
+      <rect x="989" y="606" width="38" height="16" rx="8" fill="#d5a000"/>
+      <rect x="1031" y="606" width="40" height="16" rx="8" fill="#d6cfff"/>
+      <circle cx="1013" cy="650" r="20" fill="#fff6d8" stroke="#d5a000" stroke-width="3"/>
+      <path d="M1013 635 L1013 653 L1025 660" stroke="#2f3437" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M1049 644 C1064 635 1070 648 1058 660" stroke="#9aa0a6" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <text x="1013" y="682" text-anchor="middle" class="tiny">history-aware</text>
+    </g>
+
+    <!-- Body part -->
+    <g>
+      <rect x="1105" y="515" width="155" height="170" rx="18" class="card" stroke="#d5a000"/>
+      <text x="1183" y="548" text-anchor="middle" class="small">Body Part</text>
+      <text x="1183" y="571" text-anchor="middle" class="small">Role</text>
+      <circle cx="1183" cy="604" r="12" fill="#9aa0a6"/>
+      <line x1="1183" y1="616" x2="1183" y2="650" stroke="#9aa0a6" stroke-width="6" stroke-linecap="round"/>
+      <line x1="1183" y1="626" x2="1150" y2="644" stroke="#31a86f" stroke-width="7" stroke-linecap="round"/>
+      <line x1="1183" y1="626" x2="1216" y2="644" stroke="#2f6fb2" stroke-width="7" stroke-linecap="round"/>
+      <line x1="1183" y1="650" x2="1162" y2="674" stroke="#9aa0a6" stroke-width="6" stroke-linecap="round"/>
+      <line x1="1183" y1="650" x2="1204" y2="674" stroke="#9aa0a6" stroke-width="6" stroke-linecap="round"/>
+      <text x="1183" y="682" text-anchor="middle" class="tiny">left/right/hand</text>
+    </g>
+
+    <!-- Affordance map -->
+    <g>
+      <rect x="1275" y="515" width="155" height="170" rx="18" class="card" stroke="#d5a000"/>
+      <text x="1353" y="548" text-anchor="middle" class="small">Affordance</text>
+      <text x="1353" y="571" text-anchor="middle" class="small">Map</text>
+      <rect x="1294" y="592" width="116" height="78" rx="10" fill="#dbe7e6"/>
+      <rect x="1311" y="615" width="50" height="36" rx="5" fill="#d5cec4" stroke="#9aa0a6" stroke-width="2"/>
+      <rect x="1323" y="626" width="26" height="8" rx="4" fill="#727f83"/>
+      <path d="M1365 630 L1390 630" stroke="#31a86f" stroke-width="3" marker-end="url(#arrow-dark-mini)"/>
+      <rect x="1368" y="646" width="29" height="14" rx="7" fill="#f0c23b" opacity="0.65"/>
+      <text x="1383" y="617" text-anchor="middle" class="micro">pull</text>
+      <text x="1384" y="666" text-anchor="middle" class="micro">place</text>
+      <text x="1353" y="682" text-anchor="middle" class="tiny">interaction prior</text>
+    </g>
+
+    <!-- Contact map -->
+    <g>
+      <rect x="1445" y="515" width="155" height="170" rx="18" class="card" stroke="#d5a000"/>
+      <text x="1523" y="548" text-anchor="middle" class="small">Contact</text>
+      <text x="1523" y="571" text-anchor="middle" class="small">Map</text>
+      <rect x="1464" y="592" width="116" height="78" rx="10" fill="#dbe7e6"/>
+      <circle cx="1536" cy="634" r="24" class="bowl"/>
+      <circle cx="1519" cy="627" r="18" fill="#f06d47" opacity="0.30"/>
+      <circle cx="1517" cy="626" r="8" fill="#df4e41" opacity="0.75"/>
+      <path d="M1474 656 C1486 639 1498 632 1513 628" stroke="#202124" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <path d="M1486 647 L1511 629" stroke="#202124" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <text x="1523" y="682" text-anchor="middle" class="tiny">touch region</text>
+    </g>
+
+    <!-- Target region -->
+    <g>
+      <rect x="1615" y="515" width="155" height="170" rx="18" class="card" stroke="#d5a000"/>
+      <text x="1693" y="548" text-anchor="middle" class="small">Target</text>
+      <text x="1693" y="571" text-anchor="middle" class="small">Region</text>
+      <rect x="1636" y="596" width="114" height="66" rx="8" fill="#e5eef1"/>
+      <rect x="1672" y="614" width="42" height="28" rx="4" fill="none" stroke="#df4e41" stroke-width="4"/>
+      <circle cx="1693" cy="628" r="5" fill="#df4e41"/>
+      <text x="1693" y="682" text-anchor="middle" class="tiny">point / bbox</text>
+    </g>
+  </g>
+
+  <path d="M1010 338 L1010 405" class="line-gold"/>
+
+  <!-- World model condition bank -->
+  <g filter="url(#shadow)">
+    <rect x="1840" y="405" width="475" height="330" rx="28" class="box-purple"/>
+    <text x="2078" y="450" text-anchor="middle" class="section">WM Dynamics Conditions</text>
+    <text x="2078" y="482" text-anchor="middle" class="small">predicted future state and residual physical change</text>
+
+    <!-- Future image -->
+    <g>
+      <rect x="1885" y="525" width="180" height="160" rx="18" class="card" stroke="#7962c8"/>
+      <text x="1975" y="558" text-anchor="middle" class="small">Future</text>
+      <text x="1975" y="581" text-anchor="middle" class="small">Image</text>
+      <rect x="1906" y="604" width="62" height="48" rx="7" fill="#dbe7e6" stroke="#9aa0a6" stroke-width="2"/>
+      <circle cx="1944" cy="631" r="11" class="bowl"/>
+      <path d="M1973 628 L1997 628" stroke="#7962c8" stroke-width="3" marker-end="url(#arrow-purple)"/>
+      <rect x="2000" y="604" width="44" height="48" rx="7" fill="#f2efff" stroke="#7962c8" stroke-width="2"/>
+      <circle cx="2022" cy="620" r="10" class="bowl"/>
+      <path d="M2012 640 C2018 650 2028 650 2034 640" stroke="#31a86f" stroke-width="4" fill="none"/>
+      <text x="1975" y="674" text-anchor="middle" class="tiny">subgoal frame</text>
+    </g>
+
+    <!-- Object pose residual -->
+    <g>
+      <rect x="2090" y="525" width="180" height="160" rx="18" class="card" stroke="#7962c8"/>
+      <text x="2180" y="558" text-anchor="middle" class="small">Object Pose</text>
+      <text x="2180" y="581" text-anchor="middle" class="small">Residual</text>
+      <rect x="2120" y="614" width="42" height="34" rx="5" fill="#56a5d8" opacity="0.42" stroke="#2f6fb2" stroke-width="2"/>
+      <rect x="2197" y="606" width="42" height="34" rx="5" fill="#56a5d8" opacity="0.95" stroke="#2f6fb2" stroke-width="2"/>
+      <path d="M2168 630 L2190 623" stroke="#7962c8" stroke-width="3.2" marker-end="url(#arrow-purple-mini)"/>
+      <path d="M2201 605 L2242 605" stroke="#df4e41" stroke-width="2.4" marker-end="url(#arrow-dark-mini)"/>
+      <path d="M2201 605 L2201 577" stroke="#31a86f" stroke-width="2.4" marker-end="url(#arrow-dark-mini)"/>
+      <path d="M2183 644 C2197 662 2224 661 2237 641" stroke="#7962c8" stroke-width="2.4" fill="none" marker-end="url(#arrow-purple-mini)"/>
+      <text x="2180" y="674" text-anchor="middle" class="tiny">delta SE(3)</text>
+    </g>
+  </g>
+  <path d="M1798 338 L1798 375 L2078 375 L2078 405" class="line-purple"/>
+
+  <!-- Split condition encoders -->
+  <g filter="url(#shadow)">
+    <rect x="760" y="790" width="420" height="150" rx="28" fill="#fff8df" stroke="#d5a000" stroke-width="3"/>
+    <text x="970" y="840" text-anchor="middle" class="body">Per-step Trajectory</text>
+    <text x="970" y="872" text-anchor="middle" class="body">Encoder</text>
+    <text x="970" y="907" text-anchor="middle" class="small">time-aligned with action horizon</text>
+    <rect x="855" y="920" width="230" height="16" rx="8" fill="#f2c94c"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="1245" y="790" width="650" height="150" rx="28" fill="#fbfcff" stroke="#53616c" stroke-width="3"/>
+    <text x="1570" y="832" text-anchor="middle" class="body">Global Condition Token Encoder</text>
+    <text x="1570" y="864" text-anchor="middle" class="small">non-time-aligned tokens via cross-attn or AdaLN</text>
+    <rect x="1290" y="884" width="260" height="42" rx="12" fill="#fff8df" stroke="#d5a000" stroke-width="2.5"/>
+    <text x="1420" y="910" text-anchor="middle" class="small">Current Tokens</text>
+    <rect x="1590" y="884" width="260" height="42" rx="12" fill="#f2efff" stroke="#7962c8" stroke-width="2.5"/>
+    <text x="1720" y="910" text-anchor="middle" class="small">Future Tokens</text>
+    <rect x="1320" y="932" width="68" height="10" rx="5" fill="#d5a000"/>
+    <rect x="1402" y="932" width="68" height="10" rx="5" fill="#7ab6e4"/>
+    <rect x="1620" y="932" width="68" height="10" rx="5" fill="#9c86dd"/>
+    <rect x="1702" y="932" width="68" height="10" rx="5" fill="#31a86f"/>
+  </g>
+  <path d="M694 685 L694 760 L970 760 L970 790" class="line-gold"/>
+  <path d="M1188 735 L1188 760 L1420 760 L1420 790" class="line-gold"/>
+  <path d="M2078 735 L2078 760 L1720 760 L1720 790" class="line-purple"/>
+
+  <!-- Action head -->
+  <g filter="url(#shadow)">
+    <rect x="540" y="1015" width="1435" height="330" rx="32" class="box-green"/>
+    <text x="585" y="1068" class="title">Flow Matching Action Head</text>
+    <text x="1605" y="1068" text-anchor="middle" class="mono">v_theta(x_t, t | obs, c_step, c_current, c_future)</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="595" y="1136" width="255" height="82" rx="18" fill="#ffffff" stroke="#a4a4a4" stroke-width="3"/>
+    <text x="722" y="1172" text-anchor="middle" class="small">Noisy Action</text>
+    <text x="722" y="1201" text-anchor="middle" class="small">Tokens x_t</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="595" y="1248" width="255" height="76" rx="20" class="box-green"/>
+    <text x="722" y="1296" text-anchor="middle" class="body">Action Encoder</text>
+  </g>
+  <path d="M722 1218 L722 1248" class="line-dark"/>
+
+  <g filter="url(#shadow)">
+    <rect x="942" y="1152" width="320" height="100" rx="20" fill="#fff0a8" stroke="#d5a000" stroke-width="4"/>
+    <text x="1102" y="1195" text-anchor="middle" class="body">Step-wise Fusion</text>
+    <text x="1102" y="1230" text-anchor="middle" class="small">action_t + traj_t features</text>
+  </g>
+  <path d="M850 1286 L942 1202" class="line-dark"/>
+  <path d="M970 940 L970 990 L1102 990 L1102 1152" class="line-gold"/>
+
+  <g filter="url(#shadow)">
+    <rect x="1342" y="1110" width="350" height="190" rx="22" class="box-green"/>
+    <text x="1517" y="1155" text-anchor="middle" class="body">DiT Blocks x N</text>
+    <rect x="1378" y="1194" width="278" height="76" rx="16" fill="#ffffff" stroke="#a4a4a4" stroke-width="3"/>
+    <rect x="1397" y="1218" width="108" height="40" rx="10" fill="#ffffff" stroke="#a4a4a4" stroke-width="3"/>
+    <text x="1451" y="1243" text-anchor="middle" class="tiny">Self Attn</text>
+    <path d="M1505 1238 L1548 1238" class="line-dark"/>
+    <rect x="1548" y="1218" width="86" height="40" rx="10" fill="#eaf3ff" stroke="#2f6fb2" stroke-width="3"/>
+    <text x="1591" y="1234" text-anchor="middle" class="tiny">Cross</text>
+    <text x="1591" y="1252" text-anchor="middle" class="tiny">Attn</text>
+    <text x="1517" y="1285" text-anchor="middle" class="micro">AdaLN / FiLM</text>
+  </g>
+  <path d="M1262 1202 L1342 1202" class="line-dark"/>
+  <path d="M1570 940 L1570 1110" class="line-dark"/>
+
+  <g filter="url(#shadow)">
+    <rect x="1740" y="1160" width="210" height="108" rx="20" class="box-green"/>
+    <text x="1845" y="1214" text-anchor="middle" class="body">Flow Head</text>
+    <text x="1845" y="1244" text-anchor="middle" class="small">velocity field</text>
+  </g>
+  <path d="M1692 1202 L1740 1202" class="line-green"/>
+
+  <g filter="url(#shadow)">
+    <rect x="2102" y="1128" width="170" height="150" rx="22" class="box-gray"/>
+    <text x="2187" y="1176" text-anchor="middle" class="body">Robot</text>
+    <text x="2187" y="1211" text-anchor="middle" class="body">Action</text>
+    <text x="2187" y="1246" text-anchor="middle" class="body">Sequence</text>
+    <rect x="2127" y="1260" width="34" height="15" rx="7" fill="#31a86f"/>
+    <rect x="2169" y="1263" width="24" height="9" rx="5" fill="#31a86f"/>
+    <rect x="2201" y="1260" width="34" height="15" rx="7" fill="#31a86f"/>
+    <rect x="2243" y="1260" width="11" height="15" rx="5" fill="#31a86f"/>
+  </g>
+  <path d="M1950 1214 L2102 1214" class="line-dark"/>
+
+  <!-- Robot state routing -->
+  <path d="M478 1156 L505 1156 L505 995 L1320 995 L1320 1185 L1342 1185" class="line-dark"/>
+  <rect x="870" y="978" width="238" height="26" rx="13" fill="#ffffff" stroke="#d7dde3" stroke-width="1.5"/>
+  <text x="989" y="996" text-anchor="middle" class="tiny">state tokens / proprioception</text>
+
+  <!-- Legend -->
+  <g>
+    <rect x="655" y="1390" width="1055" height="66" rx="18" fill="#f7f9fb" stroke="#d7dde3" stroke-width="2"/>
+    <circle cx="690" cy="1423" r="9" fill="#d5a000"/>
+    <text x="710" y="1430" class="small">VLM semantic conditions</text>
+    <circle cx="1018" cy="1423" r="9" fill="#7962c8"/>
+    <text x="1038" y="1430" class="small">world-model dynamics conditions</text>
+    <circle cx="1406" cy="1423" r="9" fill="#31a86f"/>
+    <text x="1426" y="1430" class="small">flow-matching action generation</text>
+  </g>
+</svg>

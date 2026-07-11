@@ -1,0 +1,216 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="1280" viewBox="0 0 2200 1280">
+  <defs>
+    <marker id="arrow-dark" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#2f3437"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#2f6fb2"/>
+    </marker>
+    <marker id="arrow-gold" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#c89500"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#2ca56a"/>
+    </marker>
+    <filter id="shadow" x="-10%" y="-20%" width="120%" height="150%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.12"/>
+    </filter>
+    <style>
+      .title { font-family: Inter, Arial, sans-serif; font-weight: 800; font-size: 36px; fill: #202124; }
+      .subtitle { font-family: Inter, Arial, sans-serif; font-weight: 600; font-size: 21px; fill: #62676b; }
+      .body { font-family: Inter, Arial, sans-serif; font-weight: 600; font-size: 23px; fill: #2a2d30; }
+      .small { font-family: Inter, Arial, sans-serif; font-weight: 600; font-size: 18px; fill: #62676b; }
+      .tiny { font-family: Inter, Arial, sans-serif; font-weight: 600; font-size: 15px; fill: #6a7075; }
+      .formula { font-family: "SFMono-Regular", Consolas, monospace; font-size: 20px; fill: #465058; }
+      .box-gray { fill: #ffffff; stroke: #a4a4a4; stroke-width: 3; }
+      .box-blue { fill: #eaf3ff; stroke: #2f6fb2; stroke-width: 4; }
+      .box-gold { fill: #fff6d8; stroke: #d5a000; stroke-width: 4; }
+      .box-green { fill: #f2fbf6; stroke: #31a86f; stroke-width: 4; }
+      .box-purple { fill: #f2efff; stroke: #7762c7; stroke-width: 3; }
+      .line-dark { fill: none; stroke: #2f3437; stroke-width: 3; marker-end: url(#arrow-dark); }
+      .line-blue { fill: none; stroke: #2f6fb2; stroke-width: 3; marker-end: url(#arrow-blue); }
+      .line-gold { fill: none; stroke: #c89500; stroke-width: 3; marker-end: url(#arrow-gold); }
+      .line-green { fill: none; stroke: #2ca56a; stroke-width: 3; marker-end: url(#arrow-green); }
+      .line-dashed { fill: none; stroke: #2f6fb2; stroke-width: 3; stroke-dasharray: 12 10; marker-end: url(#arrow-blue); }
+    </style>
+  </defs>
+
+  <rect width="2200" height="1280" fill="#ffffff"/>
+  <text x="1100" y="62" text-anchor="middle" class="title">Semantic-Physical Conditioning for Flow Matching VLA</text>
+  <text x="1100" y="96" text-anchor="middle" class="subtitle">VLM produces tensorized conditions; the flow action head generates continuous action chunks</text>
+
+  <!-- Left inputs -->
+  <g filter="url(#shadow)">
+    <rect x="72" y="150" width="405" height="270" rx="24" class="box-gray"/>
+    <text x="274" y="187" text-anchor="middle" class="body">Single-frame</text>
+    <text x="274" y="219" text-anchor="middle" class="body">Ego-view Image</text>
+    <rect x="106" y="242" width="337" height="140" rx="18" fill="#d8e2df"/>
+    <clipPath id="clip-photo"><rect x="106" y="242" width="337" height="140" rx="18"/></clipPath>
+    <g clip-path="url(#clip-photo)">
+      <rect x="106" y="242" width="337" height="140" fill="#cbd9da"/>
+      <polygon points="106,382 443,382 395,304 151,304" fill="#e7ece8"/>
+      <polygon points="129,258 215,242 225,323 128,323" fill="#8f9d9e"/>
+      <rect x="258" y="260" width="66" height="35" rx="5" fill="#748185"/>
+      <circle cx="352" cy="335" r="27" fill="#56a5d8"/>
+      <path d="M274 320 C302 295 333 292 356 316" stroke="#f0c23b" stroke-width="14" fill="none" stroke-linecap="round"/>
+      <rect x="165" y="317" width="78" height="49" rx="5" fill="#d2cbc1"/>
+      <g fill="#7d5a45">
+        <circle cx="180" cy="330" r="2.2"/><circle cx="198" cy="342" r="2.2"/><circle cx="224" cy="330" r="2.2"/>
+        <circle cx="188" cy="358" r="2.2"/><circle cx="234" cy="354" r="2.2"/><circle cx="213" cy="365" r="2.2"/>
+      </g>
+      <path d="M388 378 C377 355 381 331 400 321 C416 313 430 321 438 335" stroke="#202124" stroke-width="12" fill="none" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="72" y="462" width="405" height="132" rx="24" class="box-gray"/>
+    <text x="274" y="511" text-anchor="middle" class="body">Language Instruction</text>
+    <text x="274" y="552" text-anchor="middle" class="subtitle">"Pick up the bowl"</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="72" y="910" width="405" height="142" rx="24" class="box-gray"/>
+    <text x="274" y="963" text-anchor="middle" class="body">Robot State</text>
+    <text x="274" y="1015" text-anchor="middle" class="subtitle">joint pos / hand state / force</text>
+  </g>
+
+  <!-- Top VLM -->
+  <g filter="url(#shadow)">
+    <rect x="590" y="128" width="1160" height="230" rx="30" class="box-blue"/>
+    <text x="1170" y="222" text-anchor="middle" class="title">Qwen3-VL</text>
+    <text x="1170" y="267" text-anchor="middle" class="subtitle">vision-language backbone</text>
+    <text x="1170" y="311" text-anchor="middle" class="formula">h_vlm = f(image, instruction, history)</text>
+  </g>
+
+  <path d="M477 285 L590 285" class="line-dark"/>
+  <path d="M477 528 L535 528 L535 310 L590 310" class="line-dark"/>
+
+  <!-- Condition compiler -->
+  <g filter="url(#shadow)">
+    <rect x="690" y="430" width="960" height="260" rx="28" class="box-gold"/>
+    <text x="1170" y="476" text-anchor="middle" class="body">VLM Condition Compiler</text>
+    <text x="1170" y="508" text-anchor="middle" class="small">compile semantic reasoning into trainable condition tensors</text>
+
+    <rect x="732" y="540" width="168" height="100" rx="16" fill="#ffffff" stroke="#d5a000" stroke-width="2.5"/>
+    <text x="816" y="574" text-anchor="middle" class="small">Future</text>
+    <text x="816" y="599" text-anchor="middle" class="small">Visual Goal</text>
+    <rect x="762" y="612" width="108" height="15" rx="5" fill="#7ab6e4"/>
+
+    <rect x="922" y="540" width="168" height="100" rx="16" fill="#ffffff" stroke="#d5a000" stroke-width="2.5"/>
+    <text x="1006" y="574" text-anchor="middle" class="small">Object</text>
+    <text x="1006" y="599" text-anchor="middle" class="small">State Delta</text>
+    <path d="M965 622 L1047 622" stroke="#d5a000" stroke-width="4" marker-end="url(#arrow-gold)"/>
+
+    <rect x="1112" y="540" width="168" height="100" rx="16" fill="#ffffff" stroke="#d5a000" stroke-width="2.5"/>
+    <text x="1196" y="574" text-anchor="middle" class="small">Contact</text>
+    <text x="1196" y="599" text-anchor="middle" class="small">Mode</text>
+    <circle cx="1165" cy="622" r="8" fill="#31a86f"/><circle cx="1196" cy="622" r="8" fill="#31a86f"/><circle cx="1227" cy="622" r="8" fill="#31a86f"/>
+
+    <rect x="1302" y="540" width="168" height="100" rx="16" fill="#ffffff" stroke="#d5a000" stroke-width="2.5"/>
+    <text x="1386" y="574" text-anchor="middle" class="small">Phase</text>
+    <text x="1386" y="599" text-anchor="middle" class="small">&amp; Hand Roles</text>
+    <rect x="1348" y="614" width="76" height="18" rx="9" fill="#d6cfff"/>
+
+    <rect x="1492" y="540" width="118" height="100" rx="16" fill="#ffffff" stroke="#d5a000" stroke-width="2.5"/>
+    <text x="1551" y="574" text-anchor="middle" class="small">Dense</text>
+    <text x="1551" y="599" text-anchor="middle" class="small">Maps</text>
+    <path d="M1518 627 C1536 604 1567 648 1586 618" stroke="#31a86f" stroke-width="5" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <path d="M1170 358 L1170 430" class="line-gold"/>
+
+  <!-- VLM feature token side branch -->
+  <g filter="url(#shadow)">
+    <rect x="1685" y="430" width="330" height="142" rx="22" class="box-blue"/>
+    <text x="1850" y="487" text-anchor="middle" class="body">VLM Features</text>
+    <text x="1850" y="526" text-anchor="middle" class="subtitle">conditioning tokens</text>
+  </g>
+  <path d="M1590 358 L1850 358 L1850 430" class="line-blue"/>
+
+  <!-- Action head -->
+  <g filter="url(#shadow)">
+    <rect x="535" y="728" width="1380" height="380" rx="32" class="box-green"/>
+    <text x="580" y="780" class="title">Action Head</text>
+    <text x="1488" y="1092" class="formula">v_theta(x_t, t | obs, C_vlm)</text>
+  </g>
+
+  <!-- Inside action head: left -->
+  <g filter="url(#shadow)">
+    <rect x="580" y="840" width="250" height="80" rx="18" fill="#ffffff" stroke="#a4a4a4" stroke-width="3"/>
+    <text x="705" y="874" text-anchor="middle" class="small">Noisy Action</text>
+    <text x="705" y="903" text-anchor="middle" class="small">Tokens x_t</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="580" y="953" width="250" height="108" rx="20" class="box-green"/>
+    <text x="705" y="995" text-anchor="middle" class="body">Action</text>
+    <text x="705" y="1031" text-anchor="middle" class="body">Encoder</text>
+  </g>
+  <path d="M705 920 L705 953" class="line-dark"/>
+
+  <!-- Condition pack encoders -->
+  <g filter="url(#shadow)">
+    <rect x="930" y="770" width="300" height="104" rx="20" class="box-gold"/>
+    <text x="1080" y="812" text-anchor="middle" class="body">Condition</text>
+    <text x="1080" y="846" text-anchor="middle" class="body">Encoders</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="920" y="924" width="320" height="108" rx="20" fill="#fff0a8" stroke="#d5a000" stroke-width="4"/>
+    <text x="1080" y="968" text-anchor="middle" class="body">Concat + Fusion</text>
+    <text x="1080" y="1008" text-anchor="middle" class="small">C_vlm-enhanced features</text>
+  </g>
+  <path d="M1170 690 L1170 770" class="line-gold"/>
+  <path d="M1080 874 L1080 924" class="line-gold"/>
+  <path d="M830 1007 L920 1007" class="line-dark"/>
+
+  <!-- DiT blocks -->
+  <g filter="url(#shadow)">
+    <rect x="1336" y="820" width="342" height="244" rx="22" class="box-green"/>
+    <text x="1507" y="865" text-anchor="middle" class="body">DiT Blocks x N</text>
+    <rect x="1380" y="914" width="254" height="80" rx="16" fill="#ffffff" stroke="#a4a4a4" stroke-width="3"/>
+    <rect x="1398" y="939" width="112" height="42" rx="10" fill="#ffffff" stroke="#a4a4a4" stroke-width="3"/>
+    <text x="1454" y="964" text-anchor="middle" class="tiny">Self Attn</text>
+    <path d="M1510 960 L1552 960" class="line-dark"/>
+    <rect x="1552" y="939" width="94" height="42" rx="10" fill="#eaf3ff" stroke="#2f6fb2" stroke-width="3"/>
+    <text x="1599" y="955" text-anchor="middle" class="tiny">Cross</text>
+    <text x="1599" y="974" text-anchor="middle" class="tiny">Attn</text>
+    <text x="1507" y="1028" text-anchor="middle" class="small">AdaLN / FiLM for phase,</text>
+    <text x="1507" y="1052" text-anchor="middle" class="small">contact, strategy tokens</text>
+  </g>
+  <path d="M1240 978 L1336 978" class="line-dark"/>
+  <path d="M1850 572 L1850 880 L1599 880 L1599 939" class="line-dashed"/>
+
+  <!-- Flow head and output -->
+  <g filter="url(#shadow)">
+    <rect x="1718" y="943" width="210" height="118" rx="20" class="box-green"/>
+    <text x="1823" y="999" text-anchor="middle" class="body">Flow Head</text>
+    <text x="1823" y="1030" text-anchor="middle" class="small">velocity field</text>
+  </g>
+  <path d="M1678 978 L1718 978" class="line-green"/>
+
+  <g filter="url(#shadow)">
+    <rect x="1998" y="905" width="150" height="154" rx="22" class="box-gray"/>
+    <text x="2073" y="952" text-anchor="middle" class="body">Robot</text>
+    <text x="2073" y="988" text-anchor="middle" class="body">Action</text>
+    <text x="2073" y="1024" text-anchor="middle" class="body">Sequence</text>
+    <rect x="2015" y="1038" width="34" height="15" rx="7" fill="#31a86f"/>
+    <rect x="2057" y="1041" width="24" height="9" rx="5" fill="#31a86f"/>
+    <rect x="2089" y="1038" width="34" height="15" rx="7" fill="#31a86f"/>
+    <rect x="2130" y="1038" width="7" height="15" rx="4" fill="#31a86f"/>
+  </g>
+  <path d="M1928 1002 L1998 1002" class="line-dark"/>
+
+  <!-- Robot state routing -->
+  <path d="M477 981 L514 981 L514 1065 L1490 1065 L1490 1064" class="line-dark"/>
+  <text x="1035" y="1051" text-anchor="middle" class="small">Robot State / proprioception</text>
+
+  <!-- Legend bottom -->
+  <g>
+    <rect x="655" y="1148" width="885" height="68" rx="18" fill="#f7f9fb" stroke="#d7dde3" stroke-width="2"/>
+    <circle cx="690" cy="1182" r="9" fill="#d5a000"/>
+    <text x="710" y="1189" class="small">VLM-compiled conditions</text>
+    <circle cx="980" cy="1182" r="9" fill="#2f6fb2"/>
+    <text x="1000" y="1189" class="small">backbone feature tokens</text>
+    <circle cx="1275" cy="1182" r="9" fill="#31a86f"/>
+    <text x="1295" y="1189" class="small">flow-matching action generation</text>
+  </g>
+</svg>
