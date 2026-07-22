@@ -276,6 +276,11 @@ assert.ok(app.includes("visual-figure-mobile"), "app should render a readable mo
 assert.ok(app.includes("visual-edge-legend"), "figures should expose edge relationships without overlapping SVG labels");
 assert.ok(app.includes("const layoutNodes"), "SVG figures should calculate text-aware node layouts");
 assert.ok(app.includes("node.detailY"), "SVG detail text should move below wrapped node titles");
+assert.ok(app.includes("buildFigureEdgePath"), "SVG arrows should use direction-aware routing");
+assert.ok(app.includes("segmentIntersectsNode"), "SVG arrows should detect intermediate node collisions");
+assert.ok(app.includes("const blockers"), "blocked SVG arrows should take a clear detour lane");
+assert.ok(app.includes("rightGap >= 18"), "SVG arrows should route left-to-right edges from horizontal ports");
+assert.ok(app.includes("leftGap >= 18"), "SVG arrows should route right-to-left edges from horizontal ports");
 assert.ok(app.includes("requestAnimationFrame(alignTarget)"), "app should defer hash scrolling until layout settles");
 assert.ok(app.includes("setTimeout(alignTarget, 120)"), "app should restore hash scroll after native anchor scrolling");
 assert.ok(app.includes("setTimeout(alignTarget, 450)"), "app should restore hash scroll after smooth anchor scrolling");

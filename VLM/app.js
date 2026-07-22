@@ -122,6 +122,104 @@
     return lines;
   }
 
+  function segmentIntersectsNode(fromPoint, toPoint, node, padding = 6) {
+    const left = node.x - padding;
+    const right = node.x + node.w + padding;
+    const top = node.y - padding;
+    const bottom = node.y + node.h + padding;
+    if (fromPoint.y === toPoint.y) {
+      const minX = Math.min(fromPoint.x, toPoint.x);
+      const maxX = Math.max(fromPoint.x, toPoint.x);
+      return fromPoint.y > top && fromPoint.y < bottom && minX < right && maxX > left;
+    }
+    const minY = Math.min(fromPoint.y, toPoint.y);
+    const maxY = Math.max(fromPoint.y, toPoint.y);
+    return fromPoint.x > left && fromPoint.x < right && minY < bottom && maxY > top;
+  }
+
+  function pointsToFigurePath(points) {
+    return points.map((point, index) => {
+      if (!index) return `M ${point.x} ${point.y}`;
+      const previous = points[index - 1];
+      return point.x === previous.x ? `V ${point.y}` : `H ${point.x}`;
+    }).join(" ");
+  }
+
+  function buildFigureEdgePath(from, to, nodes) {
+    const fromCenterX = from.x + from.w / 2;
+    const fromCenterY = from.y + from.h / 2;
+    const toCenterX = to.x + to.w / 2;
+    const toCenterY = to.y + to.h / 2;
+    const arrowGap = 10;
+    const rightGap = to.x - (from.x + from.w);
+    const leftGap = from.x - (to.x + to.w);
+
+    if (rightGap >= 18) {
+      const startX = from.x + from.w;
+      const endX = to.x - arrowGap;
+      if (Math.abs(fromCenterY - toCenterY) < 2) {
+        return `M ${startX} ${fromCenterY} H ${endX}`;
+      }
+      const laneX = startX + (endX - startX) / 2;
+      const points = [
+        { x: startX, y: fromCenterY },
+        { x: laneX, y: fromCenterY },
+        { x: laneX, y: toCenterY },
+        { x: endX, y: toCenterY }
+      ];
+      const blockers = nodes.filter((node) => node !== from && node !== to && points.slice(1).some((point, index) => segmentIntersectsNode(points[index], point, node)));
+      if (!blockers.length) return pointsToFigurePath(points);
+
+      const corridorNodes = nodes.filter((node) => node !== from && node !== to && node.x < endX && node.x + node.w > startX);
+      const upperLane = Math.max(18, Math.min(from.y, to.y, ...corridorNodes.map((node) => node.y)) - 18);
+      const approachX = endX - 18;
+      return pointsToFigurePath([
+        { x: startX, y: fromCenterY },
+        { x: startX, y: upperLane },
+        { x: approachX, y: upperLane },
+        { x: approachX, y: toCenterY },
+        { x: endX, y: toCenterY }
+      ]);
+    }
+
+    if (leftGap >= 18) {
+      const startX = from.x;
+      const endX = to.x + to.w + arrowGap;
+      if (Math.abs(fromCenterY - toCenterY) < 2) {
+        return `M ${startX} ${fromCenterY} H ${endX}`;
+      }
+      const laneX = startX + (endX - startX) / 2;
+      const points = [
+        { x: startX, y: fromCenterY },
+        { x: laneX, y: fromCenterY },
+        { x: laneX, y: toCenterY },
+        { x: endX, y: toCenterY }
+      ];
+      const blockers = nodes.filter((node) => node !== from && node !== to && points.slice(1).some((point, index) => segmentIntersectsNode(points[index], point, node)));
+      if (!blockers.length) return pointsToFigurePath(points);
+
+      const corridorNodes = nodes.filter((node) => node !== from && node !== to && node.x < startX && node.x + node.w > endX);
+      const upperLane = Math.max(18, Math.min(from.y, to.y, ...corridorNodes.map((node) => node.y)) - 18);
+      const approachX = endX + 18;
+      return pointsToFigurePath([
+        { x: startX, y: fromCenterY },
+        { x: startX, y: upperLane },
+        { x: approachX, y: upperLane },
+        { x: approachX, y: toCenterY },
+        { x: endX, y: toCenterY }
+      ]);
+    }
+
+    const movesDown = toCenterY >= fromCenterY;
+    const startY = movesDown ? from.y + from.h : from.y;
+    const endY = movesDown ? to.y - arrowGap : to.y + to.h + arrowGap;
+    if (Math.abs(fromCenterX - toCenterX) < 2) {
+      return `M ${fromCenterX} ${startY} V ${endY}`;
+    }
+    const laneY = startY + (endY - startY) / 2;
+    return `M ${fromCenterX} ${startY} V ${laneY} H ${toCenterX} V ${endY}`;
+  }
+
   function renderVisualFigures() {
     const container = byId("visual-figure-grid");
     container.replaceChildren();
@@ -151,7 +249,7 @@
         "aria-label": figure.title
       });
       const defs = svgEl("defs");
-      const marker = svgEl("marker", { id: `arrow-${figure.title.replace(/\W+/g, "-")}`, viewBox: "0 0 10 10", refX: "8", refY: "5", markerWidth: "7", markerHeight: "7", orient: "auto-start-reverse" });
+      const marker = svgEl("marker", { id: `arrow-${figure.title.replace(/\W+/g, "-")}`, viewBox: "0 0 10 10", refX: "9", refY: "5", markerWidth: "6", markerHeight: "6", orient: "auto-start-reverse" });
       const markerPath = svgEl("path", { d: "M 0 0 L 10 5 L 0 10 z", class: "figure-arrow-head", fill: "#8a9b95" });
       marker.append(markerPath);
       defs.append(marker);
@@ -170,17 +268,12 @@
       figure.edges.forEach((edge) => {
         const from = layoutNodes[edge.from];
         const to = layoutNodes[edge.to];
-        const startX = from.x + from.w;
-        const startY = from.y + from.h / 2;
-        const endX = to.x;
-        const endY = to.y + to.h / 2;
-        const midX = (startX + endX) / 2;
         const path = svgEl("path", {
-          d: `M ${startX} ${startY} C ${midX} ${startY}, ${midX} ${endY}, ${endX - 8} ${endY}`,
+          d: buildFigureEdgePath(from, to, layoutNodes),
           class: "figure-edge-path",
           fill: "none",
           stroke: "#8a9b95",
-          "stroke-width": "2.4",
+          "stroke-width": "2.2",
           "marker-end": `url(#arrow-${figure.title.replace(/\W+/g, "-")})`
         });
         svg.append(path);
