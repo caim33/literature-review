@@ -2,6 +2,8 @@
   const data = window.vlmMapData || globalThis.vlmMapData;
   let selectedFamilyId = data.families[0].id;
   let modelQuery = "";
+  let visualFiguresExpanded = false;
+  const featuredVisualFigureIndexes = [0, 4, 7];
 
   const byId = (id) => document.getElementById(id);
   const normalize = (text) => String(text || "").toLowerCase();
@@ -234,7 +236,10 @@
       benchmark: ["#fffff1", "#cacc90"],
       output: ["#f6fbf2", "#afc6a4"]
     };
-    data.visualFigureGuides.forEach((figure) => {
+    const figures = visualFiguresExpanded
+      ? data.visualFigureGuides
+      : featuredVisualFigureIndexes.map((index) => data.visualFigureGuides[index]).filter(Boolean);
+    figures.forEach((figure) => {
       const card = el("article", "visual-figure-card");
       const head = el("div", "visual-figure-head");
       head.append(el("span", "diagram-kicker", figure.kicker));
@@ -322,6 +327,20 @@
       card.append(head, stage, mobileFigure, relationLegend, body);
       container.append(card);
     });
+
+    const toggle = byId("visual-figure-toggle");
+    const status = byId("visual-figure-status");
+    toggle.setAttribute("aria-expanded", String(visualFiguresExpanded));
+    toggle.textContent = visualFiguresExpanded ? "收起至精选 3 张" : `展开全部 ${data.visualFigureGuides.length} 张`;
+    status.textContent = visualFiguresExpanded
+      ? `全部 ${data.visualFigureGuides.length} / ${data.visualFigureGuides.length} 张`
+      : `精选 ${figures.length} / ${data.visualFigureGuides.length} 张`;
+  }
+
+  function toggleVisualFigures() {
+    visualFiguresExpanded = !visualFiguresExpanded;
+    renderVisualFigures();
+    byId("visual-figure-toggle").focus();
   }
 
   function renderPaperFigureGuides() {
@@ -576,6 +595,7 @@
 
   function bind() {
     byId("model-search").addEventListener("input", applyModelSearch);
+    byId("visual-figure-toggle").addEventListener("click", toggleVisualFigures);
   }
 
   function restoreHashScroll() {

@@ -208,14 +208,17 @@ function hasAnchor(markup, href, text) {
 const html = await readFile(indexPath, "utf8");
 assert.ok(hasAnchor(html, "#visual-figures", "范式图"), "top navigation should expose visible paradigm figures directly");
 assert.ok(hasAnchor(html, "#paper-figures", "论文图"), "top navigation should expose paper figure guides directly");
-assert.ok(hasAnchor(html, "#visual-figures", "看范式图"), "hero action should jump directly to the visible SVG figure section");
+assert.ok(hasAnchor(html, "#paper-figures", "看论文原图"), "hero primary action should jump directly to paper figures");
+assert.ok(hasAnchor(html, "#visual-figures", "范式预览"), "hero secondary action should expose the concise paradigm preview");
 assert.ok(html.includes('id="paper-figures"'), "index should expose the paper figure section");
 assert.ok(html.includes('id="paper-figure-guides"'), "index should expose the paper figure guide mount");
 assert.ok(html.includes("paper-figures-band"), "index should use the paper figure band class");
-assert.ok(html.includes("./data.js?v=20260630-paperfigures"), "data script should use the paper figure cache buster");
-assert.ok(html.includes("./app.js?v=20260722-responsive"), "app script should use the responsive layout cache buster");
+assert.ok(html.indexOf('id="paper-figures"') < html.indexOf('id="visual-figures"'), "paper figures should appear before the paradigm preview");
+assert.ok(html.includes("./data.js?v=20260722-preview"), "data script should use the concise preview cache buster");
+assert.ok(html.includes("./app.js?v=20260722-preview"), "app script should use the concise preview cache buster");
 const siteHtml = await readFile(siteIndexPath, "utf8");
-assert.ok(hasAnchor(siteHtml, "./VLM/#visual-figures", "VLM 多模态大模型学习地图"), "site homepage should deep-link the VLM card to visible figures");
+assert.ok(hasAnchor(siteHtml, "./VLM/#paper-figures", "VLM 多模态大模型学习地图"), "site homepage should deep-link the VLM card to paper figures");
+assert.ok(siteHtml.includes("9 张论文原图"), "site homepage should advertise VLM paper figures");
 assert.ok(siteHtml.includes("9 张范式图"), "site homepage should advertise VLM paradigm diagrams");
 for (const group of data.tocGroups) {
   for (const item of group.items) {
@@ -227,6 +230,8 @@ for (const id of [
   "contents",
   "visual-figures",
   "visual-figure-grid",
+  "visual-figure-toggle",
+  "visual-figure-status",
   "paper-figures",
   "paper-figure-guides",
   "page-toc",
@@ -263,7 +268,8 @@ for (const fn of [
   "renderReferences",
   "renderGlossary",
   "restoreHashScroll",
-  "applyModelSearch"
+  "applyModelSearch",
+  "toggleVisualFigures"
 ]) {
   assert.ok(app.includes(fn), `app should include ${fn}`);
 }
@@ -272,6 +278,8 @@ assert.ok(app.includes("window.scrollTo({"), "app should restore hash scroll aft
 assert.ok(app.includes("target.getBoundingClientRect().top + window.scrollY"), "app should align to the target's final document position");
 assert.ok(app.includes("createElementNS(svgNS"), "app should render visible SVG figures");
 assert.ok(app.includes("figurePalette"), "app should assign explicit SVG colors for visible figures");
+assert.ok(app.includes("featuredVisualFigureIndexes = [0, 4, 7]"), "concise preview should span foundation, instruction tuning, and unified generation");
+assert.ok(app.includes("visualFiguresExpanded"), "users should be able to expand all paradigm figures on demand");
 assert.ok(app.includes("visual-figure-mobile"), "app should render a readable mobile alternative to wide SVG figures");
 assert.ok(app.includes("visual-edge-legend"), "figures should expose edge relationships without overlapping SVG labels");
 assert.ok(app.includes("const layoutNodes"), "SVG figures should calculate text-aware node layouts");
@@ -294,6 +302,7 @@ for (const className of [
   "principle-grid",
   "learning-path",
   "visual-figure-grid",
+  "visual-figure-controls",
   "visual-figure-card",
   "visual-figure-svg",
   "visual-figure-mobile",

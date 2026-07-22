@@ -31,9 +31,10 @@ const vlmMapData = {
     {
       title: "先建立框架",
       items: [
+        { target: "paper-figures", title: "论文原图导读", note: "先看 9 张论文/项目主图，再按三步拆解回到原文。" },
         { target: "principles", title: "四个心智模型", note: "先把 VLP、VLM、MLLM 和统一生成理解分清。" },
         { target: "learning-path", title: "学习路线", note: "从 CLIP 到 BAGEL 的阅读顺序。" },
-        { target: "visual-figures", title: "范式图", note: "先看 9 张 SVG 图：双塔、融合、Q-Former、LLaVA、Flamingo、BAGEL 等。" }
+        { target: "visual-figures", title: "范式预览", note: "默认精选 CLIP、LLaVA、BAGEL，按需展开全部 9 张 SVG 图。" }
       ]
     },
     {

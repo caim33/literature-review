@@ -346,6 +346,30 @@ h3 {
   gap: 1.15rem;
 }
 
+.visual-figure-controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.visual-figure-controls p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.visual-figure-controls .button-link {
+  flex: 0 0 auto;
+  cursor: pointer;
+  justify-content: center;
+}
+
 .visual-figure-card {
   min-width: 0;
   border: 1px solid var(--line);
@@ -1323,6 +1347,15 @@ input {
 
   .visual-figure-card {
     overflow: hidden;
+  }
+
+  .visual-figure-controls {
+    display: grid;
+    align-items: stretch;
+  }
+
+  .visual-figure-controls .button-link {
+    width: 100%;
   }
 
   .visual-figure-stage {

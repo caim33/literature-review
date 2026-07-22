@@ -13,8 +13,8 @@
       <nav class="topbar" aria-label="Primary">
         <a href="../">首页</a>
         <a href="#contents">目录</a>
-        <a href="#visual-figures">范式图</a>
         <a href="#paper-figures">论文图</a>
+        <a href="#visual-figures">范式图</a>
         <a href="#learning-path">路线</a>
         <a href="#families">家族</a>
         <a href="#model-atlas">模型</a>
@@ -30,8 +30,8 @@
             从 CLIP、BLIP-2、Flamingo、LLaVA 读到 Qwen2.5-VL、InternVL、Molmo、Kimi-VL 和 BAGEL 这类统一理解与生成模型。目标不是背模型名，而是看清视觉编码器、连接器、数据配方、评测和生成目标如何共同塑造能力。
           </p>
           <div class="hero-actions">
-            <a class="button primary" href="#visual-figures">看范式图</a>
-            <a class="button" href="#contents">打开目录</a>
+            <a class="button primary" href="#paper-figures">看论文原图</a>
+            <a class="button" href="#visual-figures">范式预览</a>
           </div>
         </section>
         <aside class="hero-panel" aria-label="Quick map">
@@ -52,17 +52,6 @@
     </header>
 
     <main>
-      <section class="band visual-figures-band" id="visual-figures">
-        <div class="section-head">
-          <p class="eyebrow">Visible Paradigm Figures</p>
-          <h2>先看真正的图：VLM 主流范式九宫格</h2>
-        </div>
-        <p class="section-intro">
-          这些是对论文架构图的学习版重画：先看模块、箭头和训练目标，再回到原论文/项目页看细节。
-        </p>
-        <div id="visual-figure-grid" class="visual-figure-grid"></div>
-      </section>
-
       <section class="band paper-figures-band" id="paper-figures">
         <div class="section-head">
           <p class="eyebrow">Paper Figures</p>
@@ -72,6 +61,21 @@
           这些卡片优先展示论文/项目原图，再用三步拆解帮助对照原文读架构、训练目标和能力边界。
         </p>
         <div id="paper-figure-guides" class="paper-figure-guides"></div>
+      </section>
+
+      <section class="band visual-figures-band" id="visual-figures">
+        <div class="section-head">
+          <p class="eyebrow">Paradigm Preview</p>
+          <h2>三张图先看懂 VLM 主流范式</h2>
+        </div>
+        <p class="section-intro">
+          默认精选 CLIP、LLaVA 和统一理解生成三条代表路线；需要系统比较时再展开全部九张学习版架构图。
+        </p>
+        <div class="visual-figure-controls">
+          <p id="visual-figure-status" aria-live="polite">精选 3 / 9 张</p>
+          <button id="visual-figure-toggle" class="button-link" type="button" aria-expanded="false" aria-controls="visual-figure-grid">展开全部 9 张</button>
+        </div>
+        <div id="visual-figure-grid" class="visual-figure-grid"></div>
       </section>
 
       <section class="band toc-band" id="contents">
@@ -177,7 +181,7 @@
       <p>Updated 2026-06-29. 公开论文、项目页、官方报告、模型卡和 benchmark 混合整理；闭源产品能力请按证据等级阅读。</p>
     </footer>
 
-    <script src="./data.js?v=20260630-paperfigures"></script>
-    <script src="./app.js?v=20260722-responsive"></script>
+    <script src="./data.js?v=20260722-preview"></script>
+    <script src="./app.js?v=20260722-preview"></script>
   </body>
 </html>
