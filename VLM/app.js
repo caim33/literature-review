@@ -96,21 +96,30 @@
     });
   }
 
-  function splitSvgText(text, maxChars) {
-    const words = String(text).split(" ");
+  function splitSvgText(text, maxUnits) {
+    const tokens = String(text).trim().match(/[\u2e80-\u9fff\uac00-\ud7af\uff01-\uff60]|[^\s\u2e80-\u9fff\uac00-\ud7af\uff01-\uff60]+|\s+/g) || [];
     const lines = [];
     let current = "";
-    words.forEach((word) => {
-      const next = current ? `${current} ${word}` : word;
-      if (next.length > maxChars && current) {
-        lines.push(current);
-        current = word;
+    let currentUnits = 0;
+    const tokenUnits = (token) => Array.from(token).reduce((total, character) => {
+      if (/\s/.test(character)) return total + 0.45;
+      if (/[\u2e80-\u9fff\uac00-\ud7af\uff01-\uff60]/.test(character)) return total + 2;
+      return total + 1;
+    }, 0);
+
+    tokens.forEach((token) => {
+      const units = tokenUnits(token);
+      if (current && currentUnits + units > maxUnits) {
+        lines.push(current.trim());
+        current = token.trimStart();
+        currentUnits = tokenUnits(current);
       } else {
-        current = next;
+        current += token;
+        currentUnits += units;
       }
     });
-    if (current) lines.push(current);
-    return lines.slice(0, 3);
+    if (current.trim()) lines.push(current.trim());
+    return lines;
   }
 
   function renderVisualFigures() {
@@ -134,7 +143,13 @@
       head.append(el("h3", "", figure.title));
       head.append(el("p", "", figure.summary));
 
-      const svg = svgEl("svg", { class: "visual-figure-svg", viewBox: "0 0 920 320", role: "img", "aria-label": figure.title });
+      const svg = svgEl("svg", {
+        class: "visual-figure-svg",
+        viewBox: "0 0 920 320",
+        preserveAspectRatio: "xMidYMid meet",
+        role: "img",
+        "aria-label": figure.title
+      });
       const defs = svgEl("defs");
       const marker = svgEl("marker", { id: `arrow-${figure.title.replace(/\W+/g, "-")}`, viewBox: "0 0 10 10", refX: "8", refY: "5", markerWidth: "7", markerHeight: "7", orient: "auto-start-reverse" });
       const markerPath = svgEl("path", { d: "M 0 0 L 10 5 L 0 10 z", class: "figure-arrow-head", fill: "#8a9b95" });
@@ -142,9 +157,19 @@
       defs.append(marker);
       svg.append(defs);
 
+      const layoutNodes = figure.nodes.map((node) => {
+        const titleLines = splitSvgText(node.label, Math.max(12, Math.floor((node.w - 24) / 8)));
+        const detailLines = splitSvgText(node.detail, Math.max(15, Math.floor((node.w - 24) / 6.8)));
+        const detailY = 64 + Math.max(0, titleLines.length - 1) * 17;
+        const height = Math.max(node.h, detailY + Math.max(0, detailLines.length - 1) * 17 + 12);
+        return { ...node, titleLines, detailLines, detailY, h: height };
+      });
+      const figureHeight = Math.max(320, ...layoutNodes.map((node) => node.y + node.h + 24));
+      svg.setAttribute("viewBox", `0 0 920 ${figureHeight}`);
+
       figure.edges.forEach((edge) => {
-        const from = figure.nodes[edge.from];
-        const to = figure.nodes[edge.to];
+        const from = layoutNodes[edge.from];
+        const to = layoutNodes[edge.to];
         const startX = from.x + from.w;
         const startY = from.y + from.h / 2;
         const endX = to.x;
@@ -159,34 +184,49 @@
           "marker-end": `url(#arrow-${figure.title.replace(/\W+/g, "-")})`
         });
         svg.append(path);
-        const label = svgEl("text", {
-          x: midX - 36,
-          y: Math.min(startY, endY) + Math.abs(startY - endY) / 2 - 8,
-          class: "figure-edge-label",
-          fill: "#5f6e77"
-        });
-        label.textContent = edge.label;
-        svg.append(label);
       });
 
-      figure.nodes.forEach((node, index) => {
+      layoutNodes.forEach((node, index) => {
         const group = svgEl("g", { class: `figure-node ${node.kind}` });
         const [fill, stroke] = figurePalette[node.kind] || ["#ffffff", "#ccd4ce"];
         group.append(svgEl("rect", { x: node.x, y: node.y, width: node.w, height: node.h, rx: "9", fill, stroke, "stroke-width": "2" }));
         const indexText = svgEl("text", { x: node.x + 12, y: node.y + 22, class: "figure-node-index", fill: "#1f6f69" });
         indexText.textContent = String(index + 1).padStart(2, "0");
         group.append(indexText);
-        renderSvgText(group, splitSvgText(node.label, 18), node.x + 12, node.y + 43, "figure-node-title", "#1c2430");
-        renderSvgText(group, splitSvgText(node.detail, 23), node.x + 12, node.y + 63, "figure-node-detail", "#5d6b73");
+        renderSvgText(group, node.titleLines, node.x + 12, node.y + 43, "figure-node-title", "#1c2430");
+        renderSvgText(group, node.detailLines, node.x + 12, node.y + node.detailY, "figure-node-detail", "#5d6b73");
         svg.append(group);
       });
+
+      const stage = el("div", "visual-figure-stage");
+      stage.append(svg);
+
+      const mobileFigure = el("div", "visual-figure-mobile");
+      const mobileNodes = el("div", "visual-mobile-nodes");
+      figure.nodes.forEach((node, index) => {
+        const item = el("article", `visual-mobile-node ${node.kind}`);
+        item.append(el("span", "visual-mobile-index", String(index + 1).padStart(2, "0")));
+        item.append(el("h4", "", node.label));
+        item.append(el("p", "", node.detail));
+        mobileNodes.append(item);
+      });
+
+      const relationLegend = el("div", "visual-edge-legend");
+      relationLegend.append(el("span", "visual-edge-legend-title", "关系与训练目标"));
+      figure.edges.forEach((edge) => {
+        const relation = el("div", "visual-edge-item");
+        relation.append(el("span", "", `${figure.nodes[edge.from].label} → ${figure.nodes[edge.to].label}`));
+        relation.append(el("strong", "", edge.label));
+        relationLegend.append(relation);
+      });
+      mobileFigure.append(mobileNodes);
 
       const body = el("div", "visual-figure-body");
       const list = el("ul", "visual-read-list");
       figure.readAs.forEach((item) => list.append(el("li", "", item)));
       const link = linkEl("figure-source", figure.sourceUrl, "打开论文 / 项目入口");
       body.append(list, link);
-      card.append(head, svg, body);
+      card.append(head, stage, mobileFigure, relationLegend, body);
       container.append(card);
     });
   }

@@ -213,7 +213,7 @@ assert.ok(html.includes('id="paper-figures"'), "index should expose the paper fi
 assert.ok(html.includes('id="paper-figure-guides"'), "index should expose the paper figure guide mount");
 assert.ok(html.includes("paper-figures-band"), "index should use the paper figure band class");
 assert.ok(html.includes("./data.js?v=20260630-paperfigures"), "data script should use the paper figure cache buster");
-assert.ok(html.includes("./app.js?v=20260630-paperfigures"), "app script should use the paper figure cache buster");
+assert.ok(html.includes("./app.js?v=20260722-responsive"), "app script should use the responsive layout cache buster");
 const siteHtml = await readFile(siteIndexPath, "utf8");
 assert.ok(hasAnchor(siteHtml, "./VLM/#visual-figures", "VLM 多模态大模型学习地图"), "site homepage should deep-link the VLM card to visible figures");
 assert.ok(siteHtml.includes("9 张范式图"), "site homepage should advertise VLM paradigm diagrams");
@@ -272,6 +272,10 @@ assert.ok(app.includes("window.scrollTo({"), "app should restore hash scroll aft
 assert.ok(app.includes("target.getBoundingClientRect().top + window.scrollY"), "app should align to the target's final document position");
 assert.ok(app.includes("createElementNS(svgNS"), "app should render visible SVG figures");
 assert.ok(app.includes("figurePalette"), "app should assign explicit SVG colors for visible figures");
+assert.ok(app.includes("visual-figure-mobile"), "app should render a readable mobile alternative to wide SVG figures");
+assert.ok(app.includes("visual-edge-legend"), "figures should expose edge relationships without overlapping SVG labels");
+assert.ok(app.includes("const layoutNodes"), "SVG figures should calculate text-aware node layouts");
+assert.ok(app.includes("node.detailY"), "SVG detail text should move below wrapped node titles");
 assert.ok(app.includes("requestAnimationFrame(alignTarget)"), "app should defer hash scrolling until layout settles");
 assert.ok(app.includes("setTimeout(alignTarget, 120)"), "app should restore hash scroll after native anchor scrolling");
 assert.ok(app.includes("setTimeout(alignTarget, 450)"), "app should restore hash scroll after smooth anchor scrolling");
@@ -287,6 +291,8 @@ for (const className of [
   "visual-figure-grid",
   "visual-figure-card",
   "visual-figure-svg",
+  "visual-figure-mobile",
+  "visual-mobile-node",
   "paper-figures-band",
   "paper-figure-guides",
   "figure-guide",
