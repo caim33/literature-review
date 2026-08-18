@@ -67,6 +67,8 @@ const requiredNames = [
   "Gemini Robotics 2",
   "Pelican-VLA 0.5",
   "ACT-2",
+  "G1PO",
+  "Robo-Kart",
   "Galaxea G0.5",
   "XPENG Robotics Fe0",
   "DreamZero",
@@ -82,6 +84,12 @@ const searchable = JSON.stringify(data).toLowerCase();
 for (const name of requiredNames) {
   assert.ok(searchable.includes(name.toLowerCase()), `missing required topic: ${name}`);
 }
+
+const humanoidRoute = data.routes.find((route) => route.id === "humanoid-wholebody");
+assert.ok(humanoidRoute.references.some((reference) => reference.title.includes("G1PO")), "G1PO Robo-Kart should live in the humanoid VLA system route");
+const g1poRecipe = data.trainingRecipes.find((recipe) => recipe.title.includes("G1PO"));
+assert.ok(g1poRecipe, "training recipes should include the G1PO boundary case");
+assert.ok(g1poRecipe.readAs.includes("边界案例") && g1poRecipe.unknowns.some((item) => item.includes("没有证据")), "G1PO should not be overstated as a confirmed VLA");
 assert.ok(
   !data.paperFigureGuides.some((figure) => figure.title.includes("Curr-0") && figure.title.includes("World Model")),
   "Current Robotics world-model research should live on the WM page, not as a VLA paper-figure card"
