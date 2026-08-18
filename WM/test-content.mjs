@@ -187,6 +187,11 @@ const requiredNames = [
   "Wan",
   "Genie 2",
   "GAIA-1",
+  "Being-H0.7",
+  "Being-H0.8",
+  "Qwen-RobotWorld",
+  "dWorldEval",
+  "Hi-WM",
 ];
 
 const searchable = JSON.stringify(data).toLowerCase();
@@ -271,6 +276,15 @@ const wamFigureLabels = wamFigure.nodes.map((node) => node.label);
 for (const label of ["Video / World Backbone", "Future Video / Latent", "Inverse Dynamics", "Joint Video + Action", "Representation-Only", "Robot Action Chunk"]) {
   assert.ok(wamFigureLabels.includes(label), `WAM simplified pipeline should include ${label}`);
 }
+
+const currentFigure = data.paperFigures.find((figure) => figure.title.includes("Current Robotics"));
+assert.ok(currentFigure, "paper figures should include the Current Robotics evaluation/correction loop");
+assert.ok(currentFigure.originalMedia.src.endsWith("current-dworldeval.png"), "Current Robotics figure should lead with dWorldEval");
+assert.ok(currentFigure.supportingMedia.some((media) => media.src.endsWith("current-hiwm.png")), "Current Robotics figure should include Hi-WM as supporting evidence");
+const hybridRoute = data.routes.find((route) => route.id === "vla-wm-hybrid");
+assert.ok(hybridRoute.references.some((reference) => reference.title.includes("dWorldEval")), "dWorldEval should live in the WM hybrid/evaluation route");
+assert.ok(hybridRoute.references.some((reference) => reference.title.includes("Hi-WM")), "Hi-WM should live in the WM hybrid/correction route");
+assert.ok(!data.routes.some((route) => route.id.toLowerCase().includes("vla-only-current")), "Current Robotics WM work should not be modeled as a VLA-only route");
 
 for (const route of data.routes) {
   assert.ok(route.id, "route needs id");

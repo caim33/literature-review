@@ -2,7 +2,7 @@ const vlaMapData = {
   meta: {
     title: "VLA Learning Map",
     subtitle: "Vision-Language-Action, World Models, WAM, and Whole-Body Robot Foundation Models",
-    updated: "2026-06-16",
+    updated: "2026-08-18",
     note: "Public papers, official project pages, and official company blogs are mixed here. Items marked as blog/model-card should be treated as engineering signals, not peer-reviewed claims."
   },
   glossary: [
@@ -44,7 +44,7 @@ const vlaMapData = {
     {
       title: "看系统和论文图",
       items: [
-        { target: "training-recipes", title: "训练配方表", note: "拆 Qwen-VLA、π0、GR00T、Figure、Curr-0、GENE 等数据与训练阶段。" },
+        { target: "training-recipes", title: "训练配方表", note: "拆 Qwen-RobotManip、Being-H、π0、GR00T、Gemini、Curr-0 等数据与训练阶段。" },
         { target: "case-studies", title: "Figure 案例", note: "从 Helix 上身控制读到 Helix 02 厨房/卧室全身任务。" },
         { target: "paper-figures", title: "论文图导读", note: "按 RT-2、OpenVLA、π0、GR00T、DreamZero 等核心图理解范式。" }
       ]
@@ -66,7 +66,7 @@ const vlaMapData = {
     { year: "2023", label: "RT-2 / PaLM-E / Open X-Embodiment / Diffusion Policy", lane: "foundation", note: "Web-scale VLM knowledge meets robot actions; large robot mixtures become credible." },
     { year: "2024", label: "OpenVLA / Octo / DROID / RoboCasa / π0", lane: "open", note: "Open generalist policies and in-the-wild datasets make VLA reproducible." },
     { year: "2025", label: "π0.5 / FAST / Gemini Robotics / Figure Helix / GR00T N1", lane: "systems", note: "Long-horizon, whole-body, and company VLA systems become the frontier." },
-    { year: "2026", label: "π0.7 / GR00T N1.7 / DreamZero / Curr-0 / GENE-26.5", lane: "systems", note: "Steerable generalists, open humanoid checkpoints, WAM-style policies, loco-dexterous humanoid systems, and dexterous manipulation systems reshape the map." }
+    { year: "2026", label: "Being-H0.8 / Gemini Robotics 2 / Qwen-RobotManip / π0.7 / GR00T N1.7", lane: "systems", note: "Human-video and tactile pretraining, whole-body VLA, cross-embodiment alignment, open humanoid checkpoints, and latent world-action policies reshape the map." }
   ],
   equations: [
     {
@@ -234,7 +234,7 @@ const vlaMapData = {
         actionSpace: "EEF delta、joint、gripper、双臂 action chunk、hand/finger command；很多系统不直接负责腿部平衡。",
         data: "Open X-Embodiment、DROID、BridgeData、ALOHA/ACT、RoboSet、LIBERO/RLBench/RoboCasa、MimicGen/DexMimicGen、GENE-26.5 类灵巧数据。",
         metrics: "物体/场景/语言泛化、接触成功率、长程步骤完成率、恢复能力、真实机器人闭环成功率。",
-        examples: ["RT-2", "OpenVLA", "Octo", "π0 / OpenPI", "Qwen-VLA", "Galaxea G0.5", "GENE-26.5"]
+        examples: ["RT-2", "OpenVLA", "Octo", "π0 / OpenPI", "Qwen-RobotManip", "Being-H0 → H0.8", "Pelican-VLA 0.5"]
       },
       {
         id: "wholebody-vla",
@@ -244,7 +244,7 @@ const vlaMapData = {
         actionSpace: "上身、手、头、躯干、移动底盘或腿部相关命令；常通过 System 0 / whole-body controller 转成稳定关节控制。",
         data: "humanoid teleop、全身仿真/RL、human video/retarget、房间级部署日志、厨房/卧室/物流长程任务、跨 embodiment robot pool。",
         metrics: "任务成功率之外，还要看失稳、碰撞、步态/姿态约束、房间级导航、多人/多机器人交互和安全中止。",
-        examples: ["Figure Helix / Helix 02", "GR00T N1 / N1.7", "Curr-0", "Gemini Robotics 1.5", "XPENG Robotics Fe0", "Agility whole-body stack"]
+        examples: ["Figure Helix / Helix 02", "GR00T N1 / N1.7", "Curr-0", "Gemini Robotics 2", "XPENG Robotics Fe0", "Agility whole-body stack"]
       }
     ],
     boundaries: [
@@ -521,6 +521,72 @@ const vlaMapData = {
       ]
     },
     {
+      title: "Qwen-RobotManip",
+      year: "2026",
+      family: "Aligned cross-embodiment VLA",
+      domain: "Manipulation VLA",
+      evidence: "技术报告/官方 blog/项目页",
+      sources: [
+        { title: "Qwen-RobotManip Technical Report", url: "https://arxiv.org/abs/2606.17846" },
+        { title: "Qwen-RobotManip official repository", url: "https://github.com/QwenLM/Qwen-RobotManip" },
+        { title: "Qwen-RobotManip official blog", url: "https://qwen.ai/blog?id=qwen-robotmanip" }
+      ],
+      paradigm: "Qwen3.5-4B 视觉语言 backbone + flow-matching DiT action expert；重点不是单纯扩数据，而是先把 representation、motion、behavior 三个层面对齐，再做规模化预训练。",
+      action: "80D canonical state-action slots + per-dimension mask，覆盖单臂、双臂、灵巧手和移动操作；EEF delta 放在相机坐标系，并用 CaPE 注入内外参，以减轻跨机器人坐标系冲突。",
+      readAs: "把它和 Qwen-VLA 分开读：Qwen-VLA 追求 manipulation/navigation/human trajectory 的统一接口；RobotManip 聚焦操作，并把 Human-to-Robot 合成、OOD 评测与跨 embodiment 对齐做成一条更清晰的 foundation-model 配方。",
+      dataMix: [
+        { label: "Robot data · ~11,420h", role: "公开机器人数据覆盖 single-arm、dual-arm、mobile manipulation 和 dexterous settings，提供真实闭环动作监督。" },
+        { label: "Egocentric human · ~1,933h", role: "人类操作视频提供开放场景、物体和交互先验，也是 Human-to-Robot 合成的原始来源。" },
+        { label: "H2R synthetic · ~24,808h", role: "通过动作 retarget、手部移除/修复、robot rendering 和 depth-aware compositing，扩成 15 种机器人 embodiment 的配对示范。" },
+        { label: "VLM co-training", role: "预训练公开口径使用 VLA:VLM 约 9:1 的双流共训，保持语言理解、空间 grounding 和指令跟随能力。" }
+      ],
+      training: [
+        { stage: "1", title: "Representation alignment", detail: "统一 state/action slots、mask、embodiment prompt 与 camera geometry，让异构来源先能在同一接口中学习。" },
+        { stage: "2", title: "Human-to-Robot scaling", detail: "把约 1,933h egocentric human video 转成约 24,808h、15 embodiments 的合成 robot demonstrations，并经过多阶段过滤。" },
+        { stage: "3", title: "VLA + VLM pretraining", detail: "联合多源 robot、H2R 和视觉语言数据，flow action expert 学连续 action chunk，VLM backbone 保留开放词表与指令 grounding。" },
+        { stage: "4", title: "Generalist post-training + OOD evaluation", detail: "在目标 benchmark/robot 数据上 SFT，并以 LIBERO-Plus、RoboTwin-IF/XE、RoboCasa365 和真机跨本体任务检验预训练质量。" }
+      ],
+      unknowns: [
+        "官方仓库明确说明当前没有发布 Qwen-RobotManip 权重；公开入口主要是技术报告、项目素材和 benchmark 结果。",
+        "约 38,100h 是 robot、human 与 H2R synthetic 的训练时长口径，不能当作 38,100h 独立真实机器人采集。",
+        "强 OOD 结果仍依赖目标平台标定、动作接口和 post-training；不能由统一 80D slot 直接推断零适配跨任意硬件。"
+      ]
+    },
+    {
+      title: "Being-H0 → Being-H0.8",
+      year: "2025-2026",
+      family: "Human-centric dexterous VLA → latent tactile world-action model",
+      domain: "Dexterous / cross-embodiment manipulation",
+      evidence: "论文/代码 + 官方项目页",
+      sources: [
+        { title: "Being-H0", url: "https://arxiv.org/abs/2507.15597" },
+        { title: "Being-H0.5", url: "https://arxiv.org/abs/2601.12993" },
+        { title: "Being-H0.7", url: "https://arxiv.org/abs/2605.00078" },
+        { title: "Being-H0.8 official project page", url: "https://research.beingbeyond.com/being-h08" }
+      ],
+      paradigm: "这条线从 human-video VLA 逐步跨到 latent WAM：H0 用手部 motion token 和 physical instruction tuning；H0.5 用统一动作语言 + MoT/Mixture-of-Flow；H0.7 用 future-aware posterior 对齐 deployable latent prior；H0.8 再把视觉、触觉和动作放进同一个 latent world-action state。",
+      action: "H0 从人手运动 token 迁移到机器人；H0.5 用语义对齐的 unified state-action slots；H0.7 直接输出 chunk、部署时不生成未来 RGB；H0.8 用 TopoHand 统一人手、灵巧手和 gripper，并以 slow-fast expert 高频刷新近端动作。",
+      readAs: "最值得看的不是版本号，而是监督信号的迁移：human motion → cross-embodiment action → future-aware latent → visuo-tactile latent。H0/H0.5 更像 VLA 主线，H0.7/H0.8 已进入 VLA 与 WAM/WM 的交界。",
+      dataMix: [
+        { label: "H0 · motion/VR/RGB video", role: "整合 motion capture、VR 与 RGB-only human video，配合 part-level motion tokenization 建立可迁移的手部操作先验。" },
+        { label: "H0.5 · UniHand 2.0", role: "混合 human demonstrations、robot manipulation 与 vision-language supervision，并限制 simulation 不支配 action manifold。" },
+        { label: "H0.7 · 200k + 15k hours", role: "官方公开为 200,000h egocentric human video + 15,000h robot demonstrations，用未来观测塑造 latent world-action prior。" },
+        { label: "H0.8 · UniHand 3.0", role: "500,000+ 小时可追溯 raw egocentric human video，经清洗、去重、筛选和结构化后提供 interaction-centric supervision。" },
+        { label: "Touch + aligned synthesis", role: "TactoHand 生成 contact/proximity pseudo labels，叠加真实/手套触觉、异构 robot data、task-aligned human demos 与 human-to-robot synthetic pairs。" }
+      ],
+      training: [
+        { stage: "H0", title: "Physical instruction tuning", detail: "先在人类视频上预训练手部 motion-language prior，再做 3D physical-space alignment 和 robot post-training。" },
+        { stage: "H0.5", title: "Cross-embodiment VLA", detail: "用统一动作语言、Mixture-of-Transformers / Mixture-of-Flow 和 embodiment-specific adaptation 兼顾共享能力与硬件差异。" },
+        { stage: "H0.7", title: "Latent future supervision", detail: "训练期 posterior 读取未来观测，和只看当前上下文的 prior latent 对齐；部署时移除 posterior，避免显式 future-video rollout。" },
+        { stage: "H0.8", title: "Visuo-tactile world-action learning", detail: "posterior 同时读取未来视觉/触觉，prior 学任务相关后果；slow-fast expert 在 chunk 内用最新 proprioception/touch 重算近端动作。" }
+      ],
+      unknowns: [
+        "Being-H0.8 截至 2026-08-18 主要证据是官方项目页，尚不能按 peer-reviewed paper 的可复现性解读。",
+        "H0.7/H0.8 的 human-video 小时数是不同版本/原始数据口径，不能和保留训练样本量直接等同比较。",
+        "H0.8 的真实触觉、pseudo-touch 与无触觉样本比例、完整训练算力和权重开放范围仍未完整披露。"
+      ]
+    },
+    {
       title: "Galaxea G0.5 / GalaxeaVLA",
       year: "2026",
       family: "Open-world robot manipulation VLA",
@@ -712,33 +778,38 @@ const vlaMapData = {
       ]
     },
     {
-      title: "Gemini Robotics 1.5",
-      year: "2025",
-      family: "Embodied reasoning + VLA execution",
-      domain: "Hybrid manipulation / humanoid stack",
-      evidence: "技术报告/官方 blog",
+      title: "Gemini Robotics 1.5 → 2",
+      year: "2025-2026",
+      family: "Embodied reasoning + whole-body VLA execution",
+      domain: "Manipulation / whole-body humanoid stack",
+      evidence: "技术报告/官方 blog/model card",
       sources: [
         { title: "Gemini Robotics Technical Report", url: "https://arxiv.org/abs/2503.20020" },
-        { title: "Gemini Robotics 1.5 blog", url: "https://deepmind.google/blog/gemini-robotics-15-brings-ai-agents-into-the-physical-world/" }
+        { title: "Gemini Robotics 1.5 blog", url: "https://deepmind.google/blog/gemini-robotics-15-brings-ai-agents-into-the-physical-world/" },
+        { title: "Gemini Robotics 2 official release", url: "https://deepmind.google/blog/gemini-robotics-2-brings-whole-body-intelligence-to-robots/" },
+        { title: "Gemini Robotics 2 model page", url: "https://deepmind.google/models/gemini-robotics/vla/" }
       ],
-      paradigm: "把 embodied reasoning 模型和 VLA execution model 分层：ER 负责高层任务理解、空间推理和计划，VLA 负责真实动作。",
-      action: "Gemini 2.0/1.5 系列将 physical action 作为输出模态；具体机器人 action interface 依任务和平台而变。",
-      readAs: "适合放在 agentic VLA 章节里读：它强调长程任务不能只靠单步 policy，需要 reasoning、工具、空间记忆和执行模型分工。",
+      paradigm: "保持 ER reasoning + VLA execution 分层：Gemini Robotics 2 是动作模型，ER 2 做分钟级规划、进度跟踪、人机沟通和多机器人协作；On-Device 2 则把 VLA 压到本地部署。",
+      action: "从 1.5 的跨 embodiment manipulation 扩到同一 checkpoint 控制 Apollo 2 全身、22-DoF dexterous hand 与 Franka Duo gripper；具体 action schema 与低层稳定控制接口仍依平台而变。",
+      readAs: "这是 2026 年最重要的 whole-body VLA 更新之一：重点看它怎样把脚到指尖控制、灵巧手、ER 2 agent 和 on-device adaptation 拆成三种模型角色，而不是把所有能力混成一个黑箱。",
       dataMix: [
-        { label: "Robot task data", role: "支撑真实 manipulation、origami、打包等灵巧操作执行。" },
+        { label: "Multi-embodiment robot data", role: "支撑 bi-arm、parallel gripper、22-DoF hand 和 humanoid whole-body manipulation；官方未公开完整数据配比。" },
         { label: "VLM/general web data", role: "提供开放词表、物体属性、场景理解和多模态推理。" },
-        { label: "Embodied reasoning data", role: "训练 ER 模型处理任务分解、环境理解、空间关系和失败恢复。" },
-        { label: "Safety / trusted testing", role: "官方发布强调 embodied safety 与测试机制，是部署层训练/评估的重要部分。" }
+        { label: "Embodied reasoning traces", role: "训练 ER 2 做任务分解、分钟级进度跟踪、工具调用、失败恢复和多机器人协调。" },
+        { label: "Fast adaptation", role: "On-Device 2 公开材料强调用少量新 embodiment 示例完成本地适配，典型口径为数小时、少于 200 examples。" },
+        { label: "Safety / trusted testing", role: "发布引入 ASIMOV-Agentic 等安全评测，并保留物理安全层、human proximity 与 safe-stop 工具调用。" }
       ],
       training: [
         { stage: "1", title: "VLM foundation", detail: "从 Gemini 多模态基础能力出发，保留语义、常识和视觉推理。" },
         { stage: "2", title: "Robot-action adaptation", detail: "把 physical action 加为输出模态，用机器人数据对齐到真实执行。" },
-        { stage: "3", title: "ER + VLA split", detail: "1.5 路线把高层 embodied reasoning 与低层 VLA execution 拆开组合。" },
-        { stage: "4", title: "Safety and deployment evaluation", detail: "公开材料更强调安全报告和 trusted tester；训练细节仍需以 technical report 为准。" }
+        { stage: "3", title: "Whole-body and dexterity expansion", detail: "Robotics 2 把 VLA 从上身/桌面扩到 humanoid feet-to-fingertips control，并覆盖灵巧手和双臂 gripper。" },
+        { stage: "4", title: "ER 2 + VLA 2 agent stack", detail: "ER 2 负责计划、进度、沟通和协作，VLA 2 执行动作，On-Device 2 面向低延迟与新硬件适配。" },
+        { stage: "5", title: "Safety and deployment evaluation", detail: "以模型卡、安全技术报告、ASIMOV-Agentic 和 trusted tester 检查不确定性、危险工具调用与人类接近场景。" }
       ],
       unknowns: [
-        "数据配比、action head 细节、是否统一多 embodiment action space 没有完整公开。",
-        "ER 与 VLA 的接口粒度、调用频率和失败恢复闭环需要从 demo/报告细读。"
+        "Gemini Robotics 2 仍是 private preview / early access，数据配比、action head 与低层 whole-body controller 细节没有完整公开。",
+        "官方成功率按不同 hardware/task group 报告，不能与 LIBERO/RoboTwin 等公开 benchmark 直接横向比较。",
+        "ER 2、VLA 2 与安全工具的接口粒度、调用频率和多机器人通信机制仍需等待更完整技术报告。"
       ]
     },
     {
@@ -976,32 +1047,32 @@ const vlaMapData = {
       watchFor: "Helix 的学习点不是论文 benchmark，而是工业系统如何为高维 humanoid action space 处理实时性；铺床/叠被子请进一步看 Helix-02 Bedroom Tidy。"
     },
     {
+      title: "Being-H0.8：未来视觉 + 触觉塑造可部署动作先验",
+      sourceTitle: "Being-H0.8: A Latent Tactile World-Action Model at Scale",
+      sourceUrl: "https://research.beingbeyond.com/being-h08",
+      imageUrl: "./assets/figures/being-h08-model-pipeline.webp",
+      originalFigure: "官方项目页 Figure 6：训练期 posterior 看未来视觉与触觉，deployable prior 只看当前上下文；两条分支共享 MoT/action-expert 权重，并在 latent state 上对齐。",
+      simplified: [
+        "Prior branch 输入当前 instruction、视觉、本体/触觉状态和 latent queries，生成可部署 world-action state。",
+        "训练期 posterior branch 把对应 latent 位置换成 future visual + tactile embeddings，提供未来后果监督。",
+        "两条分支在共享 token layout 中做 latent alignment；目标不是重建未来 RGB，而是蒸馏任务相关的未来交互结构。",
+        "推理时移除 posterior 和未来观测，slow-fast action expert 用最新 proprioception/touch 高频刷新即将执行的短段。"
+      ],
+      watchFor: "它处在 VLA/WAM 边界：输出仍是直接 action chunk，但训练目标已经用未来视觉和触觉构造 latent world model。不要把它误读成测试时生成视频再行动。"
+    },
+    {
       title: "Curr-0：HumanEx 数据飞轮 + 三系统全身灵巧操作",
       sourceTitle: "Curr-0: A Loco-Dexterous Manipulation Model for Humanoids",
       sourceUrl: "https://current-robotics.com/blog/curr-0",
       imageUrl: "./assets/figures/curr0-humanex.webp",
-      originalFigure: "官方 blog 的 HumanEx system overview、data-source comparison 和 world-model evaluator correlation 图：重点看人类全身数据如何变成 humanoid-actionable data。",
+      originalFigure: "官方 blog 的 HumanEx system overview 与 data-source comparison 图：重点看人类全身数据如何变成 humanoid-actionable data。",
       simplified: [
         "HumanEx 把 egocentric video、hand/finger motion、whole-body proprioception、EMG 和环境运动信号同步采集。",
         "人类数据经过 calibration、synchronization、retargeting 和 alignment，转成 70+ DoF 人形可用的训练监督。",
         "System 2 负责 vision-language grounding 和 task latent；System 1 负责 whole-body motion/stability；System 0 负责 21-DoF hand 的接触交互。",
-        "Interactive multimodal world simulator 用于 rollout、评估、排序和 human-in-the-world-model corrective post-training。"
+        "Curr-0 的策略侧只保留 WM 作为 post-training/evaluation 接口；Current Robotics 的 dWorldEval 与 Hi-WM 论文已归入独立 WM 页面。"
       ],
       watchFor: "Curr-0 和 Figure 都用 System 0/1/2 语言，但含义不完全一样；读时要按官方定义拆层，不要只按名字对齐。"
-    },
-    {
-      title: "Curr-0：World Model 作为人形策略评估器",
-      sourceTitle: "Curr-0 World-Model Evaluator / Human-in-the-World-Model",
-      sourceUrl: "https://current-robotics.com/blog/curr-0",
-      imageUrl: "./assets/figures/curr0-world-model-correlation.png",
-      originalFigure: "官方 blog 的 world-model evaluator correlation 和 cost scaling 图：重点看它把 WM 放在评估/纠错/部署前验证，而不是把 WM 直接写成 VLA policy。",
-      simplified: [
-        "Policy 在 interactive multimodal world simulator 中闭环 rollout。",
-        "Evaluator 不只看 RGB 未来，还要预测 proprioception、force 和 tactile consequences。",
-        "当 rollout 错误、不确定或 failure-prone，人类在 world model 中直接介入纠正。",
-        "纠正片段用于 post-training；真实机器人主要承担 grounding、calibration 和 final validation。"
-      ],
-      watchFor: "这张图适合放进 WM/WAM 章节读：它说明工业系统可能先把 WM 用作 scalable evaluator，而不是一步到位替代真实世界。"
     }
   ],
   readingPath: [
@@ -1030,7 +1101,7 @@ const vlaMapData = {
       phase: "Phase 4",
       title: "进入全身人形",
       goal: "理解 Figure Helix、GR00T、Gemini Robotics 为什么不只是机械臂 VLA 的放大版。",
-      read: ["Figure Helix", "GR00T N1", "GR00T N1.7", "Curr-0", "Gemini Robotics", "Gemini Robotics 1.5"],
+      read: ["Figure Helix", "GR00T N1", "GR00T N1.7", "Curr-0", "Being-H0.7 / H0.8", "Gemini Robotics 2"],
       output: "能拆出上身/手/导航/全身平衡/多机器人协作各自需要的模型层。"
     },
     {
@@ -1251,6 +1322,34 @@ const vlaMapData = {
           value: "Qwen3.5-4B VLM + 1.15B DiT flow action decoder，公开了 T2A/CPT/SFT/RL 四阶段和数据混合比例。"
         },
         {
+          title: "Qwen-RobotManip: Alignment Unlocks Scale",
+          year: "2026",
+          type: "paper",
+          url: "https://arxiv.org/abs/2606.17846",
+          value: "用 80D canonical slots、camera-frame EEF、CaPE 和约 38,100h robot/human/H2R mixture 强化跨本体与 OOD 操作泛化。"
+        },
+        {
+          title: "Being-H0: VLA Pretraining from Large-Scale Human Videos",
+          year: "2025",
+          type: "paper",
+          url: "https://arxiv.org/abs/2507.15597",
+          value: "以人手作为 foundation manipulator，用 part-level motion tokenization 与 physical instruction tuning 把 human video 迁移到机器人。"
+        },
+        {
+          title: "Being-H0.5: Cross-Embodiment Generalization",
+          year: "2026",
+          type: "paper",
+          url: "https://arxiv.org/abs/2601.12993",
+          value: "把 human/robot embodiment 映射到语义对齐动作空间，并以 MoT + Mixture-of-Flow 扩展跨本体动作容量。"
+        },
+        {
+          title: "Pelican-VLA 0.5: Attending Before Acting",
+          year: "2026",
+          type: "paper",
+          url: "https://arxiv.org/abs/2607.06655",
+          value: "用 learnable reasoning slots 在 perception 与 action 之间形成 manipulation-centric attention；权重和可视化代码已开放，训练代码仍在发布计划中。"
+        },
+        {
           title: "Galaxea G0.5",
           year: "2026",
           type: "paper",
@@ -1376,13 +1475,13 @@ const vlaMapData = {
       id: "humanoid-wholebody",
       title: "全身/人形 VLA 系统",
       question: "机械臂 VLA 放到人形机器人上，为什么会变成一个新问题？因为全身平衡、双手、躯干、导航、实时安全和多机器人协作必须一起解决。",
-      takeaway: "Figure Helix、GR00T、Gemini Robotics、Agility/Digit、Optimus 是学习人形 VLA 的系统样本。重点看公开证据：谁有论文/权重，谁只有 blog/demo，谁其实是 low-level whole-body control 而非 VLA。",
+      takeaway: "Figure Helix、GR00T、Curr-0、Gemini Robotics 2、Agility/Digit 是学习人形 VLA 的系统样本。重点看公开证据：谁有论文/权重，谁只有 blog/demo，谁其实是 low-level whole-body control 而非 VLA。",
       priority: "重点",
       branches: [
         "全上身 VLA：Figure Helix 直接控制手腕、躯干、头部和手指，并展示多机器人协作。",
         "开放人形 foundation model：GR00T N1/N1.5/N1.6/N1.7 逐步加入 FLARE、world model、sim-to-real 和开放权重。",
         "Loco-dexterous foundation system：Curr-0 强调人类全身数据、三系统控制和 world-model evaluator，把移动、平衡、灵巧手和工具使用耦合训练。",
-        "Agentic stack：Gemini Robotics-ER 做高层 embodied reasoning，Gemini Robotics VLA 做动作。",
+        "Agentic whole-body stack：Gemini Robotics 2 负责 feet-to-fingertips VLA 动作，ER 2 做分钟级规划、进度跟踪和多机器人协作。",
         "底层 whole-body motor cortex：Agility/Digit 更接近 RL 训练的低层全身控制，可接 VLA/LLM 上层。",
         "产业 demo 与证据等级：Tesla/Optimus 值得观察，但公开 VLA 技术材料少，需要谨慎标注。"
       ],
@@ -1468,6 +1567,13 @@ const vlaMapData = {
           type: "blog",
           url: "https://deepmind.google/blog/gemini-robotics-15-brings-ai-agents-into-the-physical-world/",
           value: "展示 ER planning + VLA execution 的 agentic robot stack。"
+        },
+        {
+          title: "Gemini Robotics 2",
+          year: "2026",
+          type: "blog",
+          url: "https://deepmind.google/blog/gemini-robotics-2-brings-whole-body-intelligence-to-robots/",
+          value: "把 VLA 扩到 humanoid feet-to-fingertips control、22-DoF hand、Franka Duo gripper，并与 ER 2 / On-Device 2 组成 agentic 与低延迟部署栈。"
         },
         {
           title: "Agility Whole-Body Control Foundation Model",
@@ -1568,11 +1674,18 @@ const vlaMapData = {
           value: "明确提出 WAM，把视频世界模型和动作生成合并成可零样本控制的策略。"
         },
         {
-          title: "Curr-0 World-Model Evaluator / Human-in-the-World-Model",
+          title: "Being-H0.7: A Latent World-Action Model from Egocentric Videos",
           year: "2026",
-          type: "blog",
-          url: "https://current-robotics.com/blog/curr-0",
-          value: "不是 WAM paper，但展示公司系统如何把 multimodal world simulator 用作 humanoid policy 的闭环评估、排序和人类纠错 post-training 环境。"
+          type: "paper",
+          url: "https://arxiv.org/abs/2605.00078",
+          value: "用 future-aware posterior 对齐 deployable latent prior，训练期学习未来结构、推理期直接生成动作而不 rollout RGB。"
+        },
+        {
+          title: "Being-H0.8: A Latent Tactile World-Action Model at Scale",
+          year: "2026",
+          type: "project",
+          url: "https://research.beingbeyond.com/being-h08",
+          value: "把 H0.7 的 latent WAM 扩到 tactile-aware interaction：未来视觉/触觉监督、TopoHand 和 slow-fast action expert。"
         },
         {
           title: "SayCan",
@@ -1657,7 +1770,7 @@ const vlaMapData = {
       id: "dexterous-longhorizon",
       title: "精细交互与长程任务",
       question: "VLA 从桌面抓放走向叠衣服、整理厨房、开抽屉、做咖啡、协作搬运，会遇到接触、遮挡、失败恢复和长时记忆。",
-      takeaway: "精细交互要同时学手、物体状态、接触和纠错。长程任务要把语言分解、记忆、子目标、失败检测和动作 chunk 接起来，Figure Helix 叠被子/协作、GENE-26.5 灵巧操作、π0.5 家庭清洁、Gemini Robotics origami 都是典型样本。",
+      takeaway: "精细交互要同时学手、物体状态、接触和纠错。Being-H0.8 把 pseudo/real touch 接入 latent WAM，Gemini Robotics 2 扩到 22-DoF hand 与全身，ACT-2 则把可靠性、覆盖范围和部署适配成本一起量化。",
       priority: "重点",
       branches: [
         "双臂与灵巧手：ALOHA/ACT、RoboSet、DexMG、GENE-26.5、GR00T、Gemini Robotics 都在强化精细双手。",
@@ -1734,6 +1847,41 @@ const vlaMapData = {
           type: "paper",
           url: "https://arxiv.org/abs/2503.20020",
           value: "展示 origami、打包等灵巧操作，并区分 VLA 与 ER reasoning 模型。"
+        },
+        {
+          title: "Being-H0.8: Latent Tactile World-Action Model",
+          year: "2026",
+          type: "project",
+          url: "https://research.beingbeyond.com/being-h08",
+          value: "用 500,000+ 小时 egocentric video、TactoHand pseudo-touch、TopoHand 和 slow-fast action expert 研究 contact-rich dexterity。"
+        },
+        {
+          title: "Qwen-RobotManip",
+          year: "2026",
+          type: "paper",
+          url: "https://arxiv.org/abs/2606.17846",
+          value: "Human-to-Robot 合成与跨本体对齐的操作 VLA，强调 unseen instruction、scene、behavior 和 embodiment 的 OOD 评测。"
+        },
+        {
+          title: "Gemini Robotics 2",
+          year: "2026",
+          type: "blog",
+          url: "https://deepmind.google/blog/gemini-robotics-2-brings-whole-body-intelligence-to-robots/",
+          value: "同一系统覆盖 humanoid whole-body、22-DoF hand、parallel gripper、分钟级 ER 规划与多机器人协作。"
+        },
+        {
+          title: "ACT-2 Preview: Generalizing Reliability",
+          year: "2026",
+          type: "blog",
+          url: "https://www.sunday.ai/blog/act-2-preview",
+          value: "用 unseen-home laundry 的固定 checkpoint 评测引出 Solve：performance + declared scope + adaptation cost；属于公司自报系统结果，需按证据等级阅读。"
+        },
+        {
+          title: "Pelican-VLA 0.5",
+          year: "2026",
+          type: "paper",
+          url: "https://arxiv.org/abs/2607.06655",
+          value: "用 compact reasoning slots 形成任务/接触区域注意力，并公开预训练权重、RoboTwin checkpoint 和 attention visualization。"
         },
         {
           title: "π0.7 / pi0.7",
@@ -1825,6 +1973,20 @@ const vlaMapData = {
           type: "report",
           url: "https://deepmind.google/discover/blog/gemini-robotics-brings-ai-into-the-physical-world/",
           value: "Google 在 Gemini Robotics 发布中强调 embodied safety 和 trusted tester 机制。"
+        },
+        {
+          title: "ACT-2 Solve Evaluation",
+          year: "2026",
+          type: "blog",
+          url: "https://www.sunday.ai/blog/act-2-preview",
+          value: "把成功率和明确 scope、deployment adaptation cost 绑定，提醒 VLA 评测必须报告分布边界，而不是只报一个 demo 成功率。"
+        },
+        {
+          title: "Gemini Robotics 2 Safety Technical Report",
+          year: "2026",
+          type: "report",
+          url: "https://storage.googleapis.com/deepmind-media/gemini-robotics/Gemini-Robotics-2-Safety.pdf",
+          value: "配合 ASIMOV-Agentic 评估不安全工具调用、不确定性处理、人类接近与 safe-stop，是 whole-body agent stack 的安全更新。"
         }
       ]
     },
@@ -1881,6 +2043,13 @@ const vlaMapData = {
           type: "paper",
           url: "https://arxiv.org/abs/2510.03342",
           value: "展示 ER 1.5 planning + Gemini Robotics 1.5 action 的分层具身 agent。"
+        },
+        {
+          title: "Gemini Robotics 2 / ER 2",
+          year: "2026",
+          type: "blog",
+          url: "https://deepmind.google/blog/gemini-robotics-2-brings-whole-body-intelligence-to-robots/",
+          value: "ER 2 做分钟级计划、进度跟踪和多机器人协作，VLA 2 做 whole-body/dexterous execution，On-Device 2 面向低延迟适配。"
         }
       ]
     }

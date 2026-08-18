@@ -59,6 +59,14 @@ const requiredNames = [
   "Helix 02 Kitchen",
   "GENE-26.5",
   "Qwen-VLA",
+  "Qwen-RobotManip",
+  "Being-H0",
+  "Being-H0.5",
+  "Being-H0.7",
+  "Being-H0.8",
+  "Gemini Robotics 2",
+  "Pelican-VLA 0.5",
+  "ACT-2",
   "Galaxea G0.5",
   "XPENG Robotics Fe0",
   "DreamZero",
@@ -74,6 +82,10 @@ const searchable = JSON.stringify(data).toLowerCase();
 for (const name of requiredNames) {
   assert.ok(searchable.includes(name.toLowerCase()), `missing required topic: ${name}`);
 }
+assert.ok(
+  !data.paperFigureGuides.some((figure) => figure.title.includes("Curr-0") && figure.title.includes("World Model")),
+  "Current Robotics world-model research should live on the WM page, not as a VLA paper-figure card"
+);
 assert.ok(
   searchable.includes("cosmos") &&
     searchable.includes("wm / physical ai support") &&

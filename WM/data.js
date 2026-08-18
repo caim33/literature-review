@@ -2,7 +2,7 @@ const wmMapData = {
   meta: {
     title: "WM Learning Map",
     subtitle: "World Models for Robotics, VLA, Humanoids, and Physical AI",
-    updated: "2026-06-29",
+    updated: "2026-08-18",
     note: "Robot-first world model map. Autonomous driving is kept as a lightweight side route for transferable simulation and evaluation ideas."
   },
   glossary: [
@@ -598,6 +598,92 @@ const wmMapData = {
       ]
     },
     {
+      title: "Current Robotics：dWorldEval + Hi-WM 评估与纠错闭环",
+      source: "dWorldEval 2026, Hi-WM 2026, Current Robotics",
+      originalMedia: {
+        type: "image",
+        src: "assets/paper-figures/current-dworldeval.png",
+        alt: "dWorldEval overview showing action controllability, spatiotemporal consistency, progress scoring, and policy compatibility",
+        caption: "dWorldEval 总览图：把 multi-view observation、language 和 action chunk 放进离散 diffusion WM，联合预测 future visual state 与 progress，用于自动成功判定和 policy ranking。",
+        sourceUrl: "https://dworldeval.github.io/",
+        sourceLabel: "dWorldEval project page"
+      },
+      supportingMedia: [
+        {
+          type: "image",
+          src: "assets/paper-figures/current-hiwm.png",
+          alt: "Hi-WM pipeline with policy rollout, rollback, human intervention, future branching, and post-training",
+          caption: "Hi-WM 总览图：policy 在 learned WM 中 rollout；失败状态可缓存、回滚和分叉，人类在虚拟环境中给短纠正片段，再回流 policy post-training。",
+          sourceUrl: "https://hi-wm.github.io/",
+          sourceLabel: "Hi-WM project page"
+        }
+      ],
+      viewBox: "0 0 1160 450",
+      cardClass: "wide",
+      diagramClass: "pipeline",
+      thesis: "Current Robotics 的两项 WM 工作应作为一条完整闭环读：dWorldEval 先回答 learned simulator 能否忠实评估和排序 policy，Hi-WM 再把这个 simulator 变成可回滚、可分叉、可由人纠正的 post-training workspace。",
+      detail: "dWorldEval 使用 action-centric masked discrete diffusion，把 vision、language、action 当作同一 token space 中的一等输入，并用 sparse keyframe memory 和 progress-as-text 降低长 rollout 漂移与 false success。Hi-WM 在此类 action-faithful WM 中运行 policy；人类只在 failure-prone state 介入，缓存状态可反复生成 recovery branches，最终用纠正轨迹更新真实 policy。它们的重点不是取代 VLA，而是把昂贵真机评估/纠错迁移到可复用 learned environment。",
+      deepDive: {
+        summary: "先看 evaluator 是否可信，再看虚拟纠错如何回到真实策略。",
+        sections: [
+          {
+            title: "先看 dWorldEval",
+            body: "评估型 world model 最怕视觉先验把错误动作“修正”成成功视频。dWorldEval 把 action chunk 作为一等 token，与多视角视觉和语言一起去噪，并额外预测任务 progress，目标是让 imagined rollout 对不同 policy 的优劣保持排序一致。"
+          },
+          {
+            title: "再看 Hi-WM",
+            body: "Hi-WM 不只让 policy 在 WM 中自动 rollout；当轨迹开始偏离时，人类通过 keyboard、VR 或 robot interface 提供短纠正。因为中间状态可以缓存，系统能回滚到同一个 failure point，收集多条不同 recovery continuation。"
+          },
+          {
+            title: "为什么归在 WM",
+            body: "这里的核心资产是 action-conditioned learned environment：它生成未来观测、维护状态、给出 progress，并支撑 rollback/branch。被更新的是外部 DP 或 π0 policy，因此它是 WM evaluation/post-training framework，不是一个新的 VLA action head。"
+          },
+          {
+            title: "证据与边界",
+            body: "dWorldEval 报告 LIBERO、RoboTwin 和真机上的 policy-ranking 信号；Hi-WM 在三类真实操作任务、两种 policy backbone 上报告平均提升。仍需检查 OOD failure state、长时累积误差和 sim exploit，不能把高相关性外推到任意任务。"
+          }
+        ]
+      },
+      stages: [
+        { label: "Faithful Evaluation", x: 24, y: 34, w: 330, h: 360 },
+        { label: "Rollback + Human Correction", x: 378, y: 34, w: 390, h: 360 },
+        { label: "Policy Post-Training", x: 792, y: 34, w: 344, h: 360 }
+      ],
+      nodes: [
+        { id: "context", label: "Obs + Language", note: "multi-view state", x: 48, y: 72, w: 135, h: 58, kind: "input" },
+        { id: "policy", label: "Robot Policy", note: "DP / π0 / VLA", x: 48, y: 188, w: 135, h: 62, kind: "policy" },
+        { id: "actions", label: "Action Chunk", note: "first-class tokens", x: 208, y: 188, w: 125, h: 62, kind: "action" },
+        { id: "dwe", label: "dWorldEval", note: "discrete diffusion WM", x: 208, y: 302, w: 125, h: 66, kind: "model" },
+        { id: "future", label: "Future + Progress", note: "visual state / score", x: 410, y: 92, w: 150, h: 66, kind: "future" },
+        { id: "failure", label: "Failure State Cache", note: "rollback point", x: 410, y: 216, w: 150, h: 66, kind: "state" },
+        { id: "human", label: "Human Intervention", note: "short correction", x: 602, y: 92, w: 145, h: 66, kind: "score" },
+        { id: "branches", label: "Recovery Branches", note: "multiple continuations", x: 602, y: 260, w: 145, h: 66, kind: "future" },
+        { id: "dataset", label: "Hi-WM Dataset", note: "failure-targeted", x: 820, y: 92, w: 135, h: 62, kind: "state" },
+        { id: "post", label: "Post-Train Policy", note: "IL / RL update", x: 820, y: 250, w: 135, h: 66, kind: "policy" },
+        { id: "real", label: "Real Robot Check", note: "final validation", x: 992, y: 168, w: 125, h: 66, kind: "world" }
+      ],
+      edges: [
+        { from: "context", to: "policy", label: "observe" },
+        { from: "policy", to: "actions", label: "act" },
+        { from: "actions", to: "dwe", label: "condition" },
+        { from: "context", to: "dwe", label: "initialize" },
+        { from: "dwe", to: "future", label: "rollout + score" },
+        { from: "future", to: "failure", label: "detect drift" },
+        { from: "failure", to: "human", label: "ask correction" },
+        { from: "human", to: "branches", label: "intervene" },
+        { from: "failure", to: "branches", label: "rollback" },
+        { from: "branches", to: "dataset", label: "collect" },
+        { from: "dataset", to: "post", label: "train" },
+        { from: "post", to: "real", label: "validate" }
+      ],
+      readingFocus: [
+        "dWorldEval 是否把 action 当作 causal token，并保持多视角/长时状态一致。",
+        "progress score 与真机 success/ranking 的相关性是否在新任务和新 policy 上保持。",
+        "Hi-WM 的 rollback/branching 是否真的覆盖 failure distribution，而不是只在 WM 熟悉区域纠错。",
+        "虚拟 intervention 的收益能否在真实机器人上复现，且不被 model bias 抵消。"
+      ]
+    },
+    {
       title: "World-Action Model：Pretrained to Imagine, Fine-Tuned to Act",
       source: "NVIDIA WAM blog 2026, UniPi, DreamZero, Cosmos Policy, LingBot-VA, Fast-WAM",
       originalMedia: {
@@ -711,7 +797,7 @@ const wmMapData = {
     { year: "2023", label: "DreamerV3 / UniSim / GAIA-1", lane: "foundation", note: "Scalable world-model RL, interactive real-world simulation, and driving world models accelerate." },
     { year: "2024", label: "Genie / RoboDreamer / IRASim", lane: "foundation", note: "Latent actions, robot imagination, and action-aligned simulation become central." },
     { year: "2025", label: "Cosmos / V-JEPA 2 / GR00T N1", lane: "systems", note: "Physical AI world foundation models and humanoid VLA systems begin to converge." },
-    { year: "2026", label: "DreamZero / Cosmos Policy / Fast-WAM", lane: "systems", note: "World-Action Models become a visible second recipe next to VLM-based VLAs." }
+    { year: "2026", label: "Being-H0.8 / Qwen-RobotWorld / dWorldEval / Hi-WM", lane: "systems", note: "Latent world-action priors, natural-language action simulators, policy evaluation and in-model human correction begin to form one deployable WM loop." }
   ],
   equations: [
     {
@@ -774,13 +860,13 @@ const wmMapData = {
       {
         label: "交互接口",
         question: "模型能不能像环境一样 step-by-step 接收动作、返回下一观测、继续闭环？",
-        examples: "UniSim / Genie / IRASim / Cosmos Predict",
+        examples: "UniSim / Genie / IRASim / Cosmos Predict / dWorldEval / Hi-WM",
         robotUse: "决定它能不能成为训练/评估环境，而不只是一次性生成未来片段。"
       },
       {
         label: "系统位置",
         question: "它接在 VLA 前面做表征、后面做慢速校验，还是作为训练/评估环境？",
-        examples: "VLA proposal + WM rollout + Cosmos synthetic data + critic/safety + controller",
+        examples: "VLA proposal + dWorldEval / Hi-WM rollout + Cosmos synthetic data + critic/safety + controller",
         robotUse: "决定它是表征底座、慢速想象层、critic/reranker，还是仿真数据源。"
       }
     ],
@@ -811,7 +897,7 @@ const wmMapData = {
     },
     {
       name: "Interactive generative simulator",
-      examples: "UniSim, Genie, IRASim, Cosmos Predict",
+      examples: "UniSim, Genie, IRASim, Cosmos Predict, dWorldEval, Hi-WM",
       layer: "交互接口 / 生成式环境",
       readingHint: "先问它是不是能被 agent 连续 step，而不是只看生成视频是否清晰。",
       axis: "接口形态：能否 step-by-step 交互。",
@@ -833,7 +919,7 @@ const wmMapData = {
     },
     {
       name: "VLA + WM system integration",
-      examples: "GR-1, OpenVLA + critic, π0 + rollout, GR00T stack",
+      examples: "GR-1, OpenVLA + critic, π0 + rollout, dWorldEval, Hi-WM",
       layer: "系统集成 / 机器人部署架构",
       readingHint: "先问 VLA、WM、critic/safety、controller 的输入输出怎么接，而不是问它属于哪种预测目标。",
       axis: "系统组合：VLA、WM、critic/safety、controller 怎么分工。",
@@ -972,7 +1058,8 @@ const wmMapData = {
         "Online world-model RL：边交互边更新模型和策略，减少真实数据需求。",
         "Decoder-free latent control：不追求像素重建，把 latent 学成服务 Q/value/planning 的状态。",
         "Trajectory generative planning：把轨迹当 token 或 diffusion sample，生成可执行计划。",
-        "Failure-aware latent state：对真实机器人要额外预测碰撞、失稳、接触失败和任务进度。"
+        "Failure-aware latent state：对真实机器人要额外预测碰撞、失稳、接触失败和任务进度。",
+        "Multimodal posterior：Being-H0.7/H0.8 用未来视觉乃至伪触觉监督训练更强 posterior，再把能力蒸馏进部署时只看当前观测的 prior。"
       ],
       patterns: [
         "真实机器人上，模型的保守性和不确定性估计往往比平均预测误差更重要。",
@@ -987,7 +1074,9 @@ const wmMapData = {
         { title: "Decision Transformer", year: "2021", type: "paper", url: "https://arxiv.org/abs/2106.01345", value: "把 return-conditioned control 变成序列建模，为 action token 范式铺路。" },
         { title: "Planning with Diffusion for Flexible Behavior Synthesis", year: "2022", type: "paper", url: "https://arxiv.org/abs/2205.09991", value: "用 diffusion 生成轨迹，把规划视为去噪采样。" },
         { title: "Diffusion Policy", year: "2023", type: "paper", url: "https://arxiv.org/abs/2303.04137", value: "本身是动作生成器而非 WM，但成为 VLA/WM hybrid 的重要动作头。" },
-        { title: "Masked World Models for Visual Control", year: "2022", type: "paper", url: "https://arxiv.org/abs/2206.14244", value: "把 masked visual pretraining 和 latent dynamics 解耦，用于视觉控制。" }
+        { title: "Masked World Models for Visual Control", year: "2022", type: "paper", url: "https://arxiv.org/abs/2206.14244", value: "把 masked visual pretraining 和 latent dynamics 解耦，用于视觉控制。" },
+        { title: "Being-H0.7: Latent World-Action Model for Generalizable Humanoid Manipulation", year: "2026", type: "paper", url: "https://arxiv.org/abs/2605.00078", value: "用未来视觉 posterior 教部署时的 latent prior，在不生成测试时视频的前提下把人类第一视角视频先验迁到人形操作。" },
+        { title: "Being-H0.8", year: "2026", type: "project", url: "https://research.beingbeyond.com/being-h08", value: "把 latent world-action 学习扩展到视觉 + 伪触觉 posterior，并用 TactoHand/TopoHand 数据增强精细接触与拓扑理解；截至 2026-08-18 以官方项目页为证据。" }
       ]
     },
     {
@@ -998,6 +1087,7 @@ const wmMapData = {
       priority: "重点",
       branches: [
         "Policy formulation：inverse dynamics 先预测 future video/latent，再从视觉变化反推 action；joint prediction 同时输出 future video 和 action；representation-only 训练时用视频预测，推理时跳过 test-time future generation。",
+        "Latent prior/posterior：Being-H0.7 用能看见未来的 posterior 教只看历史的 policy prior；Being-H0.8 再加入触觉 posterior，把接触知识压进可实时执行的动作先验。",
         "Action integration：action tokens 把连续/离散动作当新模态；action-as-image 把 action/proprio/value 编成 synthetic latent frames；latent actions/plans 从视频里学 compact plan，再 decode 成 robot action。",
         "Architecture style：monolithic transformer 强耦合 video/action；Mixture-of-Transformers 用 shared attention 连接 video expert 和 action expert；hierarchical pipeline 先跑 video/world module 再跑 action module。",
         "Backbone bet：Wan、Cosmos、Veo-like video/world models 提供 language-conditioned physical change prior；机器人数据负责把 language-to-action grounding 对齐到 hardware、proprioception、action chunk 和 closed-loop recovery。"
@@ -1020,7 +1110,9 @@ const wmMapData = {
         { title: "Video Prediction Policy", year: "2025", type: "paper", url: "https://arxiv.org/abs/2412.14803", value: "用 predictive visual representation 条件化机器人动作，是 video backbone policy 的重要中间形态。" },
         { title: "Unified Video Action Model", year: "2025", type: "paper", url: "https://arxiv.org/abs/2503.00200", value: "把 video dynamics 和 action 放进统一建模框架，适合读 WAM 的 joint modeling 设计空间。" },
         { title: "Wan: Open and Advanced Large-Scale Video Generative Models", year: "2025", type: "paper", url: "https://arxiv.org/abs/2503.20314", value: "许多现代 WAM 复用的 video backbone；重要性在于开放强视频 prior，而不是机器人 policy 本身。" },
-        { title: "Do World Action Models Generalize Better than VLAs? A Robustness Study", year: "2026", type: "paper", url: "https://arxiv.org/abs/2603.22078", value: "WAM 与 VLA 的鲁棒性对比入口，提醒不要只看单篇 leaderboard 胜负。" }
+        { title: "Do World Action Models Generalize Better than VLAs? A Robustness Study", year: "2026", type: "paper", url: "https://arxiv.org/abs/2603.22078", value: "WAM 与 VLA 的鲁棒性对比入口，提醒不要只看单篇 leaderboard 胜负。" },
+        { title: "Being-H0.7: Latent World-Action Model for Generalizable Humanoid Manipulation", year: "2026", type: "paper", url: "https://arxiv.org/abs/2605.00078", value: "latent WAM 新路线：以未来视频 posterior 监督可部署 prior，推理时不做昂贵的像素级未来生成。" },
+        { title: "Being-H0.8", year: "2026", type: "project", url: "https://research.beingbeyond.com/being-h08", value: "在 H0.7 上加入 TactoHand 伪触觉与 TopoHand 数据，让未来视觉 + 触觉 posterior 塑造 slow-fast 动作专家。" }
       ]
     },
     {
@@ -1034,6 +1126,8 @@ const wmMapData = {
         "Latent action discovery：从无动作标签视频中学习可控 action space。",
         "Robot action simulation：把机器人动作和每帧变化对齐，服务 manipulation 数据生成。",
         "Physical AI world foundation models：面向机器人/自动驾驶的 text/image/video-to-world 平台。",
+        "Natural-language action world model：Qwen-RobotWorld 用自然语言动作统一操作、导航、驾驶与人到机器人的视频动力学接口。",
+        "Policy evaluation simulator：dWorldEval 用离散扩散、关键帧记忆和进度 token rollout 候选策略，重点不是画质而是能否可靠排名。",
         "Cosmos family：不是三个版本，不要把 Predict/Transfer/Reason 读成版本号。更准确是多代模型 + 三类能力线：Cosmos Predict 做未来世界生成/预测，Cosmos Transfer 做受 depth/seg/edge/HD map 等条件控制的仿真和数据扩增，Cosmos Reason 做 embodied/physical reasoning。",
         "Cosmos 3：更新方向更像 omni/omnimodal world foundation model，把 reasoning、multimodal world generation 和 action prediction / World Action Model backbone 放进同一 Physical AI 底座；本页不把它主要归为 VLA policy 主线，而是归在支持 policy/WAM 开发的 WM 底座。"
       ],
@@ -1058,7 +1152,9 @@ const wmMapData = {
         { title: "Cosmos Predict2.5", year: "2026", type: "project", url: "https://github.com/nvidia-cosmos/cosmos-predict2.5", value: "Predict 能力线的当前开源入口之一：未来世界生成/预测，可理解为 Text/Image/Video-to-World 和机器人候选 rollout 的基础能力。" },
         { title: "Cosmos Transfer2.5", year: "2026", type: "project", url: "https://github.com/nvidia-cosmos/cosmos-transfer2.5", value: "Transfer 能力线：受 depth、segmentation、edge、HD map 等条件控制的 world generation，用于仿真数据、长尾场景和 sim-to-real 数据扩增。" },
         { title: "Cosmos Reason2", year: "2026", type: "project", url: "https://github.com/nvidia-cosmos/cosmos-reason2", value: "Reason 能力线：面向 physical commonsense 和 embodied reasoning 的 VLM/backbone，补足世界生成模型的物理理解和评估能力。" },
-        { title: "Sora: Video Generation Models as World Simulators", year: "2024", type: "report", url: "https://openai.com/research/video-generation-models-as-world-simulators", value: "把大规模视频生成定位为 world simulator 候选，但公开接口不是机器人闭环 WM。" }
+        { title: "Sora: Video Generation Models as World Simulators", year: "2024", type: "report", url: "https://openai.com/research/video-generation-models-as-world-simulators", value: "把大规模视频生成定位为 world simulator 候选，但公开接口不是机器人闭环 WM。" },
+        { title: "Qwen-RobotWorld: A Unified World Model for Robot Intelligence", year: "2026", type: "paper", url: "https://arxiv.org/abs/2606.17030", value: "用自然语言动作接口和双流 MMDiT 统一 20+ embodiments 的操作、驾驶、导航与人类视频世界建模。" },
+        { title: "dWorldEval: An Action-Centric World Model for Embodied Policy Evaluation", year: "2026", type: "paper", url: "https://arxiv.org/abs/2604.22152", value: "Current Robotics 的 ICML 2026 Spotlight：用 action-centric 离散扩散 WM 评估并排序机器人策略。" }
       ]
     },
     {
@@ -1072,14 +1168,16 @@ const wmMapData = {
         "WAM policy backbone：从 video/world backbone 出发，jointly predict future/action 或用 predictive representation 直接出 action。",
         "WM evaluation：对候选动作 rollout，预测成功、碰撞、物体变化、任务进度或失败风险。",
         "Synthetic data engine：用 WM 生成长尾场景、未见物体组合和纠错数据。",
-        "Auxiliary prediction：给 VLA 加未来帧、latent、progress、affordance 等辅助目标。"
+        "Auxiliary prediction：给 VLA 加未来帧、latent、progress、affordance 等辅助目标。",
+        "Failure-driven post-training：Hi-WM 在 learned WM 中缓存失败状态、回滚并分支采集人类纠错，再用这些纠错轨迹后训练真实策略。"
       ],
       patterns: [
         "VLA 和 WM 的动作接口要一致：token、delta pose、joint action、trajectory chunk 或 latent action。",
         "不要把 DreamZero/Cosmos Policy 这类 WAM 硬读成纯 reranker；它们更像 video/world prior 直接进入 policy backbone。",
         "Cosmos 这类 WM 平台可以为 VLA 提供合成数据、候选 rollout、失败评估和 World Action Model backbone；本页不把它主要归为 VLA policy 主线。",
         "在线部署时 WM 可能只做短 horizon 重排，长 horizon 规划交给高层 planner。",
-        "不要只看生成质量，要看是否提升真实机器人 success rate、recovery 和安全性。"
+        "不要只看生成质量，要看是否提升真实机器人 success rate、recovery 和安全性。",
+        "dWorldEval 回答“候选策略谁更好”，Hi-WM 回答“失败之后怎样在人类帮助下修正策略”；二者构成评估→纠错→后训练闭环。"
       ],
       references: [
         { title: "RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control", year: "2023", type: "paper", url: "https://arxiv.org/abs/2307.15818", value: "现代 VLA 标志性工作，为 VLA+WM 提供 policy 侧对照。" },
@@ -1089,7 +1187,9 @@ const wmMapData = {
         { title: "RoboDreamer", year: "2024", type: "paper", url: "https://arxiv.org/abs/2404.12377", value: "用语言分解和视频 world model 增强机器人组合泛化。" },
         { title: "IRASim", year: "2024", type: "paper", url: "https://arxiv.org/abs/2406.14540", value: "机器人动作条件交互模拟器，可作为 VLA 训练/评估的 world model。" },
         { title: "GR00T N1: Open Foundation Model for Humanoid Robots", year: "2025", type: "paper", url: "https://arxiv.org/abs/2503.14734", value: "开放人形机器人 foundation model，展示 VLA、动作生成和仿真栈融合方向。" },
-        { title: "Gemini Robotics", year: "2025", type: "paper", url: "https://arxiv.org/abs/2503.20020", value: "把 Gemini 多模态模型扩展到 physical action，适合作为 VLA 系统参照。" }
+        { title: "Gemini Robotics", year: "2025", type: "paper", url: "https://arxiv.org/abs/2503.20020", value: "把 Gemini 多模态模型扩展到 physical action，适合作为 VLA 系统参照。" },
+        { title: "dWorldEval: An Action-Centric World Model for Embodied Policy Evaluation", year: "2026", type: "paper", url: "https://arxiv.org/abs/2604.22152", value: "Current Robotics 的 policy evaluator：用统一视觉/语言/动作 token、稀疏关键帧记忆和任务进度 token 对候选策略 rollout 与排名。" },
+        { title: "Hi-WM: Learning Policy Corrections in a Human-interactive World Model", year: "2026", type: "paper", url: "https://arxiv.org/abs/2604.21741", value: "Current Robotics 的闭环纠错框架：在 learned WM 中定位失败、回滚分支、采集人类纠正并后训练真实机器人策略。" }
       ]
     },
     {
