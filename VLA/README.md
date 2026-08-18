@@ -29,7 +29,7 @@ python3 -m http.server 8123
 - π0.7 目前主要是 Physical Intelligence 官方 blog。
 - Being-H0/H0.5/H0.7 有论文或代码入口；Being-H0.8 截至 2026-08-18 主要是官方项目页，应按 latent tactile WAM 的工程信号阅读。
 - Gemini Robotics 2 目前是 private preview / early access 官方发布，公开成功率不能直接等同于可复现 benchmark。
-- G1PO / Robo-Kart 是 humanoid system 边界案例：官方展示了 RL/IL、视觉感知和 go-kart 集成，但没有公开 VLA 架构；2025 showrace 仍有人工辅助，不能写成已验证的端到端 VLA 赛车手。
+- Symbiosis Robotics 的 G1 Kart / DPC 是最新 humanoid VLA 演示：公开转述称 DPC 直接把 vision/language/body state/feedback 映射到关节和手部目标；截至 2026-08-18 尚未找到官方原始技术页、论文或权重，自动驾驶程度与 15,010h 数据口径均应标作待核验。
 - Qwen-RobotManip 有技术报告和官方项目页，但官方仓库说明当前没有模型权重发布计划。
 - Current Robotics 的 dWorldEval 与 Hi-WM 属于 world-model evaluation / post-training，详细内容放在 `WM/`，VLA 页只保留 Curr-0 策略系统接口。
 - StarVLA 和 SpatialVLA 不是同一个项目；StarVLA 是 2026 年模块化 VLA 框架/强基线，SpatialVLA 是空间增强 VLA 路线。

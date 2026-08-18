@@ -244,7 +244,7 @@ const vlaMapData = {
         actionSpace: "上身、手、头、躯干、移动底盘或腿部相关命令；常通过 System 0 / whole-body controller 转成稳定关节控制。",
         data: "humanoid teleop、全身仿真/RL、human video/retarget、房间级部署日志、厨房/卧室/物流长程任务、跨 embodiment robot pool。",
         metrics: "任务成功率之外，还要看失稳、碰撞、步态/姿态约束、房间级导航、多人/多机器人交互和安全中止。",
-        examples: ["Figure Helix / Helix 02", "GR00T N1 / N1.7", "Curr-0", "Gemini Robotics 2", "XPENG Robotics Fe0", "G1PO Robo-Kart（边界案例）", "Agility whole-body stack"]
+        examples: ["Figure Helix / Helix 02", "GR00T N1 / N1.7", "Curr-0", "Gemini Robotics 2", "XPENG Robotics Fe0", "Symbiosis Robotics G1 Kart / DPC（演示）", "Agility whole-body stack"]
       }
     ],
     boundaries: [
@@ -813,36 +813,33 @@ const vlaMapData = {
       ]
     },
     {
-      title: "G1PO / Robo-Kart",
-      year: "2025-2026",
-      family: "Humanoid system boundary case",
-      domain: "Whole-body control + human-interface driving",
-      evidence: "官方项目页/活动展示",
+      title: "Symbiosis Robotics G1 Kart / DPC",
+      year: "2026",
+      family: "Humanoid VLA candidate / company demo",
+      domain: "Whole-body continuous control + human-interface driving",
+      evidence: "二手公开转述；官方原始技术资料待公开",
       sources: [
-        { title: "The Robo-Kart", url: "https://innovation-hacking.com/post/" },
-        { title: "Humanoid robot takes the wheel", url: "https://www.tngtech.com/en/about-us/news/humanoid-robot-takes-the-wheel/" },
-        { title: "Humanoid robot drives go-kart", url: "https://www.tngtech.com/en/about-us/events/2026-05-04-vortrag-im-deutschen-museum-humanoider-roboter-faehrt-go-kart/" },
-        { title: "G1PO exhibit description", url: "https://www.bigtechday.com/exponate" }
+        { title: "G1 go-kart demo report (secondary source)", url: "https://www.reddit.com/r/AIdaily_news/comments/1vrobip/a_unitree_g1_humanoid_robot_successfully_entered/" }
       ],
-      paradigm: "TNG 在 Unitree G1 上组合自研 RL 步态、Apple Vision Pro 遥操、imitation learning 与 camera/depth/LiDAR perception，再让人形机器人坐进为人设计的 go-kart。它展示的是 humanoid stack 如何复用人类接口，不是已公开的端到端语言条件 VLA。",
-      action: "底层是人形关节/全身控制，上层还要把环境感知映射到 go-kart 驾驶接口；官方没有公开 action schema、控制频率、语言输入或 VLM/action head，因此不能直接写成 vision-language-action policy。",
-      readAs: "把它作为 VLA 页面里的边界案例：价值在于检验 embodiment、全身稳定、视觉导航和人类工具接口怎样组合；证据等级低于论文/模型卡，不能用表演视频证明通用 autonomy。",
+      paradigm: "公开转述称，Symbiosis Robotics 的 Direct Perception Control（DPC）把视觉、语言、身体状态与执行反馈直接映射到关节和手部目标，减少独立高层目标与 whole-body tracker 等中间层。若官方材料确认，这是一条把语言条件感知直接接到全身闭环动作的 humanoid VLA 路线。",
+      action: "目标动作不是机械臂 end-effector pose，而是连续关节/手部目标：Unitree G1 坐进人类卡丁车座舱，同时操作方向盘和踏板完成赛道驾驶。控制频率、低层稳定器、车体反馈接口和干预方式尚未公开。",
+      readAs: "把它作为值得跟踪的 humanoid VLA demo，而不是已验证的论文结果：亮点是让同一全身策略在强物理约束下协调手、腿、躯干与人类机器接口；目前证据不足以判断它是否全程自主、是否真正使用语言输入，以及是否能泛化到新赛道或新车辆。",
       dataMix: [
-        { label: "RL locomotion", role: "TNG 官方更新称用自训练 neural network 教 G1PO 行走，而不是直接依赖 Unitree 预装步态程序。" },
-        { label: "Vision Pro teleoperation", role: "沉浸式遥操用于探索机器人运动能力，也可能形成 imitation data；官方未公开数据规模与清洗流程。" },
-        { label: "Imitation learning", role: "2026 展示说明称复杂行为使用 imitation learning，但未公开任务配比、网络结构或训练轮次。" },
-        { label: "Camera + depth + LiDAR", role: "为自主行走和环境定位提供多传感器 perception；go-kart 驾驶如何融合这些传感器没有完整技术报告。" }
+        { label: "Human egocentric", role: "二手转述称有 6,781h 第一视角人类记录，用于把人的观察与动作先验对齐到机器人关节轨迹；数字未获官方原始材料核验。" },
+        { label: "Armed robots", role: "转述称有 4,024h 带机械臂平台数据，为跨 embodiment 的手臂与工具交互提供监督。" },
+        { label: "Wheeled humanoids", role: "转述称有 3,660h 轮式人形数据，可能连接移动、上身操作与驾驶界面控制。" },
+        { label: "Bipedal humanoids", role: "转述称有 545h 双足平台数据，补充全身状态、平衡与接触约束；数据口径和质量控制尚未公开。" }
       ],
       training: [
-        { stage: "1", title: "Custom locomotion RL", detail: "先建立可部署的 G1 whole-body walking policy，证明团队能绕开厂商预置 locomotion stack。" },
-        { stage: "2", title: "Teleoperation and imitation", detail: "用 Vision Pro 控制与 imitation learning 扩展更复杂的人形行为；公开材料没有给出从遥操到驾驶策略的完整训练链。" },
-        { stage: "3", title: "Perception integration", detail: "相机、深度感知和 LiDAR 支撑机器人识别位置与下一步方向，再与 go-kart 的人类控制界面耦合。" },
-        { stage: "4", title: "Public driving demos", detail: "2025 showrace 与 2026 museum/exhibit 展示验证系统集成，但不同演示的人工辅助和 autonomous 程度应分别阅读。" }
+        { stage: "1", title: "Cross-embodiment joint alignment", detail: "公开转述称将遥操、头戴式与第一视角来源转换为跨 embodiment 的时间对齐关节轨迹，总量口径为 15,010h。" },
+        { stage: "2", title: "Direct perception-control policy", detail: "DPC 的公开口径是把视觉、语言、身体状态和执行反馈直接接到关节与手部目标；模型架构、objective 和 action horizon 未公开。" },
+        { stage: "3", title: "Whole-body closed loop", detail: "策略需要在驾驶过程中连续协调方向盘、踏板、身体姿态与执行反馈，而不是只输出离散高层驾驶命令。" },
+        { stage: "4", title: "Go-kart system demo", detail: "G1 进入座舱、完成赛道并展示漂移动作，证明了系统集成效果；正式 benchmark、对照实验和复现实验尚缺。" }
       ],
       unknowns: [
-        "没有论文、代码、权重、训练数据量、benchmark 或可复现 action interface。",
-        "TNG 的 2025 官方 showrace 文案明确说仍有人类帮助 steering；后续页面称 autonomous，应视为不同阶段/演示口径，不能合并成全程自主赛车结论。",
-        "没有证据表明使用大 VLM、语言指令或主流 VLA action expert；本页仅把它标作 humanoid system boundary case。"
+        "当前可索引来源主要是第三方转述；尚未找到 Symbiosis Robotics 的官方项目页、论文、模型卡、代码或权重。",
+        "是否全程自主、是否 onboard、是否有人类接管、语言输入是否在该次驾驶中启用，均没有独立证据。",
+        "15,010h 数据规模及其 6,781/4,024/3,660/545h 构成、DPC 架构和去除中间控制层的说法仍待官方原始材料核验。"
       ]
     },
     {
@@ -1508,14 +1505,14 @@ const vlaMapData = {
       id: "humanoid-wholebody",
       title: "全身/人形 VLA 系统",
       question: "机械臂 VLA 放到人形机器人上，为什么会变成一个新问题？因为全身平衡、双手、躯干、导航、实时安全和多机器人协作必须一起解决。",
-      takeaway: "Figure Helix、GR00T、Curr-0、Gemini Robotics 2、Agility/Digit 是学习人形 VLA 的系统样本；G1PO Robo-Kart 则是复用人类接口的边界案例。重点看公开证据：谁有论文/权重，谁只有 blog/demo，谁其实是 perception + whole-body control 而非 VLA。",
+      takeaway: "Figure Helix、GR00T、Curr-0、Gemini Robotics 2、Agility/Digit 是学习人形 VLA 的系统样本；Symbiosis Robotics 的 G1 Kart / DPC 是复用人类接口的最新演示。重点看公开证据：谁有论文/权重，谁只有 blog/demo，谁其实是 perception + whole-body control 而非已验证 VLA。",
       priority: "重点",
       branches: [
         "全上身 VLA：Figure Helix 直接控制手腕、躯干、头部和手指，并展示多机器人协作。",
         "开放人形 foundation model：GR00T N1/N1.5/N1.6/N1.7 逐步加入 FLARE、world model、sim-to-real 和开放权重。",
         "Loco-dexterous foundation system：Curr-0 强调人类全身数据、三系统控制和 world-model evaluator，把移动、平衡、灵巧手和工具使用耦合训练。",
         "Agentic whole-body stack：Gemini Robotics 2 负责 feet-to-fingertips VLA 动作，ER 2 做分钟级规划、进度跟踪和多机器人协作。",
-        "Human-interface transfer：G1PO 把 RL/IL 人形控制、camera/depth/LiDAR perception 接到 go-kart；它说明人形能操作人类机器，但未证明是 language-conditioned VLA。",
+        "Direct perception-control / human-interface transfer：Symbiosis Robotics 称 DPC 把 vision、language、body state 与反馈直接映射到 G1 的关节/手部目标，并用卡丁车展示连续全身控制；原始技术材料仍待公开。",
         "底层 whole-body motor cortex：Agility/Digit 更接近 RL 训练的低层全身控制，可接 VLA/LLM 上层。",
         "产业 demo 与证据等级：Tesla/Optimus 值得观察，但公开 VLA 技术材料少，需要谨慎标注。"
       ],
@@ -1617,11 +1614,11 @@ const vlaMapData = {
           value: "提醒人形 VLA 必须和底层 whole-body RL 控制栈结合。"
         },
         {
-          title: "G1PO / Robo-Kart",
-          year: "2025-2026",
-          type: "official",
-          url: "https://innovation-hacking.com/post/",
-          value: "TNG 的 Unitree G1 系统案例：自研 RL 步态、imitation learning 与 camera/depth/LiDAR perception 接入 go-kart；没有公开 VLA 架构，适合作为人类接口复用和证据边界案例。"
+          title: "Symbiosis Robotics G1 Kart / DPC",
+          year: "2026",
+          type: "report",
+          url: "https://www.reddit.com/r/AIdaily_news/comments/1vrobip/a_unitree_g1_humanoid_robot_successfully_entered/",
+          value: "Unitree G1 操作方向盘与踏板完成卡丁车赛道的最新演示；转述称 DPC 直接连接 vision/language/body state/feedback 与关节/手部目标，但官方原始技术材料仍待公开。"
         },
         {
           title: "Tesla AI & Robotics",

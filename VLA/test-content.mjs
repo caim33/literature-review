@@ -67,8 +67,8 @@ const requiredNames = [
   "Gemini Robotics 2",
   "Pelican-VLA 0.5",
   "ACT-2",
-  "G1PO",
-  "Robo-Kart",
+  "Symbiosis Robotics",
+  "Direct Perception Control",
   "Galaxea G0.5",
   "XPENG Robotics Fe0",
   "DreamZero",
@@ -86,10 +86,11 @@ for (const name of requiredNames) {
 }
 
 const humanoidRoute = data.routes.find((route) => route.id === "humanoid-wholebody");
-assert.ok(humanoidRoute.references.some((reference) => reference.title.includes("G1PO")), "G1PO Robo-Kart should live in the humanoid VLA system route");
-const g1poRecipe = data.trainingRecipes.find((recipe) => recipe.title.includes("G1PO"));
-assert.ok(g1poRecipe, "training recipes should include the G1PO boundary case");
-assert.ok(g1poRecipe.readAs.includes("边界案例") && g1poRecipe.unknowns.some((item) => item.includes("没有证据")), "G1PO should not be overstated as a confirmed VLA");
+assert.ok(humanoidRoute.references.some((reference) => reference.title.includes("Symbiosis Robotics")), "Symbiosis Robotics G1 Kart should live in the humanoid VLA system route");
+const symbiosisRecipe = data.trainingRecipes.find((recipe) => recipe.title.includes("Symbiosis Robotics"));
+assert.ok(symbiosisRecipe, "training recipes should include the Symbiosis Robotics G1 Kart demo");
+assert.ok(symbiosisRecipe.evidence.includes("二手") && symbiosisRecipe.unknowns.some((item) => item.includes("官方")), "Symbiosis Robotics DPC claims should retain an explicit evidence caveat");
+assert.ok(!searchable.includes("g1po") && !searchable.includes("robo-kart"), "the misidentified G1PO / Robo-Kart case should be removed");
 assert.ok(
   !data.paperFigureGuides.some((figure) => figure.title.includes("Curr-0") && figure.title.includes("World Model")),
   "Current Robotics world-model research should live on the WM page, not as a VLA paper-figure card"
